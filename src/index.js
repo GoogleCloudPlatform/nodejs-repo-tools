@@ -76,7 +76,7 @@ exports.getRequest = function (config) {
   if (process.env.E2E_TESTS) {
     return supertest(getUrl(config));
   }
-  return supertest(proxyquire(path.join(__dirname, '../' + config.test, 'app'), {}));
+  return supertest(proxyquire(path.join(config.cwd, 'app'), {}));
 };
 
 exports.testInstallation = function testInstallation (config, done) {
@@ -84,7 +84,7 @@ exports.testInstallation = function testInstallation (config, done) {
   var calledDone = false;
 
   var proc = spawn('npm', ['install'], {
-    cwd: config.path
+    cwd: config.cwd
   });
 
   proc.on('error', finish);
@@ -114,7 +114,7 @@ exports.testLocalApp = function testLocalApp (config, done) {
   var calledDone = false;
 
   var opts = {
-    cwd: config.path
+    cwd: config.cwd
   };
   if (config.env) {
     opts.env = {};
@@ -179,8 +179,6 @@ exports.testDeploy = function (config, done) {
   // Manually set # of instances to 1
   // changeScaling(config.test);
 
-  var _cwd = getPath(config.test);
-
   var args = [
     'preview',
     'app',
@@ -206,7 +204,7 @@ exports.testDeploy = function (config, done) {
 
   // Don't use "npm run deploy" because we need extra flags
   var proc = spawn('gcloud', args, {
-    cwd: _cwd
+    cwd: config.cwd
   });
 
   console.log(config.test + ': Deploying app...');
