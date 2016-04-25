@@ -113,9 +113,23 @@ exports.testInstallation = function testInstallation (config, done) {
 exports.testLocalApp = function testLocalApp (config, done) {
   var calledDone = false;
 
-  var proc = spawn(config.cmd, config.args, {
+  var opts = {
     cwd: config.path
-  });
+  };
+  if (config.env) {
+    opts.env = {};
+    for (var key in process.env) {
+      if (process.env.hasOwnProperty(key)) {
+        opts.env[key] = process.env[key];
+      }
+    }
+    for (key in config.env) {
+      if (config.env.hasOwnProperty(key)) {
+        opts.env[key] = config.env[key];
+      }
+    }
+  }
+  var proc = spawn(config.cmd, config.args, opts);
 
   proc.on('error', finish);
 
@@ -125,21 +139,24 @@ exports.testLocalApp = function testLocalApp (config, done) {
     });
   }
 
+  var requestErr;
+
   proc.on('exit', function (code, signal) {
     if (code !== 0 && signal !== 'SIGKILL') {
       return finish(new Error(config.test + ': failed to run!'));
     } else {
-      return finish();
+      return finish(requestErr);
     }
   });
 
   // Give the server time to start up
   setTimeout(function () {
     // Test that the app is working
-    testRequest('http://localhost:8080', config, function (err) {
+    testRequest(config.url || 'http://localhost:8080', config, function (err) {
+      requestErr = err;
       proc.kill('SIGKILL');
       setTimeout(function () {
-        return finish(err);
+        return finish(requestErr);
       }, 1000);
     });
   }, 3000);
@@ -168,7 +185,7 @@ exports.testDeploy = function (config, done) {
     'preview',
     'app',
     'deploy',
-    'app.yaml',
+    config.yaml || 'app.yaml',
     // Skip prompt
     '-q',
     '--project',
@@ -260,6 +277,10 @@ exports.testDeploy = function (config, done) {
           // Test versioned url of "default" module
           var demoUrl = 'http://' + config.test + '-dot-' + projectId +
             '.appspot.com';
+
+          if (config.demoUrl) {
+            demoUrl = config.demoUrl;
+          }
 
           // Test that app is running successfully
           console.log(config.test + ': Testing ' + demoUrl);
