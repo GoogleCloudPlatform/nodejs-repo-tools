@@ -209,7 +209,7 @@ exports.testDeploy = function (config, done) {
 
   console.log(config.test + ': Deploying app...');
   console.log(config.test + ': ' + config.cwd);
-  console.log(config.test + ': ', args);
+  console.log(config.test + ': ', args.join(' '));
   // Exit helper so we don't call "done" more than once
   function finish (err) {
     if (!calledDone) {
