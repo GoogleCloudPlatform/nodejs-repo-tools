@@ -83,7 +83,7 @@ exports.testInstallation = function testInstallation (config, done) {
   // Keep track off whether "done" has been called yet
   var calledDone = false;
 
-  var proc = spawn('npm', ['install'], {
+  var proc = spawn('npm', ['install', '--update-binary'], {
     cwd: config.cwd
   });
 
