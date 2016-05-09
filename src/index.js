@@ -23,10 +23,6 @@ var proxyquire = require('proxyquire').noPreserveCache();
 var cwd = process.cwd();
 var projectId = process.env.GCLOUD_PROJECT;
 
-function getPath (dir) {
-  return path.join(cwd, dir);
-}
-
 // Retry the request using exponential backoff up to a maximum number of tries.
 function makeRequest (url, numTry, maxTries, cb) {
   request(url, function (err, res, body) {
