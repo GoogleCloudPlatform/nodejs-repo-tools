@@ -16,7 +16,9 @@
 var fs = require('fs');
 var path = require('path');
 var request = require('request');
-var spawn = require('child_process').spawn;
+var childProcess = require('child_process');
+var spawn = childProcess.spawn;
+var exec = childProcess.exec;
 var supertest = require('supertest');
 var proxyquire = require('proxyquire').noPreserveCache();
 
@@ -67,6 +69,13 @@ function testRequest (url, config, cb) {
 function getUrl (config) {
   return 'http://' + config.test + '-dot-' + projectId + '.appspot.com';
 }
+
+// Delete an App Engine version
+exports.deleteVersion = function (version, cwd, done) {
+  exec(`gcloud app versions delete ${version} --project ${projectId} -q`, {
+    cwd: cwd
+  }, done);
+};
 
 exports.getRequest = function (config) {
   if (process.env.E2E_TESTS) {
@@ -176,7 +185,6 @@ exports.testDeploy = function (config, done) {
   // changeScaling(config.test);
 
   var args = [
-    'preview',
     'app',
     'deploy',
     config.yaml || 'app.yaml',

@@ -1,6 +1,6 @@
 # nodejs-repo-tools [![build status][travis_badge]][travis_link]
 
-Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm
+Tools used to maintain and test Node.js repositories in the GoogleCloudPlatform
 organization.
 
 ## Usage
