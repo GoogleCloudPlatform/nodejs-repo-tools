@@ -67,7 +67,7 @@ function testRequest (url, config, cb) {
 }
 
 function getUrl (config) {
-  return 'http://' + config.test + '-dot-' + projectId + '.appspot.com';
+  return 'http://' + config.test + '-dot-' + projectId + '.appspot-preview.com';
 }
 
 // Delete an App Engine version
@@ -279,8 +279,7 @@ exports.testDeploy = function (config, done) {
         // Give apps time to start
         setTimeout(function () {
           // Test versioned url of "default" module
-          var demoUrl = 'http://' + config.test + '-dot-' + projectId +
-            '.appspot.com';
+          var demoUrl = getUrl(config);
 
           if (config.demoUrl) {
             demoUrl = config.demoUrl;
