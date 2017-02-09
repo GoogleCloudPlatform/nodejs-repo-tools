@@ -19,6 +19,7 @@ const fs = require('fs');
 const path = require('path');
 const request = require('request');
 const childProcess = require('child_process');
+const net = require('net');
 const spawn = childProcess.spawn;
 const exec = childProcess.exec;
 const supertest = require('supertest');
@@ -93,6 +94,26 @@ function log (config, msg) {
   console.log(`${config.test}: ${msg}`);
 }
 
+let portrange = 45032;
+
+function getPort () {
+  return new Promise((resolve, reject) => {
+    const port = portrange;
+    portrange += 1;
+
+    const server = net.createServer();
+    server.listen(port, () => {
+      server.once('close', () => {
+        resolve(port);
+      });
+      server.close();
+    });
+    server.on('error', () => {
+      resolve(getPort());
+    });
+  });
+}
+
 // Delete an App Engine version
 exports.deleteVersion = (config, done) => {
   return new Promise((resolve) => {
@@ -153,59 +174,63 @@ exports.testInstallation = (config, done) => {
 
 exports.testLocalApp = (config, done) => {
   return new Promise((resolve, reject) => {
-    log(config, 'TESTING LOCAL APP...');
-    let calledDone = false;
+    getPort().then((port) => {
+      log(config, 'TESTING LOCAL APP...');
+      let calledDone = false;
 
-    const opts = {
-      cwd: config.cwd
-    };
+      const opts = {
+        cwd: config.cwd
+      };
 
-    if (config.env) {
       opts.env = Object.assign({}, process.env);
-      Object.assign(opts.env, config.env);
-    }
-    const proc = spawn(config.cmd, config.args, opts);
-
-    proc.on('error', finish);
-
-    proc.stdout.on('data', (data) => {
-      process.stdout.write(`${config.test}: ${data.toString()}`);
-    });
-    proc.stderr.on('data', (data) => {
-      process.stderr.write(`${config.test}: ${data.toString()}`);
-    });
-
-    let requestErr;
-
-    proc.on('exit', (code, signal) => {
-      if (code !== 0 && signal !== 'SIGKILL') {
-        finish(new Error(`${config.test}: failed to run!`));
-        return;
-      } else {
-        finish(requestErr);
-        return;
+      if (config.env) {
+        Object.assign(opts.env, config.env);
       }
-    });
+      opts.env.PORT = config.port || port;
 
-    // Give the server time to start up
-    setTimeout(() => {
-      // Test that the app is working
-      testRequest(config.url || 'http://localhost:8080', config, (err) => {
-        requestErr = err;
-        proc.kill('SIGKILL');
-        setTimeout(() => {
-          finish(requestErr);
-        }, 1000);
+      const proc = spawn(config.cmd || 'yarn', config.args || ['start'], opts);
+
+      proc.on('error', finish);
+
+      proc.stdout.on('data', (data) => {
+        process.stdout.write(`${config.test}: ${data.toString()}`);
       });
-    }, 3000);
+      proc.stderr.on('data', (data) => {
+        process.stderr.write(`${config.test}: ${data.toString()}`);
+      });
 
-    // Exit helper so we don't call "cb" more than once
-    function finish (err) {
-      if (!calledDone) {
-        calledDone = true;
-        finalize(err, resolve, reject, done);
+      let requestErr;
+
+      proc.on('exit', (code, signal) => {
+        if (code !== 0 && signal !== 'SIGKILL') {
+          finish(new Error(`${config.test}: failed to run!`));
+          return;
+        } else {
+          finish(requestErr);
+          return;
+        }
+      });
+
+      // Give the server time to start up
+      setTimeout(() => {
+        // Test that the app is working
+        testRequest(config.url || `http://localhost:${config.port || port}`, config, (err) => {
+          requestErr = err;
+          proc.kill('SIGKILL');
+          setTimeout(() => {
+            finish(requestErr);
+          }, 1000);
+        });
+      }, 3000);
+
+      // Exit helper so we don't call "cb" more than once
+      function finish (err) {
+        if (!calledDone) {
+          calledDone = true;
+          finalize(err, resolve, reject, done);
+        }
       }
-    }
+    });
   });
 };
 
