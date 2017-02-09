@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "lint": "semistandard \"**/*.js\"",
-    "test": "npm run lint"
+    "check": "yarn check --strict-semver --integrity",
+    "test": "yarn run lint && yarn run check"
   },
   "main": "src/index.js",
   "author": "Google Inc.",
@@ -14,9 +15,13 @@
     {
       "name": "Jason Dobry",
       "email": "jdobry@google.com"
+    },
+    {
+      "name": "Ace Nassri",
+      "email": "anassri@google.com"
     }
   ],
-  "license": "Apache Version 2.0",
+  "license": "Apache-2.0",
   "semistandard": {
     "globals": [
       "after",
@@ -28,15 +33,15 @@
     ]
   },
   "engines": {
-    "node": ">=0.12.7"
+    "node": ">=4.3.2"
   },
   "dependencies": {
-    "async": "^1.5.2",
-    "proxyquire": "^1.7.4",
-    "request": "^2.72.0",
-    "supertest": "^1.2.0"
+    "async": "2.1.4",
+    "proxyquire": "1.7.11",
+    "request": "2.79.0",
+    "supertest": "3.0.0"
   },
   "devDependencies": {
-    "semistandard": "^7.0.5"
+    "semistandard": "9.2.1"
   }
 }
