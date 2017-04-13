@@ -186,7 +186,7 @@ exports.testLocalApp = (config, done) => {
       if (config.env) {
         Object.assign(opts.env, config.env);
       }
-      opts.env.PORT = config.port || port;
+      opts.env.PORT = opts.env.PORT || config.port || port;
 
       const proc = spawn(config.cmd || 'yarn', config.args || ['start'], opts);
 
