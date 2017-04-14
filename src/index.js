@@ -15,17 +15,18 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const request = require('request');
-const childProcess = require('child_process');
-const net = require('net');
-const spawn = childProcess.spawn;
-const exec = childProcess.exec;
-const supertest = require('supertest');
-const proxyquire = require('proxyquire').noPreserveCache();
+require('colors');
 
-const projectId = process.env.GCLOUD_PROJECT;
+const childProcess = require('child_process');
+const fs = require('fs');
+const got = require('got');
+const net = require('net');
+const path = require('path');
+const proxyquire = require('proxyquire').noPreserveCache();
+const supertest = require('supertest');
+
+const MAX_TRIES = 8;
+const PROJECT_ID = process.env.GCLOUD_PROJECT;
 
 function finalize (err, resolve, reject, done) {
   if (err) {
@@ -41,57 +42,54 @@ function finalize (err, resolve, reject, done) {
   }
 }
 
+function log (config, msg) {
+  console.log(`${config.test.bold}: ${msg}`);
+}
+
 // Retry the request using exponential backoff up to a maximum number of tries.
-function makeRequest (url, numTry, maxTries, cb) {
-  request(url, (err, res, body) => {
-    if (err) {
-      if (numTry >= maxTries) {
-        cb(err);
-        return;
+function makeRequest (url, numTry) {
+  if (!numTry) {
+    numTry = 1;
+  }
+
+  return got(url)
+    .catch((err) => {
+      if (numTry >= MAX_TRIES) {
+        return Promise.reject(err);
       }
-      setTimeout(() => {
-        makeRequest(url, numTry + 1, maxTries, cb);
-      }, 500 * Math.pow(numTry, 2));
-    } else {
-      cb(null, res, body);
-    }
-  });
+
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          makeRequest(url, numTry + 1).then(resolve, reject);
+        }, 500 * Math.pow(numTry, 2));
+      });
+    });
 }
 
 // Send a request to the given url and test that the response body has the
 // expected value
-function testRequest (url, config, cb) {
+function testRequest (url, config) {
   log(config, `VERIFYING: ${url}`);
-  // Try up to 8 times
-  makeRequest(url, 1, 8, (err, res, body) => {
-    if (err) {
-      // Request error
-      cb(err);
-      return;
-    }
-    if (body && body.indexOf(config.msg) !== -1 &&
-          (res.statusCode === 200 || res.statusCode === config.code) &&
-          (!config.testStr || config.testStr.test(body))) {
-      // Success
-      cb();
-      return;
-    }
-    // Short-circuit app test
-    const message = `${config.dir}: failed verification!
-                  Expected: ${config.msg}
-                  Actual: ${body}`;
 
-    // Response body did not match expected
-    cb(new Error(message));
-  });
+  return makeRequest(url)
+    .then((response) => {
+      const EXPECTED_STATUS_CODE = config.code || 200;
+
+      const body = response.body || '';
+      const code = response.statusCode;
+
+      if (code !== EXPECTED_STATUS_CODE) {
+        throw new Error(`${config.test}: failed verification!\nExpected status code: ${EXPECTED_STATUS_CODE}\nActual: ${code}`);
+      } else if (!body.includes(config.msg)) {
+        throw new Error(`${config.test}: failed verification!\nExpected body: ${config.msg}\nActual: ${body}`);
+      } else if (config.testStr && !config.testStr.test(body)) {
+        throw new Error(`${config.test}: failed verification!\nExpected body: ${config.testStr}\nActual: ${body}`);
+      }
+    });
 }
 
 function getUrl (config) {
-  return `https://${config.test}-dot-${projectId}.appspot-preview.com`;
-}
-
-function log (config, msg) {
-  console.log(`${config.test}: ${msg}`);
+  return `https://${config.test}-dot-${PROJECT_ID}.appspot-preview.com`;
 }
 
 let portrange = 45032;
@@ -116,15 +114,62 @@ function getPort () {
 
 // Delete an App Engine version
 exports.deleteVersion = (config, done) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     log(config, 'DELETING DEPLOYMENT...');
-    exec(`gcloud app versions delete ${config.test} --project ${projectId} -q`, {
-      cwd: config.cwd
-    }, (err, result) => {
-      console.log(err);
-      // Ignore error
-      finalize(null, resolve, null, done);
+    // Keep track off whether "done" has been called yet
+    let calledDone = false;
+
+    const args = [
+      `app`,
+      `versions`,
+      `delete`,
+      config.test,
+      `--project=${PROJECT_ID}`,
+      `-q`
+    ];
+
+    const child = childProcess.spawn(`gcloud`, args, {
+      cwd: config.cwd,
+      // Shouldn't take more than 4 minutes to delete a deployed version
+      timeout: 4 * 60 * 1000
     });
+
+    log(config, `gcloud ${args.join(' ')}`);
+
+    child.on('error', finish);
+
+    child.stdout.on('data', (data) => {
+      const str = data.toString();
+      if (str.includes('\n')) {
+        process.stdout.write(`${config.test.bold}: ${str}`);
+      } else {
+        process.stdout.write(str);
+      }
+    });
+    child.stderr.on('data', (data) => {
+      const str = data.toString();
+      if (str.includes('\n')) {
+        process.stderr.write(`${config.test.bold}: ${str}`);
+      } else {
+        process.stderr.write(str);
+      }
+    });
+
+    child.on('exit', (code) => {
+      if (code !== 0) {
+        finish(new Error(`${config.test}: failed to delete deployment!`));
+      } else {
+        finish();
+      }
+    });
+
+    // Exit helper so we don't call "cb" more than once
+    function finish (err) {
+      if (!calledDone) {
+        calledDone = true;
+        finalize(err, resolve, reject, done);
+      }
+    }
   });
 };
 
@@ -137,21 +182,21 @@ exports.getRequest = (config) => {
 
 exports.testInstallation = (config, done) => {
   return new Promise((resolve, reject) => {
-    console.log(`${config.test}: TESTING INSTALLATION...`);
+    log(config, 'TESTING INSTALLATION...');
     // Keep track off whether "done" has been called yet
     let calledDone = false;
 
-    const proc = spawn('yarn', ['install'], {
+    const proc = childProcess.spawn('yarn', ['install'], {
       cwd: config.cwd
     });
 
     proc.on('error', finish);
 
     proc.stdout.on('data', (data) => {
-      process.stdout.write(`${config.test}: ${data.toString()}`);
+      process.stdout.write(`${config.test.bold}: ${data.toString()}`);
     });
     proc.stderr.on('data', (data) => {
-      process.stderr.write(`${config.test}: ${data.toString()}`);
+      process.stderr.write(`${config.test.bold}: ${data.toString()}`);
     });
 
     proc.on('exit', (code) => {
@@ -188,15 +233,15 @@ exports.testLocalApp = (config, done) => {
       }
       opts.env.PORT = opts.env.PORT || config.port || port;
 
-      const proc = spawn(config.cmd || 'yarn', config.args || ['start'], opts);
+      const proc = childProcess.spawn(config.cmd || 'yarn', config.args || ['start'], opts);
 
       proc.on('error', finish);
 
       proc.stdout.on('data', (data) => {
-        process.stdout.write(`${config.test}: ${data.toString()}`);
+        process.stdout.write(`${config.test.bold}: ${data.toString()}`);
       });
       proc.stderr.on('data', (data) => {
-        process.stderr.write(`${config.test}: ${data.toString()}`);
+        process.stderr.write(`${config.test.bold}: ${data.toString()}`);
       });
 
       let requestErr;
@@ -204,35 +249,49 @@ exports.testLocalApp = (config, done) => {
       proc.on('exit', (code, signal) => {
         if (code !== 0 && signal !== 'SIGKILL') {
           finish(new Error(`${config.test}: failed to run!`));
-          return;
         } else {
           finish(requestErr);
-          return;
         }
       });
 
       // Give the server time to start up
       setTimeout(() => {
         // Test that the app is working
-        testRequest(config.url || `http://localhost:${config.port || port}`, config, (err) => {
-          requestErr = err;
-          proc.kill('SIGKILL');
-          setTimeout(() => {
+        testRequest(config.url || `http://localhost:${config.port || port}`, config)
+          .then(() => finish(), (err) => {
+            requestErr = err;
             finish(requestErr);
-          }, 1000);
-        });
+          });
       }, 3000);
 
       // Exit helper so we don't call "cb" more than once
       function finish (err) {
         if (!calledDone) {
           calledDone = true;
-          finalize(err, resolve, reject, done);
+          try {
+            proc.kill('SIGKILL');
+          } catch (err) {
+            // Ignore error
+          }
+          setTimeout(() => finalize(err, resolve, reject, done), 1000);
         }
       }
     });
   });
 };
+
+function changeScaling (config, yamlName) {
+  const oldYamlPath = path.join(config.cwd, yamlName);
+  const newYamlPath = path.join(config.cwd, `${Date.now()}.yaml`);
+
+  let yaml = fs.readFileSync(oldYamlPath, 'utf8');
+
+  yaml += `manual_scaling:\n  instances: 1\n`;
+
+  fs.writeFileSync(newYamlPath, yaml, 'utf8');
+
+  return newYamlPath;
+}
 
 exports.testDeploy = (config, done) => {
   return new Promise((resolve, reject) => {
@@ -243,15 +302,15 @@ exports.testDeploy = (config, done) => {
     let logFinished = false;
 
     // Manually set # of instances to 1
-    // changeScaling(config.test);
+    const tmpAppYaml = changeScaling(config, config.yaml || 'app.yaml');
 
     const args = [
       'app',
       'deploy',
-      config.yaml || 'app.yaml',
+      path.parse(tmpAppYaml).base,
       // Skip prompt
       '-q',
-      `--project=${projectId}`,
+      `--project=${PROJECT_ID}`,
       // Deploy over existing version so we don't have to clean up
       `--version=${config.test}`,
       '--no-promote'
@@ -261,7 +320,7 @@ exports.testDeploy = (config, done) => {
     const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 
     // Don't use "npm run deploy" because we need extra flags
-    const proc = spawn('gcloud', args, {
+    const proc = childProcess.spawn('gcloud', args, {
       cwd: config.cwd,
       shell: true
     });
@@ -270,6 +329,12 @@ exports.testDeploy = (config, done) => {
 
     // Exit helper so we don't call "done" more than once
     function finish (err) {
+      try {
+        fs.unlinkSync(tmpAppYaml);
+      } catch (err) {
+        // Ignore error
+      }
+
       if (!calledDone) {
         calledDone = true;
         if (err) {
@@ -309,6 +374,23 @@ exports.testDeploy = (config, done) => {
       proc.stdout.pipe(logStream, { end: false });
       proc.stderr.pipe(logStream, { end: false });
 
+      proc.stdout.on('data', (data) => {
+        const str = data.toString();
+        if (str.includes('\n')) {
+          process.stdout.write(`${config.test.bold}: ${str}`);
+        } else {
+          process.stdout.write(str);
+        }
+      });
+      proc.stderr.on('data', (data) => {
+        const str = data.toString();
+        if (str.includes('\n')) {
+          process.stderr.write(`${config.test.bold}: ${str}`);
+        } else {
+          process.stderr.write(str);
+        }
+      });
+
       proc.stdout.on('end', finishLogs);
       proc.stderr.on('end', finishLogs);
 
@@ -328,7 +410,6 @@ exports.testDeploy = (config, done) => {
           // Pass error as second argument so we don't short-circuit the
           // parallel tasks
           finish(new Error(`${config.test}: failed to deploy!`));
-          return;
         } else {
           // Deployment succeeded
           log(config, 'App deployed...');
@@ -344,12 +425,11 @@ exports.testDeploy = (config, done) => {
 
             // Test that app is running successfully
             log(config, `Testing ${demoUrl}`);
-            testRequest(demoUrl, config, (err) => {
-              if (!err) {
+            testRequest(demoUrl, config)
+              .then(() => {
                 log(config, 'Success!');
-              }
-              finish(err);
-            });
+                finish();
+              }, finish);
           }, 5000);
         }
       });
