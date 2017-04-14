@@ -286,7 +286,7 @@ function changeScaling (config, yamlName) {
 
   let yaml = fs.readFileSync(oldYamlPath, 'utf8');
 
-  yaml += `manual_scaling:\n  instances: 1\n`;
+  yaml += `\n\nmanual_scaling:\n  instances: 1\n`;
 
   fs.writeFileSync(newYamlPath, yaml, 'utf8');
 
