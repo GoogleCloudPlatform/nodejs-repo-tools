@@ -282,7 +282,7 @@ exports.testLocalApp = (config, done) => {
 
 function changeScaling (config, yamlName) {
   const oldYamlPath = path.join(config.cwd, yamlName);
-  const newYamlPath = path.join(config.cwd, `${Date.now()}.yaml`);
+  const newYamlPath = path.join(config.cwd, `${config.test}-${config.now}.yaml`);
 
   let yaml = fs.readFileSync(oldYamlPath, 'utf8');
 
@@ -295,6 +295,7 @@ function changeScaling (config, yamlName) {
 
 exports.testDeploy = (config, done) => {
   return new Promise((resolve, reject) => {
+    config.now = Date.now();
     log(config, 'DEPLOYING...');
     // Keep track off whether "done" has been called yet
     let calledDone = false;
@@ -316,7 +317,7 @@ exports.testDeploy = (config, done) => {
       '--no-promote'
     ];
 
-    const logFile = path.join(config.cwd, `${config.test}-${Date.now()}.log`);
+    const logFile = path.join(config.cwd, `${config.test}-${config.now}.log`);
     const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 
     // Don't use "npm run deploy" because we need extra flags
