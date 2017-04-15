@@ -93,15 +93,23 @@ function getUrl (config) {
 }
 
 let portrange = 45032;
+// Only let one client request a port at a time
+let portAccess = false;
 
 function getPort () {
-  return new Promise((resolve, reject) => {
-    const port = portrange;
-    portrange += 1;
-
+  if (portAccess) {
+    return new Promise((resolve) => {
+      setTimeout(() => getPort().then(resolve), 500);
+    });
+  }
+  portAccess = true;
+  const port = portrange;
+  portrange += 1;
+  return new Promise((resolve) => {
     const server = net.createServer();
     server.listen(port, () => {
       server.once('close', () => {
+        portAccess = false;
         resolve(port);
       });
       server.close();
