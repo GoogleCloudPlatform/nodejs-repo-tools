@@ -241,7 +241,8 @@ exports.testLocalApp = (config, done) => {
       }
       opts.env.PORT = opts.env.PORT || config.port || port;
 
-      const proc = childProcess.spawn(config.cmd || 'yarn', config.args || ['start'], opts);
+      const proc = childProcess.spawn(config.cmd || 'npm', config.args || ['start'], opts);
+      log(config, `PID: ${proc.pid}`);
 
       proc.on('error', finish);
 
@@ -274,13 +275,24 @@ exports.testLocalApp = (config, done) => {
 
       // Exit helper so we don't call "cb" more than once
       function finish (err) {
+        if (err) {
+          log(config, `ERROR: ${err.message}`);
+        } else {
+          log(config, 'DONE');
+        }
+
+        try {
+          process.kill(proc.pid, 'SIGKILL');
+        } catch (err) {
+          // Ignore error
+        }
+        try {
+          proc.kill('SIGKILL');
+        } catch (err) {
+          // Ignore error
+        }
         if (!calledDone) {
           calledDone = true;
-          try {
-            proc.kill('SIGKILL');
-          } catch (err) {
-            // Ignore error
-          }
           setTimeout(() => finalize(err, resolve, reject, done), 1000);
         }
       }
