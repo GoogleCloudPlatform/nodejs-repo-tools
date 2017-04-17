@@ -192,9 +192,13 @@ exports.testInstallation = (config, done) => {
     // Keep track off whether "done" has been called yet
     let calledDone = false;
 
-    const proc = childProcess.spawn('yarn', ['install', '--mutex', 'file:/tmp/.yarn-mutex'], {
-      cwd: config.cwd
-    });
+    const proc = childProcess.spawn(
+      config.installCmd || 'yarn',
+      config.installArgs || ['install', '--mutex', 'file:/tmp/.yarn-mutex'],
+      {
+        cwd: config.cwd
+      }
+    );
 
     proc.on('error', finish);
 
