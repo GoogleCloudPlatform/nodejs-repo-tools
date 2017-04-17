@@ -93,29 +93,27 @@ function getUrl (config) {
 }
 
 let portrange = 45032;
-// Only let one client request a port at a time
-let portAccess = false;
+const triedPorts = {};
 
-function getPort () {
-  if (portAccess) {
-    return new Promise((resolve) => {
-      setTimeout(() => getPort().then(resolve), 500);
-    });
+function getPort (config) {
+  let port = config.port || portrange;
+
+  triedPorts[port] = true;
+
+  while (triedPorts[port]) {
+    port += 1;
   }
-  portAccess = true;
-  const port = portrange;
-  portrange += 1;
+
   return new Promise((resolve) => {
     const server = net.createServer();
     server.listen(port, () => {
       server.once('close', () => {
-        portAccess = false;
         resolve(port);
       });
       server.close();
     });
     server.on('error', () => {
-      resolve(getPort());
+      resolve(getPort(config));
     });
   });
 }
@@ -227,7 +225,9 @@ exports.testInstallation = (config, done) => {
 
 exports.testLocalApp = (config, done) => {
   return new Promise((resolve, reject) => {
-    getPort().then((port) => {
+    log(config, 'GETTING PORT...');
+    getPort(config).then((port) => {
+      log(config, `GOT PORT ${port}...`);
       log(config, 'TESTING LOCAL APP...');
       let calledDone = false;
 

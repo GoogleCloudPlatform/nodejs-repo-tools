@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "repository": {
     "type": "git",
@@ -38,10 +38,10 @@
     "node": ">=4.3.2"
   },
   "dependencies": {
-    "colors": "^1.1.2",
-    "got": "^6.7.1",
-    "proxyquire": "^1.7.11",
-    "supertest": "^3.0.0"
+    "colors": "1.1.2",
+    "got": "6.7.1",
+    "proxyquire": "1.7.11",
+    "supertest": "3.0.0"
   },
   "devDependencies": {
     "semistandard": "^10.0.0"
