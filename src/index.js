@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-'use strict';
-
 require('colors');
 
 const childProcess = require('child_process');
@@ -24,6 +22,9 @@ const net = require('net');
 const path = require('path');
 const proxyquire = require('proxyquire').noPreserveCache();
 const supertest = require('supertest');
+
+const { install } = require('./api/testRunner');
+const { onChange } = require('./webhook');
 
 const MAX_TRIES = 8;
 const PROJECT_ID = process.env.GCLOUD_PROJECT;
@@ -186,46 +187,8 @@ exports.getRequest = (config) => {
   return supertest(proxyquire(path.join(config.cwd, 'app'), {}));
 };
 
-exports.testInstallation = (config, done) => {
-  return new Promise((resolve, reject) => {
-    log(config, 'TESTING INSTALLATION...');
-    // Keep track off whether "done" has been called yet
-    let calledDone = false;
-
-    const proc = childProcess.spawn(
-      config.installCmd || 'yarn',
-      config.installArgs || ['install', '--mutex', 'file:/tmp/.yarn-mutex'],
-      {
-        cwd: config.cwd
-      }
-    );
-
-    proc.on('error', finish);
-
-    proc.stdout.on('data', (data) => {
-      process.stdout.write(`${config.test.bold}: ${data.toString()}`);
-    });
-    proc.stderr.on('data', (data) => {
-      process.stderr.write(`${config.test.bold}: ${data.toString()}`);
-    });
-
-    proc.on('exit', (code) => {
-      if (code !== 0) {
-        finish(new Error(`${config.test}: failed to install dependencies!`));
-      } else {
-        finish();
-      }
-    });
-
-    // Exit helper so we don't call "cb" more than once
-    function finish (err) {
-      if (!calledDone) {
-        calledDone = true;
-        finalize(err, resolve, reject, done);
-      }
-    }
-  });
-};
+exports.install = install;
+exports.testInstallation = install;
 
 exports.testLocalApp = (config, done) => {
   return new Promise((resolve, reject) => {
@@ -465,4 +428,113 @@ exports.testDeploy = (config, done) => {
       finish(err);
     }
   });
+};
+
+exports.onChange = onChange;
+
+const assert = require(`assert`);
+const sinon = global.sinon = require(`sinon`);
+global.test = require(`ava`);
+
+exports.run = (cmd, cwd) => {
+  return childProcess.execSync(cmd, { cwd: cwd }).toString().trim();
+};
+
+exports.runAsync = (cmd, cwd, cb) => {
+  return new Promise((resolve, reject) => {
+    childProcess.exec(cmd, { cwd: cwd }, (err, stdout, stderr) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      if (stdout) {
+        resolve(stdout.toString().trim());
+      } else {
+        resolve(stdout);
+      }
+    });
+  });
+};
+
+class Try {
+  constructor (test) {
+    this._maxTries = 10;
+    this._maxDelay = 20000;
+    this._timeout = 60000;
+    this._iteration = 1;
+    this._multiplier = 1.3;
+    this._delay = 500;
+    this._test = test;
+  }
+
+  execute () {
+    if (this._iteration >= this._maxTries) {
+      return this.reject(this._error || new Error('Reached maximum number of tries'));
+    } else if ((Date.now() - this._start) >= this._timeout) {
+      return this.reject(this._error || new Error('Test timed out'));
+    }
+
+    return Promise.resolve()
+      .then(() => this._test(assert))
+      .then(() => this.resolve())
+      .catch((err) => {
+        this._error = err;
+        this._iteration++;
+        this._delay = Math.min(this._delay * this._multiplier, this._maxDelay);
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            Promise.resolve()
+              .then(() => this.execute())
+              .then(resolve, reject);
+          }, this._delay);
+        });
+      });
+  }
+
+  timeout (timeout) {
+    this._timeout = timeout;
+  }
+
+  tries (maxTries) {
+    this._maxTries = maxTries;
+  }
+
+  start () {
+    this._start = Date.now();
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+      this.execute().then(resolve, reject);
+    });
+    return this.promise;
+  }
+}
+
+exports.tryTest = (test) => {
+  return new Try(test);
+};
+
+exports.stubConsole = () => {
+  if (typeof console.log.restore !== `function` && typeof console.error.restore !== `function`) {
+    if (process.env.DEBUG) {
+      sinon.spy(console, `error`);
+      sinon.spy(console, `log`);
+    } else {
+      sinon.stub(console, `error`);
+      sinon.stub(console, `log`).callsFake((a, b, c) => {
+        if (typeof a === `string` && a.indexOf(`\u001b`) !== -1 && typeof b === `string`) {
+          console.log.apply(console, arguments);
+        }
+      });
+    }
+  }
+};
+
+exports.restoreConsole = () => {
+  if (typeof console.log.restore === `function`) {
+    console.log.restore();
+  }
+  if (typeof console.error.restore === `function`) {
+    console.error.restore();
+  }
 };

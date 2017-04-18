@@ -1,0 +1,23 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud container builds submit . --config=cloudbuild.yaml
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/nodejs', '.']
+
+# Print Node.js version.
+- name: 'gcr.io/$PROJECT_ID/nodejs'
+  entrypoint: 'node'
+  args: ['--version']
+
+# Print npm version.
+- name: 'gcr.io/$PROJECT_ID/nodejs'
+  entrypoint: 'npm'
+  args: ['--version']
+
+# Print Yarn version.
+- name: 'gcr.io/$PROJECT_ID/nodejs'
+  entrypoint: 'yarn'
+  args: ['--version']
+
+images: ['gcr.io/$PROJECT_ID/nodejs']
