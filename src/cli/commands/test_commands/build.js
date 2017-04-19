@@ -181,7 +181,7 @@ exports.handler = (opts) => {
       fs.writeFileSync(config.cloudbuildYamlPath, template(config));
 
       // Start the build
-      let buildCmd = `gcloud container builds submit . --config=cloudbuild.yaml --project=${opts.builderProjectId || 'cloud-docs-samples'}`;
+      let buildCmd = `gcloud container builds submit . --config=cloudbuild.yaml --project=${opts.builderProjectId}`;
       if (opts.async) {
         buildCmd += ' --async';
       }
