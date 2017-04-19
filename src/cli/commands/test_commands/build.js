@@ -88,6 +88,8 @@ exports.builder = (yargs) => {
 };
 
 exports.handler = (opts) => {
+  opts.localPath = path.resolve(opts.localPath);
+
   // Load package.json file
   const pkgPath = path.join(opts.localPath, 'package.json');
   let pkg;
