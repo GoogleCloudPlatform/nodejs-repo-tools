@@ -88,6 +88,23 @@ function testRequest (url, config) {
       } else if (config.testStr && !config.testStr.test(body)) {
         throw new Error(`${config.test}: failed verification!\nExpected body: ${config.testStr}\nActual: ${body}`);
       }
+    }, (err) => {
+      if (err && err.response) {
+        const EXPECTED_STATUS_CODE = config.code || 200;
+
+        const body = err.response.body || '';
+        const code = err.response.statusCode;
+
+        if (code !== EXPECTED_STATUS_CODE) {
+          throw new Error(`${config.test}: failed verification!\nExpected status code: ${EXPECTED_STATUS_CODE}\nActual: ${code}`);
+        } else if (!body.includes(config.msg)) {
+          throw new Error(`${config.test}: failed verification!\nExpected body: ${config.msg}\nActual: ${body}`);
+        } else if (config.testStr && !config.testStr.test(body)) {
+          throw new Error(`${config.test}: failed verification!\nExpected body: ${config.testStr}\nActual: ${body}`);
+        }
+      } else {
+        return Promise.reject(err);
+      }
     });
 }
 
