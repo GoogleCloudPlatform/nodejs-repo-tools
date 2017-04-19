@@ -259,14 +259,7 @@ exports.testLocalApp = (config, done) => {
           });
       }, 3000);
 
-      // Exit helper so we don't call "cb" more than once
-      function finish (err) {
-        if (err) {
-          log(config, `ERROR: ${err.message}`);
-        } else {
-          log(config, 'DONE');
-        }
-
+      function cleanup () {
         try {
           process.kill(proc.pid, 'SIGKILL');
         } catch (err) {
@@ -277,6 +270,21 @@ exports.testLocalApp = (config, done) => {
         } catch (err) {
           // Ignore error
         }
+      }
+
+      process.on('exit', cleanup);
+
+      // Exit helper so we don't call "cb" more than once
+      function finish (err) {
+        if (err) {
+          log(config, `ERROR: ${err.message}`);
+        } else {
+          log(config, 'DONE');
+        }
+
+        cleanup();
+        process.off('exit', cleanup);
+
         if (!calledDone) {
           calledDone = true;
           setTimeout(() => finalize(err, resolve, reject, done), 1000);
