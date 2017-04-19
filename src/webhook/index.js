@@ -58,7 +58,7 @@ function createStatus (config) {
   console.log(`Updating status to ${config.STATE}.`);
   console.log(config);
 
-  const statusUrl = `https://api.github.com/${path.join('repos', config.REPO_PATH, 'commits', config.SHA)}`;
+  const statusUrl = `https://api.github.com/${path.join('repos', config.REPO_PATH, 'statuses', config.SHA)}`;
 
   const body = {
     state: config.STATE,
