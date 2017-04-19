@@ -29,6 +29,6 @@ RUN set -ex \
   && mv yarn.js /usr/local/bin/yarn \
   && chmod +x /usr/local/bin/yarn
 
-RUN yarn global add @google-cloud/nodejs-repo-tools
+RUN yarn global add nyc codecov @google-cloud/nodejs-repo-tools
 
 ENTRYPOINT ["node"]

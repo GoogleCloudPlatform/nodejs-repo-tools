@@ -15,12 +15,14 @@
 
 require('colors');
 
+const assert = require('assert');
 const childProcess = require('child_process');
 const fs = require('fs');
 const got = require('got');
 const net = require('net');
 const path = require('path');
 const proxyquire = require('proxyquire').noPreserveCache();
+const sinon = require(`sinon`);
 const supertest = require('supertest');
 
 const { install } = require('./api/testRunner');
@@ -432,10 +434,6 @@ exports.testDeploy = (config, done) => {
 
 exports.onChange = onChange;
 
-const assert = require(`assert`);
-const sinon = global.sinon = require(`sinon`);
-global.test = require(`ava`);
-
 exports.run = (cmd, cwd) => {
   return childProcess.execSync(cmd, { cwd: cwd }).toString().trim();
 };
@@ -536,5 +534,15 @@ exports.restoreConsole = () => {
   }
   if (typeof console.error.restore === `function`) {
     console.error.restore();
+  }
+};
+
+exports.checkCredentials = (t) => {
+  if (t && typeof t.truthy === 'function') {
+    t.truthy(process.env.GCLOUD_PROJECT, `Must set GCLOUD_PROJECT environment variable!`);
+    t.truthy(process.env.GOOGLE_APPLICATION_CREDENTIALS, `Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!`);
+  } else {
+    assert(process.env.GCLOUD_PROJECT, `Must set GCLOUD_PROJECT environment variable!`);
+    assert(process.env.GOOGLE_APPLICATION_CREDENTIALS, `Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!`);
   }
 };
