@@ -158,6 +158,7 @@ exports.handler = (opts) => {
         config.keyFilePath = path.resolve(opts.keyFile);
         console.log(`${config.test.bold}: Copying ${config.keyFilePath.yellow}`);
         config.keyFileName = path.parse(config.keyFilePath).base;
+        config.copiedKeyFilePath = path.join(opts.localPath, path.parse(config.keyFilePath).base);
         cp(config.keyFilePath, path.join(opts.localPath, path.parse(config.keyFilePath).base));
       }
       // Setup project ID, if any
@@ -197,7 +198,7 @@ function cleanup (opts, config) {
     fs.unlinkSync(config.cloudbuildYamlPath);
   } catch (err) {}
   try {
-    fs.unlinkSync(config.keyFilePath);
+    fs.unlinkSync(config.copiedKeyFilePath);
   } catch (err) {}
 }
 
