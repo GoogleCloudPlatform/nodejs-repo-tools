@@ -40,6 +40,12 @@ exports.builder = (yargs) => {
         default: false,
         type: 'boolean'
       },
+      builderProjectId: {
+        alias: 'bp',
+        default: 'cloud-docs-samples',
+        requiresArg: true,
+        type: 'string'
+      },
       changesOnly: {
         alias: 'ch',
         default: false,
@@ -175,7 +181,7 @@ exports.handler = (opts) => {
       fs.writeFileSync(config.cloudbuildYamlPath, template(config));
 
       // Start the build
-      let buildCmd = 'gcloud container builds submit . --config=cloudbuild.yaml';
+      let buildCmd = `gcloud container builds submit . --config=cloudbuild.yaml --project=${opts.builderProjectId} || 'cloud-docs-samples'}`;
       if (opts.async) {
         buildCmd += ' --async';
       }
