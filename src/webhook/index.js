@@ -17,8 +17,6 @@ const got = require('got');
 const path = require('path');
 const url = require('url');
 
-const settings = require('../../settings.json');
-
 /**
  * Helper method for making requests to the GitHub API.
  *
@@ -26,6 +24,8 @@ const settings = require('../../settings.json');
  * @param {object} [options]
  */
 function makeRequest (uri, options) {
+  const settings = require('../../settings.json');
+
   options || (options = {});
 
   // Add appropriate headers
