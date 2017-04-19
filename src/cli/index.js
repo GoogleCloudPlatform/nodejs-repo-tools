@@ -32,4 +32,5 @@ require('yargs')
   .epilogue('For more information, see https://github.com/GoogleCloudPlatform/nodejs-repo-tools')
   .help()
   .strict()
+  .version(require('../../package.json').version)
   .argv;
