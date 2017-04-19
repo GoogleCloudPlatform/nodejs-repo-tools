@@ -49,32 +49,15 @@ function log (config, msg) {
   console.log(`${config.test.bold}: ${msg}`);
 }
 
-// Retry the request using exponential backoff up to a maximum number of tries.
-function makeRequest (url, numTry) {
+// Send a request to the given url and test that the response body has the
+// expected value
+function testRequest (url, config, numTry) {
+  log(config, `VERIFYING: ${url}`);
   if (!numTry) {
     numTry = 1;
   }
 
   return got(url)
-    .catch((err) => {
-      if (numTry >= MAX_TRIES) {
-        return Promise.reject(err);
-      }
-
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          makeRequest(url, numTry + 1).then(resolve, reject);
-        }, 500 * Math.pow(numTry, 2));
-      });
-    });
-}
-
-// Send a request to the given url and test that the response body has the
-// expected value
-function testRequest (url, config) {
-  log(config, `VERIFYING: ${url}`);
-
-  return makeRequest(url)
     .then((response) => {
       const EXPECTED_STATUS_CODE = config.code || 200;
 
@@ -105,6 +88,17 @@ function testRequest (url, config) {
       } else {
         return Promise.reject(err);
       }
+    })
+    .catch((err) => {
+      if (numTry >= MAX_TRIES) {
+        return Promise.reject(err);
+      }
+
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          testRequest(url, config, numTry + 1).then(resolve, reject);
+        }, 500 * Math.pow(numTry, 2));
+      });
     });
 }
 
@@ -283,7 +277,7 @@ exports.testLocalApp = (config, done) => {
         }
 
         cleanup();
-        process.off('exit', cleanup);
+        process.removeListener('exit', cleanup);
 
         if (!calledDone) {
           calledDone = true;
