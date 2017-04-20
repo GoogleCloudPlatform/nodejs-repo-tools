@@ -1,23 +1,26 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
+  "author": "Google Inc.",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
   },
+  "engines": {
+    "node": ">=4.3.2"
+  },
+  "bin": {
+    "samples": "./bin/samples"
+  },
+  "main": "src/index.js",
   "scripts": {
     "lint": "semistandard **/*.js",
     "check": "yarn check --strict-semver --integrity",
     "samples": "node ./bin/samples",
     "test": "npm run lint && ava --verbose test/**/*.test.js"
   },
-  "bin": {
-    "samples": "./bin/samples"
-  },
-  "main": "src/index.js",
-  "author": "Google Inc.",
-  "license": "Apache-2.0",
   "contributors": [
     {
       "name": "Jason Dobry",
@@ -28,9 +31,6 @@
       "email": "anassri@google.com"
     }
   ],
-  "file": [
-    "src/"
-  ],
   "semistandard": {
     "globals": [
       "after",
@@ -40,9 +40,6 @@
       "describe",
       "it"
     ]
-  },
-  "engines": {
-    "node": ">=4.3.2"
   },
   "dependencies": {
     "async": "2.0.1",
@@ -64,6 +61,8 @@
   },
   "cloud": {
     "requiresKeyFile": false,
-    "requiresProjectId": false
+    "requiresProjectId": false,
+    "testCmd": "npm",
+    "testArgs": ["run", "system-test"]
   }
 }

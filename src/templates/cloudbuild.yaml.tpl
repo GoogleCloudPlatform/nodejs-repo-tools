@@ -10,7 +10,7 @@ steps:
     'GOOGLE_CLOUD_PROJECT={{projectId}}'
   ]
   entrypoint: '{{installCmd}}'
-  args: ['install']
+  args: [{{#each installArgs}}'{{this}}'{{#if @last}}{{else}},{{/if}}{{/each}}]
 - name: 'gcr.io/$PROJECT_ID/nodejs'
   env: [
     'GOOGLE_APPLICATION_CREDENTIALS={{keyFileName}}',
@@ -18,7 +18,7 @@ steps:
     'GOOGLE_CLOUD_PROJECT={{projectId}}'
   ]
   entrypoint: '{{testCmd}}'
-  args: ['test']
+  args: [{{#each testArgs}}'{{this}}'{{#if @last}}{{else}},{{/if}}{{/each}}]
 # - name: 'gcr.io/$PROJECT_ID/nodejs'
 #  entrypoint: 'yarn'
 #  args: ['run', 'samples', '--', 'test', 'install']

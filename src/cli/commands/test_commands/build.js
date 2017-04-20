@@ -133,7 +133,9 @@ exports.handler = (opts) => {
   config.test || (config.test = pkg.name);
   config.cwd = opts.localPath;
   config.installCmd || (config.installCmd = 'yarn');
+  config.installArgs || (config.installArgs = ['install']);
   config.testCmd || (config.testCmd = 'yarn');
+  config.testArgs || (config.testArgs = ['test']);
   config.cloudbuildYamlPath = path.join(opts.localPath, 'cloudbuild.yaml');
 
   if (config.requiresKeyFile && !opts.keyFile) {
@@ -159,33 +161,39 @@ exports.handler = (opts) => {
     console.log(`${config.test.bold}: CI: ${config.ci}`);
   }
 
-  if (!opts.dryRun) {
-    try {
-      // Setup key file, if any
-      if (opts.keyFile && config.requiresKeyFile) {
-        config.keyFilePath = path.resolve(opts.keyFile);
-        console.log(`${config.test.bold}: Copying ${config.keyFilePath.yellow}`);
-        config.keyFileName = path.parse(config.keyFilePath).base;
-        config.copiedKeyFilePath = path.join(opts.localPath, path.parse(config.keyFilePath).base);
+  try {
+    // Setup key file, if any
+    if (opts.keyFile && config.requiresKeyFile) {
+      config.keyFilePath = path.resolve(opts.keyFile);
+      console.log(`${config.test.bold}: Copying ${config.keyFilePath.yellow}`);
+      config.keyFileName = path.parse(config.keyFilePath).base;
+      config.copiedKeyFilePath = path.join(opts.localPath, path.parse(config.keyFilePath).base);
+      if (!opts.dryRun) {
         cp(config.keyFilePath, path.join(opts.localPath, path.parse(config.keyFilePath).base));
       }
-      // Setup project ID, if any
-      if (opts.projectId) {
-        config.projectId = opts.projectId;
-        console.log(`${config.test.bold}: Setting build project ID to ${config.projectId.yellow}`);
-      }
+    }
+    // Setup project ID, if any
+    if (opts.projectId) {
+      config.projectId = opts.projectId;
+      console.log(`${config.test.bold}: Setting build project ID to ${config.projectId.yellow}`);
+    }
 
-      // Generate the cloudbuild.yaml file
-      const template = handlebars.compile(fs.readFileSync(tpl, 'utf8'));
-      console.log(`${config.test.bold}: Writing ${config.cloudbuildYamlPath.yellow}`);
-      fs.writeFileSync(config.cloudbuildYamlPath, template(config));
+    // Generate the cloudbuild.yaml file
+    console.log(`${config.test.bold}: Writing ${config.cloudbuildYamlPath.yellow}`);
+    const template = handlebars.compile(fs.readFileSync(tpl, 'utf8'))(config);
+    if (!opts.dryRun) {
+      fs.writeFileSync(config.cloudbuildYamlPath, template);
+    } else {
+      console.log(template);
+    }
 
-      // Start the build
-      let buildCmd = `gcloud container builds submit . --config=cloudbuild.yaml --project=${opts.builderProjectId}`;
-      if (opts.async) {
-        buildCmd += ' --async';
-      }
-      console.log(`${config.test.bold}: Build cmd: ${buildCmd.yellow}`);
+    // Start the build
+    let buildCmd = `gcloud container builds submit . --config=cloudbuild.yaml --project=${opts.builderProjectId}`;
+    if (opts.async) {
+      buildCmd += ' --async';
+    }
+    console.log(`${config.test.bold}: Build cmd: ${buildCmd.yellow}`);
+    if (!opts.dryRun) {
       const result = exec(buildCmd, {
         cwd: opts.localPath,
         silent: opts.silent
@@ -193,11 +201,11 @@ exports.handler = (opts) => {
 
       // Remove temp files
       cleanup(opts, config);
-    } catch (err) {
-      console.error(err);
-      cleanup(opts, config);
-      throw err;
     }
+  } catch (err) {
+    console.error(err);
+    cleanup(opts, config);
+    throw err;
   }
 };
 
