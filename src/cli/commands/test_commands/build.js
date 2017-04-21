@@ -16,11 +16,12 @@
 require('colors');
 
 const fs = require('fs');
-const got = require('got');
 const handlebars = require('handlebars');
 const path = require('path');
 const string = require('string');
 const url = require('url');
+
+const { error, log } = require('../../../api/utils');
 
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
@@ -63,11 +64,6 @@ exports.builder = (yargs) => {
         requiresArg: true,
         type: 'string'
       },
-      dryRun: {
-        alias: 'd',
-        default: false,
-        type: 'boolean'
-      },
       keyFile: {
         alias: 'k',
         default: process.env.GOOGLE_APPLICATION_CREDENTIALS,
@@ -96,6 +92,8 @@ exports.builder = (yargs) => {
 exports.handler = (opts) => {
   opts.localPath = path.resolve(opts.localPath);
 
+  const tmpConfig = { test: path.parse(opts.localPath).base };
+
   // Load package.json file
   const pkgPath = path.join(opts.localPath, 'package.json');
   let pkg;
@@ -103,11 +101,11 @@ exports.handler = (opts) => {
     pkg = require(pkgPath);
   } catch (err) {
     if (err.message.includes('Cannot find')) {
-      console.error(`ERROR: Could not locate ${pkgPath}`.red);
+      error(tmpConfig, `Could not locate ${pkgPath}`);
     } else if (err.message.includes('JSON')) {
-      console.error(`ERROR: Failed to parse ${pkgPath}`.red);
+      error(tmpConfig, `Failed to parse ${pkgPath}`);
     }
-    console.error(`ERROR: ${err.stack || err.message}`.red);
+    error(tmpConfig, err.stack || err.message);
     process.exit(1);
   }
 
@@ -118,11 +116,11 @@ exports.handler = (opts) => {
     config = require(configPath) || {};
   } catch (err) {
     if (err.message.includes('Cannot find')) {
-      console.error(`ERROR: Could not locate ${configPath}`.red);
+      error(tmpConfig, `Could not locate ${configPath}`);
     } else if (err.message.includes('JSON')) {
-      console.error(`ERROR: Failed to parse ${configPath}`.red);
+      error(tmpConfig, `Failed to parse ${configPath}`);
     }
-    console.error(`ERROR: ${err.stack || err.message}`.red);
+    error(tmpConfig, err.stack || err.message);
     process.exit(1);
   }
 
@@ -138,34 +136,38 @@ exports.handler = (opts) => {
   config.testArgs || (config.testArgs = ['test']);
   config.cloudbuildYamlPath = path.join(opts.localPath, 'cloudbuild.yaml');
 
+  if (opts.dryRun) {
+    log(config, 'Beginning dry run...'.cyan);
+  }
+
   if (config.requiresKeyFile && !opts.keyFile) {
-    console.error(`ERROR: Build target requires a key file but none was provided!`.red);
+    error(config, `Build target requires a key file but none was provided!`);
     process.exit(1);
   } else if (config.requiresProjectId && !opts.projectId) {
-    console.error(`ERROR: Build target requires a project ID but none was provided!`.red);
+    error(config, `Build target requires a project ID but none was provided!`);
     process.exit(1);
   }
 
-  console.log(`${config.test.bold}: Found build target.`);
+  log(config, `Detected build target: ${configPath.yellow}`);
 
   config.repoPath = getRepoPath(pkg.repository) || 'UNKNOWN';
   if (config.repoPath) {
-    console.log(`${config.test.bold}: Repository: ${config.repoPath}`);
+    log(config, `Detected repository: ${config.repoPath.magenta}`);
   }
   config.sha = getHeadCommitSha() || 'UNKNOWN';
   if (config.sha) {
-    console.log(`${config.test.bold}: SHA: ${config.sha}`);
+    log(config, `Detected SHA: ${config.sha.magenta}`);
   }
   config.ci = process.env.CI || 'false';
   if (config.ci) {
-    console.log(`${config.test.bold}: CI: ${config.ci}`);
+    log(config, `Detected CI: ${config.ci.magenta}`);
   }
 
   try {
     // Setup key file, if any
     if (opts.keyFile && config.requiresKeyFile) {
       config.keyFilePath = path.resolve(opts.keyFile);
-      console.log(`${config.test.bold}: Copying ${config.keyFilePath.yellow}`);
+      log(config, `Copying: ${config.keyFilePath.yellow}`);
       config.keyFileName = path.parse(config.keyFilePath).base;
       config.copiedKeyFilePath = path.join(opts.localPath, path.parse(config.keyFilePath).base);
       if (!opts.dryRun) {
@@ -175,24 +177,27 @@ exports.handler = (opts) => {
     // Setup project ID, if any
     if (opts.projectId) {
       config.projectId = opts.projectId;
-      console.log(`${config.test.bold}: Setting build project ID to ${config.projectId.yellow}`);
+      log(config, `Setting build project ID to: ${config.projectId.yellow}`);
     }
 
     // Generate the cloudbuild.yaml file
-    console.log(`${config.test.bold}: Writing ${config.cloudbuildYamlPath.yellow}`);
+    log(config, `Compiling: ${config.cloudbuildYamlPath.yellow}`);
     const template = handlebars.compile(fs.readFileSync(tpl, 'utf8'))(config);
     if (!opts.dryRun) {
+      log(config, `Writing: ${config.cloudbuildYamlPath.yellow}`);
       fs.writeFileSync(config.cloudbuildYamlPath, template);
     } else {
-      console.log(template);
+      log(config, `Printing: ${config.cloudbuildYamlPath.yellow}\n${template}`);
     }
 
     // Start the build
     let buildCmd = `gcloud container builds submit . --config=cloudbuild.yaml --project=${opts.builderProjectId}`;
     if (opts.async) {
       buildCmd += ' --async';
+    } else {
+      log(config, `Will wait for build to complete.`);
     }
-    console.log(`${config.test.bold}: Build cmd: ${buildCmd.yellow}`);
+    log(config, `Build command: ${buildCmd.yellow}`);
     if (!opts.dryRun) {
       const result = exec(buildCmd, {
         cwd: opts.localPath,
@@ -201,11 +206,19 @@ exports.handler = (opts) => {
 
       // Remove temp files
       cleanup(opts, config);
+
+      if (result.code !== 0) {
+        process.exit(result.code);
+      }
     }
   } catch (err) {
-    console.error(err);
+    error(config, err);
     cleanup(opts, config);
     throw err;
+  }
+
+  if (opts.dryRun) {
+    log(config, 'Dry run complete.'.cyan);
   }
 };
 
@@ -218,29 +231,29 @@ function cleanup (opts, config) {
   } catch (err) {}
 }
 
-function getDirs (_path, currentDepth, maxDepth) {
-  if (!currentDepth) {
-    currentDepth = 0;
-  }
-  if (!maxDepth) {
-    maxDepth = 10;
-  }
+// function getDirs (_path, currentDepth, maxDepth) {
+//   if (!currentDepth) {
+//     currentDepth = 0;
+//   }
+//   if (!maxDepth) {
+//     maxDepth = 10;
+//   }
 
-  const dirs = fs.readdirSync(_path)
-    .filter((name) => !name.includes('.'))
-    .filter((name) => !name.includes('node_modules'))
-    .filter((name) => !name.includes('bower_components'))
-    .map((name) => path.join(_path, name))
-    .filter((name) => fs.statSync(name).isDirectory());
+//   const dirs = fs.readdirSync(_path)
+//     .filter((name) => !name.includes('.'))
+//     .filter((name) => !name.includes('node_modules'))
+//     .filter((name) => !name.includes('bower_components'))
+//     .map((name) => path.join(_path, name))
+//     .filter((name) => fs.statSync(name).isDirectory());
 
-  if (!dirs.length) {
-    return [_path];
-  } else if (currentDepth === maxDepth) {
-    return dirs;
-  }
+//   if (!dirs.length) {
+//     return [_path];
+//   } else if (currentDepth === maxDepth) {
+//     return dirs;
+//   }
 
-  return dirs.reduce((cur, name) => cur.concat(getDirs(name, currentDepth + 1, maxDepth)), []);
-}
+//   return dirs.reduce((cur, name) => cur.concat(getDirs(name, currentDepth + 1, maxDepth)), []);
+// }
 
 function getRepoPath (repository) {
   repository || (repository = {});

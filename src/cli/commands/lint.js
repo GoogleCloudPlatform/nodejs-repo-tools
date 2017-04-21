@@ -15,30 +15,11 @@
 
 require('colors');
 
-const fs = require('fs-extra');
-const path = require('path');
+exports.command = 'lint';
+exports.description = 'Lint samples.';
 
-exports.command = 'validate';
-exports.description = 'Validate the samples.json file in the current directory.';
-
-exports.builder = (yargs) => {
-  yargs
-    .options({
-      filename: {
-        alias: 'f',
-        default: path.join(process.cwd(), 'samples.json'),
-        type: 'string'
-      }
-    });
-};
+exports.builder = (yargs) => {};
 
 exports.handler = (opts) => {
-  fs.stat(opts.filename, (err) => {
-    if (err) {
-      console.log((opts.filename + ' does not exist!').red);
-      return;
-    }
-
-    console.log('Not yet implemented.'.red);
-  });
+  console.log('Not yet implemented.'.red);
 };

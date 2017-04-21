@@ -14,3 +14,5 @@
  */
 
 exports.install = require('./install');
+exports.app = require('./app');
+exports.deploy = require('./deploy');

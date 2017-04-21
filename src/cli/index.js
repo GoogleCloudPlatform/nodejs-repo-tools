@@ -15,13 +15,21 @@
 
 require('colors');
 
-require('yargs')
+require('yargs') // eslint-disable-line
   .demand(1)
   .commandDir('commands')
   .options({
+    dryRun: {
+      alias: 'd',
+      default: false,
+      description: `Print the actions that ${'would'.italic} be taken, but don't actually do anything.`,
+      global: true,
+      type: 'boolean'
+    },
     localPath: {
       alias: 'l',
       default: process.cwd(),
+      description: `Use this option to set the ${'current working directory'.bold} of the command.`,
       global: true,
       requiresArg: true,
       type: 'string'

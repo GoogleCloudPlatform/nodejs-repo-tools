@@ -16,15 +16,25 @@
 require('colors');
 
 const { spawn } = require('child_process');
+const { log } = require('../utils');
 
-module.exports = (config) => {
+module.exports = (config = {}) => {
   return new Promise((resolve, reject) => {
     const cwd = config.cwd || process.cwd();
     const cmd = config.installCmd || 'yarn';
     const args = config.installArgs || ['install', '--mutex', 'file:/tmp/.yarn-mutex'];
 
-    console.log(`${config.test.bold}: ${'Installing dependencies in: '.yellow} ${cwd.green}`);
-    console.log(`${config.test.bold}: ${'Using command: '.yellow} ${(cmd + ' ' + args.join(' ')).green}`);
+    if (config.dryRun) {
+      log(config, 'Beginning dry run...'.cyan);
+    }
+    log(config, `Installing dependencies in: ${cwd.yellow}`);
+    log(config, `Install command: ${(cmd + ' ' + args.join(' ')).yellow}`);
+
+    if (config.dryRun) {
+      log(config, 'Dry run complete.'.cyan);
+      resolve();
+      return;
+    }
 
     const child = spawn(cmd, args, { cwd });
 
@@ -32,16 +42,16 @@ module.exports = (config) => {
       if (code !== 0) {
         reject(new Error(`${config.test.bold}: ${'INSTALLATION FAILED!'.red}`));
       } else {
-        console.log(`${config.test.bold}: ${'SUCCESS!'.green}`);
+        log(config, 'Finished installing dependencies.'.green);
         resolve();
       }
     });
 
     child.stdout.on('data', (data) => {
-      process.stdout.write(`${config.test.bold}: ${data.toString()}`);
+      process.stdout.write(`${config.test.bold}: ${'stdout:'.bold} ${data.toString()}`);
     });
     child.stderr.on('data', (data) => {
-      process.stderr.write(`${config.test.bold}: ${data.toString().red}`);
+      process.stderr.write(`${config.test.bold}: ${'stderr:'.red} ${data.toString().red}`);
     });
   });
 };

@@ -19,6 +19,3 @@ steps:
   ]
   entrypoint: '{{testCmd}}'
   args: [{{#each testArgs}}'{{this}}'{{#if @last}}{{else}},{{/if}}{{/each}}]
-# - name: 'gcr.io/$PROJECT_ID/nodejs'
-#  entrypoint: 'yarn'
-#  args: ['run', 'samples', '--', 'test', 'install']

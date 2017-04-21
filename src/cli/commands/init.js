@@ -16,6 +16,7 @@
 require('colors');
 
 const fs = require('fs-extra');
+const path = require('path');
 
 exports.command = 'init';
 exports.description = 'Create a new samples.json file in the current directory.';

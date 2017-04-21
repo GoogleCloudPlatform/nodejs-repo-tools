@@ -16,6 +16,7 @@
 require('colors');
 
 const { install } = require('../../../api/testRunner');
+const { error } = require('../../../api/utils');
 const path = require('path');
 
 exports.command = 'install';
@@ -35,17 +36,12 @@ exports.builder = (yargs) => {
         default: 'cloud',
         requiresArg: true,
         type: 'string'
-      },
-      localPath: {
-        alias: 'l',
-        default: process.cwd(),
-        requiresArg: true,
-        type: 'string'
       }
     });
 };
 
 exports.handler = (opts) => {
+  opts.localPath = path.resolve(opts.localPath);
   const pkg = require(path.join(opts.localPath, 'package.json'));
   let config = require(opts.config) || {};
 
@@ -55,9 +51,10 @@ exports.handler = (opts) => {
 
   config.test || (config.test = pkg.name);
   config.cwd = opts.localPath;
+  config.dryRun = opts.dryRun;
 
-  install(config)
+  return install(config)
     .catch((err) => {
-      console.error(`${config.test.bold}: ${(err.stack || err.message).red}`);
+      error(config, err.stack || err.message);
     });
 };

@@ -67,7 +67,7 @@ function parse (filename, cb) {
       cb(null, samples);
     });
   });
-};
+}
 
 exports.command = 'generate';
 exports.description = 'Generate a README.md file in the current directory.';
