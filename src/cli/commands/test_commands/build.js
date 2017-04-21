@@ -196,6 +196,7 @@ exports.handler = (opts) => {
       try {
         execSync(buildCmd, {
           cwd: opts.localPath,
+          stdio: 'inherit',
           timeout: 20 * 60 * 1000
         });
         // Remove temp files

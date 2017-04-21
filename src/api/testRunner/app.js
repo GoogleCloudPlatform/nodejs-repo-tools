@@ -37,7 +37,6 @@ module.exports = (config = {}) => {
     log(config, `Testing app in: ${cwd.yellow}`);
 
     getPort(config).then((port) => {
-      log(config, `Using port:`, `${port}`.yellow);
       let calledDone = false;
 
       const opts = {
@@ -49,7 +48,7 @@ module.exports = (config = {}) => {
         Object.assign(opts.env, config.env);
       }
       opts.env.PORT = opts.env.PORT || config.port || port;
-
+      log(config, `Using port:`, `${opts.env.PORT}`.yellow);
       log(config, `Start command: ${(cmd + ' ' + args.join(' ')).yellow}`);
 
       if (config.dryRun) {
