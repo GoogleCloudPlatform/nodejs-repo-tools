@@ -15,7 +15,8 @@
 
 require('colors');
 
-const fs = require('fs');
+const { execSync } = require('child_process');
+const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
 const string = require('string');
@@ -27,8 +28,6 @@ handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
 
 const tpl = path.join(__dirname, '../../../templates/cloudbuild.yaml.tpl');
-
-require('shelljs/global');
 
 exports.command = 'build';
 exports.description = 'Recursively kick off builds for detected projects.';
@@ -78,11 +77,6 @@ exports.builder = (yargs) => {
       },
       recurse: {
         alias: 'r',
-        default: false,
-        type: 'boolean'
-      },
-      silent: {
-        alias: 's',
         default: false,
         type: 'boolean'
       }
@@ -154,7 +148,7 @@ exports.handler = (opts) => {
   if (config.repoPath) {
     log(config, `Detected repository: ${config.repoPath.magenta}`);
   }
-  config.sha = getHeadCommitSha() || 'UNKNOWN';
+  config.sha = getHeadCommitSha(config.cwd) || 'UNKNOWN';
   if (config.sha) {
     log(config, `Detected SHA: ${config.sha.magenta}`);
   }
@@ -171,7 +165,7 @@ exports.handler = (opts) => {
       config.keyFileName = path.parse(config.keyFilePath).base;
       config.copiedKeyFilePath = path.join(opts.localPath, path.parse(config.keyFilePath).base);
       if (!opts.dryRun) {
-        cp(config.keyFilePath, path.join(opts.localPath, path.parse(config.keyFilePath).base));
+        fs.copySync(config.keyFilePath, path.join(opts.localPath, path.parse(config.keyFilePath).base));
       }
     }
     // Setup project ID, if any
@@ -191,7 +185,7 @@ exports.handler = (opts) => {
     }
 
     // Start the build
-    let buildCmd = `gcloud container builds submit . --config=cloudbuild.yaml --project=${opts.builderProjectId}`;
+    let buildCmd = `gcloud container builds submit . --config 'cloudbuild.yaml' --project '${opts.builderProjectId}'`;
     if (opts.async) {
       buildCmd += ' --async';
     } else {
@@ -199,16 +193,17 @@ exports.handler = (opts) => {
     }
     log(config, `Build command: ${buildCmd.yellow}`);
     if (!opts.dryRun) {
-      const result = exec(buildCmd, {
-        cwd: opts.localPath,
-        silent: opts.silent
-      });
-
-      // Remove temp files
-      cleanup(opts, config);
-
-      if (result.code !== 0) {
-        process.exit(result.code);
+      try {
+        execSync(buildCmd, {
+          cwd: opts.localPath,
+          timeout: 20 * 60 * 1000
+        });
+        // Remove temp files
+        cleanup(opts, config);
+      } catch (err) {
+        // Remove temp files
+        cleanup(opts, config);
+        process.exit(err.status);
       }
     }
   } catch (err) {
@@ -270,6 +265,14 @@ function getRepoPath (repository) {
   return url.parse(repository.url).path.replace('.git', '');
 }
 
-function getHeadCommitSha () {
-  return process.env.CIRCLE_SHA1 || exec('git log -n 1 --pretty=format:"%H"', { silent: true }).stdout.toString().trim();
+function getHeadCommitSha (cwd) {
+  if (process.env.CIRCLE_SHA1) {
+    return process.env.CIRCLE_SHA1;
+  }
+  const stdout = execSync('git log -n 1 --pretty=format:"%H"', {
+    cwd,
+    stdout: 'ignore',
+    timeout: 20 * 60 * 1000
+  });
+  return stdout.toString().trim();
 }

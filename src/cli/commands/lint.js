@@ -15,11 +15,76 @@
 
 require('colors');
 
-exports.command = 'lint';
+const path = require('path');
+const standard = require('semistandard');
+
+const {
+  error,
+  log
+} = require('../../api/utils');
+
+exports.command = 'lint [files..]';
 exports.description = 'Lint samples.';
 
-exports.builder = (yargs) => {};
+exports.builder = (yargs) => {
+  yargs
+    .options({
+      config: {
+        alias: 'c',
+        default: path.join(process.cwd(), 'package.json'),
+        requiresArg: true,
+        type: 'string'
+      },
+      configKey: {
+        alias: 'k',
+        default: 'cloud',
+        requiresArg: true,
+        type: 'string'
+      }
+    });
+};
 
 exports.handler = (opts) => {
-  console.log('Not yet implemented.'.red);
+  const pkg = require(path.join(opts.localPath, 'package.json'));
+  let config = require(opts.config) || {};
+
+  if (pkg === config) {
+    config = pkg[opts.configKey] || {};
+  }
+
+  config.test || (config.test = pkg.name);
+  config.cwd = opts.localPath;
+  config.dryRun = opts.dryRun;
+
+  log(config, 'Linting files in:', config.cwd.yellow);
+
+  const options = {
+    cwd: config.cwd
+  };
+
+  standard.lintFiles(opts.files, options, (err, results) => {
+    if (err) {
+      error(config, err.stack || err.message);
+      return;
+    } else if (results && results.errorCount) {
+      let errMessage = 'Use JavaScript Semi-Standard Style (https://github.com/Flet/semistandard)\n';
+      results.results.forEach((result) => {
+        result.messages.forEach((message) => {
+          errMessage += '  ';
+          errMessage += result.filePath;
+          errMessage += ':';
+          errMessage += message.line;
+          errMessage += ':';
+          errMessage += message.column;
+          errMessage += ' ';
+          errMessage += message.message;
+          errMessage += '\n';
+        });
+      });
+      error(config, errMessage);
+      return;
+    }
+
+    log(config, 'Done linting.'.green);
+  });
 };

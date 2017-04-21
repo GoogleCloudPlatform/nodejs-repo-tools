@@ -3,10 +3,15 @@
 Tools used to maintain and test Node.js repositories in the GoogleCloudPlatform
 organization.
 
-## Usage
+## CLI Usage
 
-1. `npm i --save https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git`
-1. `var utils = require('nodejs-repo-tools');`
+1.  `npm install -g @google-cloud/nodejs-repo-tools`
+1.  `samples --help`
+
+## Programmatic Usage
+
+1. `npm install --save @google-cloud/nodejs-repo-tools`
+1. `const tools = require('nodejs-repo-tools');`
 
 ## Contributing
 

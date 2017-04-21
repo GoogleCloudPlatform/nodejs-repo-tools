@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
@@ -16,7 +16,7 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "lint": "semistandard \"**/*.js\"",
+    "lint": "node ./bin/samples lint",
     "check": "yarn check --strict-semver --integrity",
     "test": "npm run lint && ava --verbose test/**/*.test.js"
   },
@@ -30,29 +30,20 @@
       "email": "anassri@google.com"
     }
   ],
-  "semistandard": {
-    "globals": [
-      "cp",
-      "exec"
-    ]
-  },
   "dependencies": {
-    "async": "2.0.1",
+    "async": "2.3.0",
     "ava": "0.19.1",
     "chalk": "1.1.3",
     "colors": "1.1.2",
     "fs-extra": "2.1.2",
     "got": "6.7.1",
-    "handlebars": "4.0.5",
+    "handlebars": "4.0.6",
     "proxyquire": "1.7.11",
-    "shelljs": "0.7.7",
+    "semistandard": "11.0.0",
     "sinon": "2.1.0",
-    "string": "3.3.1",
+    "string": "3.3.3",
     "supertest": "3.0.0",
     "yargs": "7.1.0"
-  },
-  "devDependencies": {
-    "semistandard": "10.0.0"
   },
   "cloud": {
     "requiresKeyFile": false,
