@@ -65,7 +65,7 @@ exports.handler = (opts) => {
   standard.lintFiles(opts.files, options, (err, results) => {
     if (err) {
       error(config, err.stack || err.message);
-      return;
+      process.exit(1);
     } else if (results && results.errorCount) {
       let errMessage = 'Use JavaScript Semi-Standard Style (https://github.com/Flet/semistandard)\n';
       results.results.forEach((result) => {
@@ -82,7 +82,7 @@ exports.handler = (opts) => {
         });
       });
       error(config, errMessage);
-      return;
+      process.exit(1);
     }
 
     log(config, 'Done linting.'.green);
