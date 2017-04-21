@@ -83,7 +83,7 @@ module.exports = (config = {}) => {
       // Give the server time to start up
       setTimeout(() => {
         // Test that the app is working
-        testRequest(config.url || `http://localhost:${config.port || port}`, config)
+        testRequest(config.url || `http://localhost:${opts.env.PORT}`, config)
           .then(() => finish(), (err) => {
             requestErr = err;
             finish(requestErr);
