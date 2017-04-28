@@ -70,7 +70,7 @@ module.exports = (config = {}) => {
           cwd: config.cwd
         });
       } catch (err) {
-
+        // Ignore error
       }
     } else {
       log(config, 'Using current configured credentials.');

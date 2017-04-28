@@ -253,7 +253,7 @@ exports.handler = (opts) => {
   Object.assign(opts, config);
   opts.test = config.test || config.name || topConfig.name || base;
   opts.cwd = opts.localPath;
-  opts.cloudbuildYamlPath = path.join(opts.localPath, 'cloudbuild.yaml');
+  opts.cloudbuildYamlPath = path.join(opts.localPath, 'repo-tools-cloudbuild.yaml');
 
   if (opts.dryRun) {
     log(opts, 'Beginning dry run...'.cyan);
@@ -308,7 +308,7 @@ exports.handler = (opts) => {
     }
 
     // Start the build
-    let buildCmd = `gcloud container builds submit . --config 'cloudbuild.yaml' --project '${opts.builderProjectId}'`;
+    let buildCmd = `gcloud container builds submit . --config 'repo-tools-cloudbuild.yaml' --project '${opts.builderProjectId}'`;
     if (opts.async) {
       buildCmd += ' --async';
     } else {
