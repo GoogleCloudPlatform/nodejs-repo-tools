@@ -20,7 +20,7 @@ require('yargs') // eslint-disable-line
   .commandDir('commands')
   .options({
     dryRun: {
-      alias: 'd',
+      alias: 'dr',
       default: false,
       description: `Print the actions that ${'would'.italic} be taken, but don't actually do anything.`,
       global: true,

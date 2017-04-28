@@ -35,7 +35,7 @@ exports.finalize = (err, resolve, reject) => {
 };
 
 exports.error = (config, ...args) => {
-  console.error(`${config.test.bold.red}:`, ...(args.map((arg) => {
+  console.error(`${(typeof config === 'string' ? config : config.test).bold.red}:`, ...(args.map((arg) => {
     if (arg.red) {
       return arg.red;
     }

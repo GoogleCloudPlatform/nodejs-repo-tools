@@ -29,159 +29,274 @@ handlebars.registerHelper('trim', (str) => string(str).trim().s);
 
 const tpl = path.join(__dirname, '../../../templates/cloudbuild.yaml.tpl');
 
+const globalDefaults = {
+  async: false,
+  builderProjectId: 'cloud-docs-samples',
+  ci: process.env.CI,
+  deploy: false,
+  keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS || undefined,
+  projectId: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
+};
+
+const buildPackDefaults = {
+  nodejs: {
+    config: 'package.json',
+    configKey: 'cloud-repo-tools',
+    deployCmd: 'samples',
+    deployArgs: ['test', 'deploy'],
+    installCmd: 'samples',
+    installArgs: ['test', 'install'],
+    testCmd: 'samples',
+    testArgs: ['test', 'app']
+  },
+  python: {
+    config: 'cloud-repo-tools.json',
+    configKey: null,
+    deployCmd: 'samples',
+    deployArgs: ['test', 'deploy'],
+    installCmd: 'samples',
+    installArgs: ['test', 'install'],
+    testCmd: 'samples',
+    testArgs: ['test', 'app']
+  }
+};
+
+function detectBuildPack () {
+  const args = process.argv;
+
+  let buildPack, localPath;
+
+  args.forEach((arg, i) => {
+    if (arg === '--build-pack' || arg === '--buildPack' || arg === 'b') {
+      if (args[i + 1] === 'nodejs') {
+        buildPack = 'nodejs';
+      } else if (args[i + 1] === 'python') {
+        buildPack = 'python';
+      }
+    } else if (arg.startsWith('--build-pack=')) {
+      buildPack = arg.replace('--build-pack=', '');
+    } else if (arg.startsWith('--buildPack=')) {
+      buildPack = arg.replace('--buildPack=', '');
+    } else if (arg.startsWith('-b=')) {
+      buildPack = arg.replace('-b=', '');
+    } else if (arg === '--local-path' || arg === '--localPath' || arg === '-l') {
+      localPath = args[i + 1];
+    }
+  });
+
+  if (buildPack) {
+    return { selected: true, buildPack };
+  }
+
+  if (localPath) {
+    localPath = path.resolve(localPath);
+  } else {
+    localPath = process.cwd();
+  }
+
+  try {
+    if (fs.statSync(path.join(localPath, 'package.json')).isFile()) {
+      buildPack = 'nodejs';
+    }
+  } catch (err) {
+
+  }
+
+  try {
+    if (fs.statSync(path.join(localPath, 'requirements.txt')).isFile()) {
+      buildPack = 'python';
+    }
+  } catch (err) {
+
+  }
+
+  if (!buildPack) {
+    error({ test: path.parse(localPath).base }, 'Unable to determine build pack.');
+    process.exit(1);
+  }
+
+  process.argv.push(`--buildPack=${buildPack}`);
+
+  return { selected: false, buildPack };
+}
+
 exports.command = 'build';
 exports.description = 'Recursively kick off builds for detected projects.';
 
+let options, defaults;
+
+/**
+ * This method sets up the commands options.
+ */
 exports.builder = (yargs) => {
-  yargs
-    .options({
-      async: {
-        alias: 'a',
-        default: false,
-        type: 'boolean'
-      },
-      builderProjectId: {
-        alias: 'bp',
-        default: 'cloud-docs-samples',
-        requiresArg: true,
-        type: 'string'
-      },
-      changesOnly: {
-        alias: 'ch',
-        default: false,
-        type: 'boolean'
-      },
-      config: {
-        alias: 'c',
-        default: 'package.json',
-        requiresArg: true,
-        type: 'string'
-      },
-      configKey: {
-        alias: 'ck',
-        default: 'cloud',
-        requiresArg: true,
-        type: 'string'
-      },
-      keyFile: {
-        alias: 'k',
-        default: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-        requiresArg: true,
-        type: 'string'
-      },
-      projectId: {
-        alias: 'p',
-        default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-        requiresArg: true,
-        type: 'string'
-      },
-      recurse: {
-        alias: 'r',
-        default: false,
-        type: 'boolean'
-      }
-    });
+  const { selected, buildPack } = detectBuildPack();
+
+  defaults = { buildPack };
+  Object.assign(defaults, globalDefaults);
+  Object.assign(defaults, buildPackDefaults[buildPack]);
+
+  options = {
+    buildPack: {
+      alias: 'b',
+      description: `${selected ? 'Selected:'.bold : 'Detected:'.bold} ${`${defaults.buildPack}`.magenta}. The build pack to use.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    async: {
+      alias: 'a',
+      description: `${'Default:'.bold} ${`${defaults.async}`.yellow}. Start the build, but don't wait for it to complete.`,
+      type: 'boolean'
+    },
+    builderProjectId: {
+      alias: 'bp',
+      description: `${'Default:'.bold} ${`${defaults.builderProjectId}`.yellow}. The project in which the Cloud Container Build should execute.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    ci: {
+      description: `${'Default:'.bold} ${`${defaults.ci}`.yellow}. Whether this is a CI environment.`,
+      type: 'boolean'
+    },
+    config: {
+      alias: 'c',
+      description: `${'Default:'.bold} ${`${defaults.config}`.yellow}. Specify a JSON config file to load. Options set in the config file supercede options set at the command line.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    configKey: {
+      description: `${'Default:'.bold} ${`${defaults.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    deploy: {
+      alias: 'd',
+      description: `${'Default:'.bold} ${`${defaults.deploy}`.yellow}. Whether to run the deploy command.`,
+      type: 'boolean'
+    },
+    deployCmd: {
+      description: `${'Default:'.bold} ${`${defaults.deployCmd}`.yellow}. The deploy command to use.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    deployArgs: {
+      description: `${'Default:'.bold} ${`${defaults.deployArgs.join(', ')}`.yellow}. The arguments to pass to the deploy command.`,
+      requiresArg: true,
+      type: 'array'
+    },
+    keyFile: {
+      alias: 'k',
+      desciption: `${'Default:'.bold} ${`${defaults.keyFile}`.yellow}. The path to the key to copy into the build.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    projectId: {
+      alias: 'p',
+      description: `${'Default:'.bold} ${`${defaults.projectId}`.yellow}. The project ID to use ${'inside'.italic} the build.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    testCmd: {
+      description: `${'Default:'.bold} ${`${defaults.testCmd}`.yellow}. The test command to use.`,
+      requiresArg: true,
+      type: 'string'
+    },
+    testArgs: {
+      description: `${'Default:'.bold} ${`${defaults.testArgs.join(', ')}`.yellow}. The arguments to pass to the test command.`,
+      requiresArg: true,
+      type: 'array'
+    }
+  };
+
+  yargs.options(options);
 };
 
 exports.handler = (opts) => {
   opts.localPath = path.resolve(opts.localPath);
+  const base = path.parse(opts.localPath).base;
+  let configPath, topConfig = {}, config = {};
 
-  const tmpConfig = { test: path.parse(opts.localPath).base };
-
-  // Load package.json file
-  const pkgPath = path.join(opts.localPath, 'package.json');
-  let pkg;
-  try {
-    pkg = require(pkgPath);
-  } catch (err) {
-    if (err.message.includes('Cannot find')) {
-      error(tmpConfig, `Could not locate ${pkgPath}`);
-    } else if (err.message.includes('JSON')) {
-      error(tmpConfig, `Failed to parse ${pkgPath}`);
+  for (let key in defaults) {
+    if (opts[key] === undefined && defaults[key] !== undefined) {
+      opts[key] = defaults[key];
     }
-    error(tmpConfig, err.stack || err.message);
-    process.exit(1);
   }
 
-  // Load alternate config file
-  const configPath = path.join(opts.localPath, opts.config);
-  let config;
-  try {
-    config = require(configPath) || {};
-  } catch (err) {
-    if (err.message.includes('Cannot find')) {
-      error(tmpConfig, `Could not locate ${configPath}`);
-    } else if (err.message.includes('JSON')) {
-      error(tmpConfig, `Failed to parse ${configPath}`);
+  // Load the config file, if any
+  if (opts.config && opts.config !== 'false') {
+    configPath = path.join(opts.localPath, opts.config);
+    try {
+      topConfig = require(configPath) || {};
+      if (opts.configKey) {
+        config = topConfig[opts.configKey] || {};
+      } else {
+        config = topConfig;
+      }
+    } catch (err) {
+      if (err.message.includes('Cannot find')) {
+        error(base, `Could not locate ${configPath}`);
+      } else if (err.message.includes('JSON')) {
+        error(base, `Failed to parse ${configPath}`);
+      }
+      error(base, err.stack || err.message);
+      process.exit(1);
     }
-    error(tmpConfig, err.stack || err.message);
-    process.exit(1);
   }
 
-  // Gather config settings
-  if (pkg === config) {
-    config = pkg[opts.configKey] || {};
-  }
-  config.test || (config.test = pkg.name);
-  config.cwd = opts.localPath;
-  config.installCmd || (config.installCmd = 'yarn');
-  config.installArgs || (config.installArgs = ['install']);
-  config.testCmd || (config.testCmd = 'yarn');
-  config.testArgs || (config.testArgs = ['test']);
-  config.cloudbuildYamlPath = path.join(opts.localPath, 'cloudbuild.yaml');
+  Object.assign(opts, config);
+  opts.test = config.test || config.name || topConfig.name || base;
+  opts.cwd = opts.localPath;
+  opts.cloudbuildYamlPath = path.join(opts.localPath, 'cloudbuild.yaml');
 
   if (opts.dryRun) {
-    log(config, 'Beginning dry run...'.cyan);
+    log(opts, 'Beginning dry run...'.cyan);
   }
 
-  if (config.requiresKeyFile && !opts.keyFile) {
-    error(config, `Build target requires a key file but none was provided!`);
+  if (opts.requiresKeyFile && !opts.keyFile) {
+    error(opts, `Build target requires a key file but none was provided!`);
     process.exit(1);
-  } else if (config.requiresProjectId && !opts.projectId) {
-    error(config, `Build target requires a project ID but none was provided!`);
+  } else if (opts.requiresProjectId && !opts.projectId) {
+    error(opts, `Build target requires a project ID but none was provided!`);
     process.exit(1);
   }
 
-  log(config, `Detected build target: ${configPath.yellow}`);
+  log(opts, `Detected build target: ${(configPath || base).yellow}`);
 
-  config.repoPath = getRepoPath(pkg.repository) || 'UNKNOWN';
-  if (config.repoPath) {
-    log(config, `Detected repository: ${config.repoPath.magenta}`);
+  opts.repoPath = getRepoPath(config.repository || topConfig.repository) || 'UNKNOWN';
+  if (opts.repoPath) {
+    log(opts, `Detected repository: ${opts.repoPath.magenta}`);
   }
-  config.sha = getHeadCommitSha(config.cwd) || 'UNKNOWN';
-  if (config.sha) {
-    log(config, `Detected SHA: ${config.sha.magenta}`);
+  opts.sha = getHeadCommitSha(opts.localPath) || 'UNKNOWN';
+  if (opts.sha) {
+    log(opts, `Detected SHA: ${opts.sha.magenta}`);
   }
-  config.ci = process.env.CI || 'false';
-  if (config.ci) {
-    log(config, `Detected CI: ${config.ci.magenta}`);
+  if (opts.ci) {
+    log(opts, `Detected CI: ${`${opts.ci}`.magenta}`);
   }
 
   try {
     // Setup key file, if any
-    if (opts.keyFile && config.requiresKeyFile) {
-      config.keyFilePath = path.resolve(opts.keyFile);
-      log(config, `Copying: ${config.keyFilePath.yellow}`);
-      config.keyFileName = path.parse(config.keyFilePath).base;
-      config.copiedKeyFilePath = path.join(opts.localPath, path.parse(config.keyFilePath).base);
+    if (opts.keyFile && opts.requiresKeyFile) {
+      opts.keyFilePath = path.resolve(opts.keyFile);
+      log(opts, `Copying: ${opts.keyFilePath.yellow}`);
+      opts.keyFileName = path.parse(opts.keyFilePath).base;
+      opts.copiedKeyFilePath = path.join(opts.localPath, path.parse(opts.keyFilePath).base);
       if (!opts.dryRun) {
-        fs.copySync(config.keyFilePath, path.join(opts.localPath, path.parse(config.keyFilePath).base));
+        fs.copySync(opts.keyFilePath, path.join(opts.localPath, path.parse(opts.keyFilePath).base));
       }
     }
     // Setup project ID, if any
     if (opts.projectId) {
-      config.projectId = opts.projectId;
-      log(config, `Setting build project ID to: ${config.projectId.yellow}`);
+      log(opts, `Setting build project ID to: ${opts.projectId.yellow}`);
     }
 
     // Generate the cloudbuild.yaml file
-    log(config, `Compiling: ${config.cloudbuildYamlPath.yellow}`);
-    const template = handlebars.compile(fs.readFileSync(tpl, 'utf8'))(config);
+    log(opts, `Compiling: ${opts.cloudbuildYamlPath.yellow}`);
+    const template = handlebars.compile(fs.readFileSync(tpl, 'utf8'))(opts);
     if (!opts.dryRun) {
-      log(config, `Writing: ${config.cloudbuildYamlPath.yellow}`);
-      fs.writeFileSync(config.cloudbuildYamlPath, template);
+      log(opts, `Writing: ${opts.cloudbuildYamlPath.yellow}`);
+      fs.writeFileSync(opts.cloudbuildYamlPath, template);
     } else {
-      log(config, `Printing: ${config.cloudbuildYamlPath.yellow}\n${template}`);
+      log(opts, `Printing: ${opts.cloudbuildYamlPath.yellow}\n${template}`);
     }
 
     // Start the build
@@ -189,9 +304,9 @@ exports.handler = (opts) => {
     if (opts.async) {
       buildCmd += ' --async';
     } else {
-      log(config, `Will wait for build to complete.`);
+      log(opts, `Will wait for build to complete.`);
     }
-    log(config, `Build command: ${buildCmd.yellow}`);
+    log(opts, `Build command: ${buildCmd.yellow}`);
     if (!opts.dryRun) {
       try {
         execSync(buildCmd, {
@@ -200,30 +315,30 @@ exports.handler = (opts) => {
           timeout: 20 * 60 * 1000
         });
         // Remove temp files
-        cleanup(opts, config);
+        cleanup(opts);
       } catch (err) {
         // Remove temp files
-        cleanup(opts, config);
+        cleanup();
         process.exit(err.status);
       }
     }
   } catch (err) {
-    error(config, err);
-    cleanup(opts, config);
+    error(opts, err);
+    cleanup(opts);
     throw err;
   }
 
   if (opts.dryRun) {
-    log(config, 'Dry run complete.'.cyan);
+    log(opts, 'Dry run complete.'.cyan);
   }
 };
 
-function cleanup (opts, config) {
+function cleanup (opts) {
   try {
-    fs.unlinkSync(config.cloudbuildYamlPath);
+    fs.unlinkSync(opts.cloudbuildYamlPath);
   } catch (err) {}
   try {
-    fs.unlinkSync(config.copiedKeyFilePath);
+    fs.unlinkSync(opts.copiedKeyFilePath);
   } catch (err) {}
 }
 

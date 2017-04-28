@@ -17,7 +17,7 @@ require('colors');
 
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
+const { execSync, spawn } = require('child_process');
 
 const {
   deleteVersion,
@@ -63,6 +63,18 @@ module.exports = (config = {}) => {
 
     // Manually set # of instances to 1
     const tmpAppYaml = changeScaling(config, config.yaml || 'app.yaml');
+
+    if (process.env.CLOUD_BUILD) {
+      try {
+        execSync(`gcloud auth activate-service-account --key-file key.json`, {
+          cwd: config.cwd
+        });
+      } catch (err) {
+
+      }
+    } else {
+      log(config, 'Using current configured credentials.');
+    }
 
     const args = [
       'app',

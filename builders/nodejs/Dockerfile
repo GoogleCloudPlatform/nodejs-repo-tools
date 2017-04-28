@@ -1,5 +1,5 @@
-# Use the base App Engine Docker image, based on debian jessie.
-FROM gcr.io/google-appengine/debian8
+# Use the base gcloud image, based on ubuntu:trusty
+FROM gcr.io/cloud-docs-samples/gcloud
 
 # Install updates and dependencies
 RUN apt-get update -y && \
