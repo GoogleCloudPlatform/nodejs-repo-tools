@@ -35,7 +35,8 @@ const globalDefaults = {
   ci: process.env.CI,
   deploy: false,
   keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS || undefined,
-  projectId: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
+  projectId: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
+  timeout: '20m'
 };
 
 const buildPackDefaults = {
@@ -154,7 +155,7 @@ exports.builder = (yargs) => {
       type: 'string'
     },
     ci: {
-      description: `${'Default:'.bold} ${`${defaults.ci}`.yellow}. Whether this is a CI environment.`,
+      description: `${'Default:'.bold} ${`${defaults.ci || false}`.yellow}. Whether this is a CI environment.`,
       type: 'boolean'
     },
     config: {
@@ -204,6 +205,11 @@ exports.builder = (yargs) => {
       description: `${'Default:'.bold} ${`${defaults.testArgs.join(', ')}`.yellow}. The arguments to pass to the test command.`,
       requiresArg: true,
       type: 'array'
+    },
+    timeout: {
+      description: `${'Default:'.bold} ${`${defaults.timeout}`.yellow}. The maximum time allowed for the build.`,
+      requiresArg: true,
+      type: 'string'
     }
   };
 
@@ -213,7 +219,9 @@ exports.builder = (yargs) => {
 exports.handler = (opts) => {
   opts.localPath = path.resolve(opts.localPath);
   const base = path.parse(opts.localPath).base;
-  let configPath, topConfig = {}, config = {};
+  let configPath;
+  let topConfig = {};
+  let config = {};
 
   for (let key in defaults) {
     if (opts[key] === undefined && defaults[key] !== undefined) {

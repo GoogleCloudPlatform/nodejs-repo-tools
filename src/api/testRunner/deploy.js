@@ -190,7 +190,7 @@ module.exports = (config = {}) => {
           finish(new Error(`${config.test}: failed to deploy!`));
         } else {
           // Deployment succeeded
-          log(config, 'App deployed...');
+          log(config, 'App deployed...'.green);
 
           // Give apps time to start
           setTimeout(() => {
@@ -205,7 +205,7 @@ module.exports = (config = {}) => {
             log(config, `Testing ${demoUrl}`);
             testRequest(demoUrl, config)
               .then(() => {
-                log(config, 'Success!');
+                log(config, 'Success!'.green);
                 finish();
               }, finish);
           }, 5000);
