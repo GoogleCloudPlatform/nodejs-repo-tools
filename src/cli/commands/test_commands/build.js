@@ -16,7 +16,7 @@
 require('colors');
 
 const _ = require('lodash');
-const { execSync } = require('child_process');
+const childProcess = require('child_process');
 const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
@@ -24,7 +24,7 @@ const string = require('string');
 const url = require('url');
 
 const buildPacks = require('../../../build_packs');
-const { error, log } = require('../../../utils');
+const utils = require('../../../utils');
 
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
@@ -116,12 +116,12 @@ exports.builder = (yargs) => {
         requiresArg: true,
         type: 'string'
       },
-      'web-cmd': {
+      'start-cmd': {
         description: `${'Default:'.bold} ${`${buildPacks.config.test.app.cmd}`.yellow}. The command the web app test will use to start the app.`,
         requiresArg: true,
         type: 'string'
       },
-      'web-args': {
+      'start-args': {
         description: `${'Default:'.bold} ${`${buildPacks.config.test.app.args.join(' ')}`.yellow}. The arguments to pass to the command used by the web app test.`,
         requiresArg: true,
         type: 'string'
@@ -150,19 +150,15 @@ exports.handler = (opts) => {
   _.mergeWith(opts, buildPacks.config.global, (objValue, srcValue) => objValue === undefined ? srcValue : objValue);
   _.mergeWith(opts, buildPacks.config.test.build, (objValue, srcValue) => objValue === undefined ? srcValue : objValue);
 
-  console.log(opts.run, buildPacks.config.test.build.run);
-
   opts.installCmd || (opts.installCmd = buildPacks.config.test.install.cmd);
   opts.installArgs || (opts.installArgs = buildPacks.config.test.install.args.join(' '));
   opts.testCmd || (opts.testCmd = buildPacks.config.test.run.cmd);
   opts.testArgs || (opts.testArgs = buildPacks.config.test.run.args.join(' '));
-  opts.webCmd || (opts.webCmd = buildPacks.config.test.app.cmd);
-  opts.webArgs || (opts.webArgs = buildPacks.config.test.app.args.join(' '));
+  opts.startCmd || (opts.startCmd = buildPacks.config.test.app.cmd);
+  opts.startArgs || (opts.startArgs = buildPacks.config.test.app.args.join(' '));
   if (opts.run === undefined) {
     opts.run = buildPacks.config.test.build.run;
   }
-
-  console.log(opts.run, buildPacks.config.test.build.run);
 
   // Load the config file, if any
   if (opts.config && opts.config !== 'false') {
@@ -176,11 +172,11 @@ exports.handler = (opts) => {
       }
     } catch (err) {
       if (err.message.includes('Cannot find')) {
-        error(base, `Could not locate ${configPath}`);
+        utils.error('base', `Could not locate ${configPath}`);
       } else if (err.message.includes('JSON')) {
-        error(base, `Failed to parse ${configPath}`);
+        utils.error('base', `Failed to parse ${configPath}`);
       }
-      error(base, err.stack || err.message);
+      utils.error('base', err.stack || err.message);
       process.exit(1);
     }
   }
@@ -191,36 +187,36 @@ exports.handler = (opts) => {
   opts.cloudbuildYamlPath = path.join(opts.localPath, 'repo-tools-cloudbuild.yaml');
 
   if (opts.dryRun) {
-    log(opts, 'Beginning dry run...'.cyan);
+    utils.log('build', 'Beginning dry run...'.cyan);
   }
 
   if (opts.requiresKeyFile && !opts.keyFile) {
-    error(opts, `Build target requires a key file but none was provided!`);
+    utils.error('opts', `Build target requires a key file but none was provided!`);
     process.exit(1);
   } else if (opts.requiresProject && !opts.project) {
-    error(opts, `Build target requires a project ID but none was provided!`);
+    utils.error('opts', `Build target requires a project ID but none was provided!`);
     process.exit(1);
   }
 
-  log(opts, `Detected build target: ${(configPath || base).yellow}`);
+  utils.log('build', `Detected build target: ${(configPath || base).yellow}`);
 
   opts.repoPath = getRepoPath(config.repository || topConfig.repository) || 'UNKNOWN';
   if (opts.repoPath) {
-    log(opts, `Detected repository: ${opts.repoPath.magenta}`);
+    utils.log('build', `Detected repository: ${opts.repoPath.magenta}`);
   }
   opts.sha = getHeadCommitSha(opts.localPath) || 'UNKNOWN';
   if (opts.sha) {
-    log(opts, `Detected SHA: ${opts.sha.magenta}`);
+    utils.log('build', `Detected SHA: ${opts.sha.magenta}`);
   }
   if (opts.ci) {
-    log(opts, `Detected CI: ${`${opts.ci}`.magenta}`);
+    utils.log('build', `Detected CI: ${`${opts.ci}`.magenta}`);
   }
 
   try {
     // Setup key file, if any
     if (opts.keyFile && opts.requiresKeyFile) {
       opts.keyFilePath = path.resolve(opts.keyFile);
-      log(opts, `Copying: ${opts.keyFilePath.yellow}`);
+      utils.log('build', `Copying: ${opts.keyFilePath.yellow}`);
       opts.keyFileName = path.parse(opts.keyFilePath).base;
       opts.copiedKeyFilePath = path.join(opts.localPath, path.parse(opts.keyFilePath).base);
       if (!opts.dryRun) {
@@ -229,17 +225,17 @@ exports.handler = (opts) => {
     }
     // Setup project ID, if any
     if (opts.project) {
-      log(opts, `Setting build project ID to: ${opts.project.yellow}`);
+      utils.log('build', `Setting build project ID to: ${opts.project.yellow}`);
     }
 
     // Generate the cloudbuild.yaml file
-    log(opts, `Compiling: ${opts.cloudbuildYamlPath.yellow}`);
+    utils.log('build', `Compiling: ${opts.cloudbuildYamlPath.yellow}`);
     const template = handlebars.compile(fs.readFileSync(tpl, 'utf8'))(opts);
     if (!opts.dryRun) {
-      log(opts, `Writing: ${opts.cloudbuildYamlPath.yellow}`);
+      utils.log('build', `Writing: ${opts.cloudbuildYamlPath.yellow}`);
       fs.writeFileSync(opts.cloudbuildYamlPath, template);
     } else {
-      log(opts, `Printing: ${opts.cloudbuildYamlPath.yellow}\n${template}`);
+      utils.log('build', `Printing: ${opts.cloudbuildYamlPath.yellow}\n${template}`);
     }
 
     // Start the build
@@ -247,12 +243,12 @@ exports.handler = (opts) => {
     if (opts.async) {
       buildCmd += ' --async';
     } else {
-      log(opts, `Will wait for build to complete.`);
+      utils.log('build', `Will wait for build to complete.`);
     }
-    log(opts, `Build command: ${buildCmd.yellow}`);
+    utils.log('build', `Build command: ${buildCmd.yellow}`);
     if (!opts.dryRun) {
       try {
-        execSync(buildCmd, {
+        childProcess.execSync(buildCmd, {
           cwd: opts.localPath,
           stdio: 'inherit',
           timeout: 20 * 60 * 1000
@@ -266,13 +262,13 @@ exports.handler = (opts) => {
       }
     }
   } catch (err) {
-    error(opts, err);
+    utils.error('opts', err);
     cleanup(opts);
     throw err;
   }
 
   if (opts.dryRun) {
-    log(opts, 'Dry run complete.'.cyan);
+    utils.log('build', 'Dry run complete.'.cyan);
   }
 };
 
@@ -304,7 +300,7 @@ function getHeadCommitSha (cwd) {
   if (process.env.CIRCLE_SHA1) {
     return process.env.CIRCLE_SHA1;
   }
-  const stdout = execSync('git log -n 1 --pretty=format:"%H"', {
+  const stdout = childProcess.execSync('git log -n 1 --pretty=format:"%H"', {
     cwd,
     stdout: 'ignore',
     timeout: 20 * 60 * 1000

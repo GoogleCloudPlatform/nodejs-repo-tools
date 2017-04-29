@@ -20,17 +20,17 @@ const childProcess = require('child_process');
 const buildPacks = require('../../../build_packs');
 const utils = require('../../../utils');
 
-const INSTALL_CMD = buildPacks.config.test.install.cmd;
-const INSTALL_ARGS = buildPacks.config.test.install.args;
-const INSTALL_CMD_STR = `${INSTALL_CMD} ${INSTALL_ARGS.join(' ')}`.trim();
-const COMMAND = `samples test install ${'[options]'.yellow}`;
-const DESCRIPTION = `Install an application's dependencies by running: ${INSTALL_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const TEST_CMD = buildPacks.config.test.run.cmd;
+const TEST_ARGS = buildPacks.config.test.run.args;
+const TEST_CMD_STR = `${TEST_CMD} ${TEST_ARGS.join(' ')}`.trim();
+const COMMAND = `samples test run ${'[options]'.yellow}`;
+const DESCRIPTION = `Run an app's system/unit tests by running: ${TEST_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
   ${DESCRIPTION}`;
 
-exports.command = 'install';
+exports.command = 'run';
 exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
@@ -49,24 +49,24 @@ exports.builder = (yargs) => {
 
 exports.handler = (opts) => {
   if (opts.dryRun) {
-    utils.log('install', 'Beginning dry run.'.cyan);
+    utils.log('run', 'Beginning dry run.'.cyan);
   }
 
   buildPacks.loadConfig(opts);
 
-  opts.cmd || (opts.cmd = INSTALL_CMD);
+  opts.cmd || (opts.cmd = TEST_CMD);
   if (opts.args) {
     // TODO: Splitting like this isn't accurate enough
     opts.args = opts.args.split(' ');
   } else {
-    opts.args = INSTALL_ARGS;
+    opts.args = TEST_ARGS;
   }
 
-  utils.log('install', `Installing dependencies in: ${opts.localPath.yellow}`);
-  utils.log('install', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+  utils.log('run', `Executing tests in: ${opts.localPath.yellow}`);
+  utils.log('run', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
   if (opts.dryRun) {
-    utils.log('install', 'Dry run complete.'.cyan);
+    utils.log('run', 'Dry run complete.'.cyan);
     return;
   }
 
@@ -79,10 +79,10 @@ exports.handler = (opts) => {
     .spawn(opts.cmd, opts.args, options)
     .on('exit', (code, signal) => {
       if (code !== 0 || signal) {
-        utils.error('install', 'Install failed.'.red);
+        utils.error('run', 'Test failed.'.red);
         process.exit(code || 1);
       } else {
-        utils.log('install', 'Installation complete.'.green);
+        utils.log('run', 'Test complete.'.green);
       }
     });
 };

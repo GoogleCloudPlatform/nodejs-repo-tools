@@ -29,7 +29,7 @@ steps:
     'GOOGLE_CLOUD_PROJECT={{project}}'
   ]
   entrypoint: 'samples'
-  args: ['test', 'app', '--cmd', '{{webCmd}}', '--args', '{{webArgs}}']{{/if}}
+  args: ['test', 'app', '--cmd', '{{startCmd}}', '--args', '{{startArgs}}']{{/if}}
 {{#if deploy}}- name: 'gcr.io/$PROJECT_ID/nodejs'
   env: [
     'CLOUD_BUILD=true',
