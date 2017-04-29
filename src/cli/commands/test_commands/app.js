@@ -72,6 +72,11 @@ exports.builder = (yargs) => {
         requiresArg: true,
         type: 'string'
       },
+      code: {
+        description: 'Override the expected status code of the response.',
+        requiresArg: true,
+        type: 'number'
+      },
       'required-env-vars': {
         alias: 'r',
         description: 'Specify environment variables that must be set for the test to succeed.',
@@ -97,6 +102,7 @@ exports.handler = (opts) => {
   }
   opts.port || (opts.port = buildPacks.config.test.app.port);
   opts.msg || (opts.msg = buildPacks.config.test.app.msg);
+  opts.code || (opts.code = buildPacks.config.test.app.code);
 
   // Verify that required env vars are set, if any
   opts.requiredEnvVars = opts.requiredEnvVars || buildPacks.config.test.app.requiredEnvVars || [];
@@ -130,7 +136,7 @@ exports.handler = (opts) => {
     utils.log('app', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
     if (opts.dryRun) {
-      utils.log('app', `Verifying ${opts.url.yellow || `http://localhost:${options.env.PORT}`.yellow}.`);
+      utils.log('app', `Verifying ${`${opts.url || `http://localhost:${options.env.PORT}`}`.yellow}.`);
       utils.log('app', 'Dry run complete.'.cyan);
       return;
     }
@@ -177,5 +183,8 @@ exports.handler = (opts) => {
           cleanup();
         });
     }, 3000);
+  }).catch((err) => {
+    utils.error('app', err.stack || err.message);
+    process.exit(1);
   });
 };
