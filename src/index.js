@@ -22,8 +22,6 @@ const proxyquire = require('proxyquire').noPreserveCache();
 const sinon = require(`sinon`);
 const supertest = require('supertest');
 
-const { install, app, deploy } = require('./api/testRunner');
-const { onChange } = require('./webhook');
 const utils = require('./api/utils');
 
 exports.getRequest = (config) => {
@@ -32,14 +30,6 @@ exports.getRequest = (config) => {
   }
   return supertest(proxyquire(path.join(config.cwd, 'app'), {}));
 };
-
-exports.install = install;
-exports.testInstallation = install;
-exports.app = app;
-exports.testLocalApp = app;
-exports.deploy = deploy;
-exports.testDeploy = deploy;
-exports.onChange = onChange;
 
 exports.run = (cmd, cwd) => {
   return childProcess.execSync(cmd, { cwd: cwd }).toString().trim();

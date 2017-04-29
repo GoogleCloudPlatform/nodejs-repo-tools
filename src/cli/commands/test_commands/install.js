@@ -15,46 +15,74 @@
 
 require('colors');
 
-const { install } = require('../../../api/testRunner');
-const { error } = require('../../../api/utils');
-const path = require('path');
+const childProcess = require('child_process');
+
+const buildPacks = require('../../../build_packs');
+const utils = require('../../../utils');
+
+const INSTALL_CMD = buildPacks.config.test.install.cmd;
+const INSTALL_ARGS = buildPacks.config.test.install.args;
+const INSTALL_CMD_STR = `${INSTALL_CMD} ${INSTALL_ARGS.join(' ')}`.trim();
+const COMMAND = `samples test install ${'[options]'.yellow}`;
+const DESCRIPTION = `Install an application's dependencies by running: ${INSTALL_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const USAGE = `Usage:
+  ${COMMAND.bold}
+Description:
+  ${DESCRIPTION}`;
 
 exports.command = 'install';
-exports.description = `Install an application's dependencies.`;
-
+exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
+    .usage(USAGE)
     .options({
-      config: {
-        alias: 'c',
-        default: path.join(process.cwd(), 'package.json'),
-        requiresArg: true,
+      cmd: {
+        description: 'c',
         type: 'string'
       },
-      configKey: {
-        alias: 'k',
-        default: 'cloud',
-        requiresArg: true,
+      args: {
+        description: 'a',
         type: 'string'
       }
     });
 };
 
 exports.handler = (opts) => {
-  opts.localPath = path.resolve(opts.localPath);
-  const pkg = require(path.join(opts.localPath, 'package.json'));
-  let config = require(opts.config) || {};
-
-  if (pkg === config) {
-    config = pkg[opts.configKey] || {};
+  if (opts.dryRun) {
+    utils.log('install', 'Beginning dry run.'.cyan);
   }
 
-  config.test || (config.test = pkg.name);
-  config.cwd = opts.localPath;
-  config.dryRun = opts.dryRun;
+  buildPacks.loadConfig(opts);
 
-  return install(config)
-    .catch((err) => {
-      error(config, err.stack || err.message);
+  opts.cmd || (opts.cmd = INSTALL_CMD);
+  if (opts.args) {
+    // TODO: Splitting like this isn't accurate enough
+    opts.args = opts.args.split(' ');
+  } else {
+    opts.args = INSTALL_ARGS;
+  }
+
+  utils.log('install', `Installing dependencies in: ${opts.localPath.yellow}`);
+  utils.log('install', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+
+  if (opts.dryRun) {
+    utils.log('install', 'Dry run complete.'.cyan);
+    return;
+  }
+
+  const options = {
+    cwd: opts.localPath,
+    stdio: 'inherit'
+  };
+
+  childProcess
+    .spawn(opts.cmd, opts.args, options)
+    .on('exit', (code, signal) => {
+      if (code !== 0 || signal) {
+        utils.error('install', 'Install failed.'.red);
+        process.exit(code || 1);
+      } else {
+        utils.log('install', 'Installation complete.'.green);
+      }
     });
 };

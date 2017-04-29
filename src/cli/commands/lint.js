@@ -15,76 +15,74 @@
 
 require('colors');
 
-const path = require('path');
-const standard = require('semistandard');
+const { spawn } = require('child_process');
 
-const {
-  error,
-  log
-} = require('../../api/utils');
+const buildPacks = require('../../build_packs');
+const { error, log } = require('../../utils');
+
+const LINT_CMD = buildPacks.config.lint.cmd;
+const LINT_ARGS = buildPacks.config.lint.args;
+const LINT_CMD_STR = `${LINT_CMD} ${LINT_ARGS.join(' ')}`.trim();
+const COMMAND = `samples lint ${'[files...]'.yellow}`;
+const DESCRIPTION = `Lint samples by running: ${LINT_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const USAGE = `Usage:
+  ${COMMAND.bold}
+Description:
+  ${DESCRIPTION}
+Positional arguments:
+  ${'files'.bold} (variadic)
+    The files to lint.`;
 
 exports.command = 'lint [files..]';
-exports.description = 'Lint samples.';
-
+exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
-  yargs
-    .options({
-      config: {
-        alias: 'c',
-        default: path.join(process.cwd(), 'package.json'),
-        requiresArg: true,
-        type: 'string'
-      },
-      configKey: {
-        alias: 'k',
-        default: 'cloud',
-        requiresArg: true,
-        type: 'string'
-      }
-    });
+  yargs.usage(USAGE);
 };
-
 exports.handler = (opts) => {
-  const pkg = require(path.join(opts.localPath, 'package.json'));
-  let config = require(opts.config) || {};
+  const cmd = LINT_CMD;
+  let args = LINT_ARGS;
 
-  if (pkg === config) {
-    config = pkg[opts.configKey] || {};
+  if (opts.dryRun) {
+    log('lint', 'Beginning dry run.'.cyan);
   }
 
-  config.test || (config.test = pkg.name);
-  config.cwd = opts.localPath;
-  config.dryRun = opts.dryRun;
+  if (opts.files && opts.files.length > 0) {
+    args = opts
+      .files
+      .filter((file) => file)
+      .map((file) => {
+        // TODO: Do more escaping of user input
+        if (!file.startsWith(`'`)) {
+          file = `'${file}`;
+        }
+        if (!file.endsWith(`'`)) {
+          file = `${file}'`;
+        }
 
-  log(config, 'Linting files in:', config.cwd.yellow);
+        return file;
+      });
+  }
+
+  log('lint', 'Linting files in:', opts.localPath.yellow);
+  log('lint', 'Running:', cmd.yellow, args.join(' ').yellow);
+
+  if (opts.dryRun) {
+    log('lint', 'Dry run complete.'.cyan);
+    return;
+  }
 
   const options = {
-    cwd: config.cwd
+    cwd: opts.localPath,
+    stdio: 'inherit'
   };
 
-  standard.lintFiles(opts.files, options, (err, results) => {
-    if (err) {
-      error(config, err.stack || err.message);
-      process.exit(1);
-    } else if (results && results.errorCount) {
-      let errMessage = 'Use JavaScript Semi-Standard Style (https://github.com/Flet/semistandard)\n';
-      results.results.forEach((result) => {
-        result.messages.forEach((message) => {
-          errMessage += '  ';
-          errMessage += result.filePath;
-          errMessage += ':';
-          errMessage += message.line;
-          errMessage += ':';
-          errMessage += message.column;
-          errMessage += ' ';
-          errMessage += message.message;
-          errMessage += '\n';
-        });
-      });
-      error(config, errMessage);
-      process.exit(1);
-    }
-
-    log(config, 'Done linting.'.green);
-  });
+  spawn(cmd, args, options)
+    .on('exit', (code, signal) => {
+      if (code !== 0 || signal) {
+        error('lint', 'Linting failed.'.red);
+        process.exit(code || 1);
+      } else {
+        log('lint', 'Looks good!'.green);
+      }
+    });
 };

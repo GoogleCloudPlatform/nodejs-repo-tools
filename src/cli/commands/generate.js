@@ -20,7 +20,7 @@ const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
 const string = require('string');
-const utils = require('../../api/utils');
+const utils = require('../../utils');
 
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);

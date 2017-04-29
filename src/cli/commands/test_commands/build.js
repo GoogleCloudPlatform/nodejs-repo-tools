@@ -15,6 +15,7 @@
 
 require('colors');
 
+const _ = require('lodash');
 const { execSync } = require('child_process');
 const fs = require('fs-extra');
 const handlebars = require('handlebars');
@@ -22,198 +23,121 @@ const path = require('path');
 const string = require('string');
 const url = require('url');
 
-const { error, log } = require('../../../api/utils');
+const buildPacks = require('../../../build_packs');
+const { error, log } = require('../../../utils');
 
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
 
 const tpl = path.join(__dirname, '../../../templates/cloudbuild.yaml.tpl');
 
-const globalDefaults = {
-  async: false,
-  builderProjectId: 'cloud-docs-samples',
-  ci: process.env.CI,
-  deploy: false,
-  keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS || undefined,
-  projectId: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
-  timeout: '20m'
-};
+const COMMAND = `samples test build ${'[options]'.yellow}`;
+const DESCRIPTION = `Launch a Cloud Container build.`;
+const USAGE = `Usage:
+  ${COMMAND.bold}
+Description:
+  ${DESCRIPTION}
 
-const buildPackDefaults = {
-  nodejs: {
-    config: 'package.json',
-    configKey: 'cloud-repo-tools',
-    deployCmd: 'samples',
-    deployArgs: ['test', 'deploy'],
-    installCmd: 'samples',
-    installArgs: ['test', 'install'],
-    testCmd: 'samples',
-    testArgs: ['test', 'app']
-  },
-  python: {
-    config: 'cloud-repo-tools.json',
-    configKey: null,
-    deployCmd: 'samples',
-    deployArgs: ['test', 'deploy'],
-    installCmd: 'samples',
-    installArgs: ['test', 'install'],
-    testCmd: 'samples',
-    testArgs: ['test', 'app']
-  }
-};
+  By default the build will install dependencies and run the system/unit tests.
+  Passing ${'--app'.bold} will cause the build to also run the web app tests.
+  Passing ${'--deploy'.bold} will cause the build to also run the web app
+  deployment test.
 
-function detectBuildPack () {
-  const args = process.argv;
-
-  let buildPack, localPath;
-
-  args.forEach((arg, i) => {
-    if (arg === '--build-pack' || arg === '--buildPack' || arg === 'b') {
-      if (args[i + 1] === 'nodejs') {
-        buildPack = 'nodejs';
-      } else if (args[i + 1] === 'python') {
-        buildPack = 'python';
-      }
-    } else if (arg.startsWith('--build-pack=')) {
-      buildPack = arg.replace('--build-pack=', '');
-    } else if (arg.startsWith('--buildPack=')) {
-      buildPack = arg.replace('--buildPack=', '');
-    } else if (arg.startsWith('-b=')) {
-      buildPack = arg.replace('-b=', '');
-    } else if (arg === '--local-path' || arg === '--localPath' || arg === '-l') {
-      localPath = args[i + 1];
-    }
-  });
-
-  if (buildPack) {
-    return { selected: true, buildPack };
-  }
-
-  if (localPath) {
-    localPath = path.resolve(localPath);
-  } else {
-    localPath = process.cwd();
-  }
-
-  try {
-    if (fs.statSync(path.join(localPath, 'package.json')).isFile()) {
-      buildPack = 'nodejs';
-    }
-  } catch (err) {
-
-  }
-
-  try {
-    if (fs.statSync(path.join(localPath, 'requirements.txt')).isFile()) {
-      buildPack = 'python';
-    }
-  } catch (err) {
-
-  }
-
-  if (!buildPack) {
-    error({ test: path.parse(localPath).base }, 'Unable to determine build pack.');
-    process.exit(1);
-  }
-
-  process.argv.push(`--buildPack=${buildPack}`);
-
-  return { selected: false, buildPack };
-}
+  Pass ${'--dry-run'.bold} to see what the cloudbuild.yaml file will look like.`;
 
 exports.command = 'build';
-exports.description = 'Recursively kick off builds for detected projects.';
-
-let options, defaults;
-
-/**
- * This method sets up the commands options.
- */
+exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
-  const { selected, buildPack } = detectBuildPack();
-
-  defaults = { buildPack };
-  Object.assign(defaults, globalDefaults);
-  Object.assign(defaults, buildPackDefaults[buildPack]);
-
-  options = {
-    buildPack: {
-      alias: 'b',
-      description: `${selected ? 'Selected:'.bold : 'Detected:'.bold} ${`${defaults.buildPack}`.magenta}. The build pack to use.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    async: {
-      alias: 'a',
-      description: `${'Default:'.bold} ${`${defaults.async}`.yellow}. Start the build, but don't wait for it to complete.`,
-      type: 'boolean'
-    },
-    builderProjectId: {
-      alias: 'bp',
-      description: `${'Default:'.bold} ${`${defaults.builderProjectId}`.yellow}. The project in which the Cloud Container Build should execute.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    ci: {
-      description: `${'Default:'.bold} ${`${defaults.ci || false}`.yellow}. Whether this is a CI environment.`,
-      type: 'boolean'
-    },
-    config: {
-      alias: 'c',
-      description: `${'Default:'.bold} ${`${defaults.config}`.yellow}. Specify a JSON config file to load. Options set in the config file supercede options set at the command line.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    configKey: {
-      description: `${'Default:'.bold} ${`${defaults.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    deploy: {
-      alias: 'd',
-      description: `${'Default:'.bold} ${`${defaults.deploy}`.yellow}. Whether to run the deploy command.`,
-      type: 'boolean'
-    },
-    deployCmd: {
-      description: `${'Default:'.bold} ${`${defaults.deployCmd}`.yellow}. The deploy command to use.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    deployArgs: {
-      description: `${'Default:'.bold} ${`${defaults.deployArgs.join(', ')}`.yellow}. The arguments to pass to the deploy command.`,
-      requiresArg: true,
-      type: 'array'
-    },
-    keyFile: {
-      alias: 'k',
-      desciption: `${'Default:'.bold} ${`${defaults.keyFile}`.yellow}. The path to the key to copy into the build.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    projectId: {
-      alias: 'p',
-      description: `${'Default:'.bold} ${`${defaults.projectId}`.yellow}. The project ID to use ${'inside'.italic} the build.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    testCmd: {
-      description: `${'Default:'.bold} ${`${defaults.testCmd}`.yellow}. The test command to use.`,
-      requiresArg: true,
-      type: 'string'
-    },
-    testArgs: {
-      description: `${'Default:'.bold} ${`${defaults.testArgs.join(', ')}`.yellow}. The arguments to pass to the test command.`,
-      requiresArg: true,
-      type: 'array'
-    },
-    timeout: {
-      description: `${'Default:'.bold} ${`${defaults.timeout}`.yellow}. The maximum time allowed for the build.`,
-      requiresArg: true,
-      type: 'string'
-    }
-  };
-
-  yargs.options(options);
+  yargs
+    .usage(USAGE)
+    .options({
+      run: {
+        default: true,
+        description: `${'Default:'.bold} ${`true`.yellow}. Whether to run the system/unit test command.`,
+        type: 'boolean'
+      },
+      app: {
+        description: `${'Default:'.bold} ${`false`.yellow}. Whether to run the web app test command.`,
+        type: 'boolean'
+      },
+      deploy: {
+        description: `${'Default:'.bold} ${`false`.yellow}. Whether to run the deploy command.`,
+        type: 'boolean'
+      },
+      'builder-project': {
+        alias: 'bp',
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.build.builderProject}`.yellow}. The project in which the Cloud Container Build should execute.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'project': {
+        alias: 'p',
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.project}`.yellow}. The project ID to use ${'inside'.italic} the build.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'key-file': {
+        alias: 'k',
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.build.keyFile}`.yellow}. The path to the key to copy into the build.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      config: {
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.config}`.yellow}. Specify a JSON config file to load. Options set in the config file supercede options set at the command line.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'config-key': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      async: {
+        alias: 'a',
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.build.async}`.yellow}. Start the build, but don't wait for it to complete.`,
+        type: 'boolean'
+      },
+      ci: {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.build.ci || false}`.yellow}. Whether this is a CI environment.`,
+        type: 'boolean'
+      },
+      timeout: {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.build.timeout}`.yellow}. The maximum time allowed for the build.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'install-cmd': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.install.cmd}`.yellow}. The install command to use.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'install-args': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.install.args.join(' ')}`.yellow}. The arguments to pass to the install command.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'web-cmd': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.app.cmd}`.yellow}. The command the web app test will use to start the app.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'web-args': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.app.args.join(' ')}`.yellow}. The arguments to pass to the command used by the web app test.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'test-cmd': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.run.cmd}`.yellow}. The system/unit test command to use.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'test-args': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.test.run.args.join(' ')}`.yellow}. The arguments to pass to the system/unit test command.`,
+        requiresArg: true,
+        type: 'string'
+      }
+    })
+    .example('samples test build -l=~/nodejs-docs-samples/appengine/cloudsql --app --deploy');
 };
 
 exports.handler = (opts) => {
@@ -223,11 +147,22 @@ exports.handler = (opts) => {
   let topConfig = {};
   let config = {};
 
-  for (let key in defaults) {
-    if (opts[key] === undefined && defaults[key] !== undefined) {
-      opts[key] = defaults[key];
-    }
+  _.mergeWith(opts, buildPacks.config.global, (objValue, srcValue) => objValue === undefined ? srcValue : objValue);
+  _.mergeWith(opts, buildPacks.config.test.build, (objValue, srcValue) => objValue === undefined ? srcValue : objValue);
+
+  console.log(opts.run, buildPacks.config.test.build.run);
+
+  opts.installCmd || (opts.installCmd = buildPacks.config.test.install.cmd);
+  opts.installArgs || (opts.installArgs = buildPacks.config.test.install.args.join(' '));
+  opts.testCmd || (opts.testCmd = buildPacks.config.test.run.cmd);
+  opts.testArgs || (opts.testArgs = buildPacks.config.test.run.args.join(' '));
+  opts.webCmd || (opts.webCmd = buildPacks.config.test.app.cmd);
+  opts.webArgs || (opts.webArgs = buildPacks.config.test.app.args.join(' '));
+  if (opts.run === undefined) {
+    opts.run = buildPacks.config.test.build.run;
   }
+
+  console.log(opts.run, buildPacks.config.test.build.run);
 
   // Load the config file, if any
   if (opts.config && opts.config !== 'false') {
@@ -262,7 +197,7 @@ exports.handler = (opts) => {
   if (opts.requiresKeyFile && !opts.keyFile) {
     error(opts, `Build target requires a key file but none was provided!`);
     process.exit(1);
-  } else if (opts.requiresProjectId && !opts.projectId) {
+  } else if (opts.requiresProject && !opts.project) {
     error(opts, `Build target requires a project ID but none was provided!`);
     process.exit(1);
   }
@@ -293,8 +228,8 @@ exports.handler = (opts) => {
       }
     }
     // Setup project ID, if any
-    if (opts.projectId) {
-      log(opts, `Setting build project ID to: ${opts.projectId.yellow}`);
+    if (opts.project) {
+      log(opts, `Setting build project ID to: ${opts.project.yellow}`);
     }
 
     // Generate the cloudbuild.yaml file
@@ -308,7 +243,7 @@ exports.handler = (opts) => {
     }
 
     // Start the build
-    let buildCmd = `gcloud container builds submit . --config 'repo-tools-cloudbuild.yaml' --project '${opts.builderProjectId}'`;
+    let buildCmd = `gcloud container builds submit . --config 'repo-tools-cloudbuild.yaml' --project '${opts.builderProject}'`;
     if (opts.async) {
       buildCmd += ' --async';
     } else {
@@ -349,30 +284,6 @@ function cleanup (opts) {
     fs.unlinkSync(opts.copiedKeyFilePath);
   } catch (err) {}
 }
-
-// function getDirs (_path, currentDepth, maxDepth) {
-//   if (!currentDepth) {
-//     currentDepth = 0;
-//   }
-//   if (!maxDepth) {
-//     maxDepth = 10;
-//   }
-
-//   const dirs = fs.readdirSync(_path)
-//     .filter((name) => !name.includes('.'))
-//     .filter((name) => !name.includes('node_modules'))
-//     .filter((name) => !name.includes('bower_components'))
-//     .map((name) => path.join(_path, name))
-//     .filter((name) => fs.statSync(name).isDirectory());
-
-//   if (!dirs.length) {
-//     return [_path];
-//   } else if (currentDepth === maxDepth) {
-//     return dirs;
-//   }
-
-//   return dirs.reduce((cur, name) => cur.concat(getDirs(name, currentDepth + 1, maxDepth)), []);
-// }
 
 function getRepoPath (repository) {
   repository || (repository = {});

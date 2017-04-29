@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Copyright 2017, Google, Inc.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +13,33 @@
  * limitations under the License.
  */
 
+const fs = require('fs-extra');
 const path = require('path');
 
-require(path.join(__dirname, '../src/cli')).parse(process.argv.slice(2));
+module.exports = {
+  global: {
+    config: 'package.json',
+    configKey: 'cloud-repo-tools'
+  },
+  detect: (cwd) => fs.statSync(path.join(cwd, 'package.json')).isFile(),
+  lint: {
+    cmd: 'semistandard',
+    args: []
+  },
+  test: {
+    app: {
+      cmd: 'node',
+      args: ['app.js']
+    },
+    build: {},
+    deploy: {},
+    install: {
+      cmd: 'yarn',
+      args: ['install', '--mutex', 'file:/tmp/.yarn-mutex']
+    },
+    run: {
+      cmd: 'yarn',
+      args: ['test']
+    }
+  }
+};

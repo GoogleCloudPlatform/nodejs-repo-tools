@@ -15,54 +15,66 @@
 
 require('colors');
 
-const { deploy } = require('../../../api/testRunner');
-const { error } = require('../../../api/utils');
+const _ = require('lodash');
+const childProcess = require('child_process');
+const fs = require('fs-extra');
 const path = require('path');
 
-exports.command = 'deploy';
-exports.description = 'Deploy an app and send it a GET request.';
+const buildPacks = require('../../../build_packs');
+const utils = require('../../../utils');
 
+const DEPLOY_CMD = buildPacks.config.test.deploy.cmd;
+const COMMAND = `samples test deploy ${'[options]'.yellow}`;
+const DESCRIPTION = `Deploy an app and test it with a GET request.`;
+const USAGE = `Usage:
+  ${COMMAND.bold}
+Description:
+  ${DESCRIPTION}`;
+
+exports.command = 'deploy';
+exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
+    .usage(USAGE)
     .options({
-      config: {
-        alias: 'c',
-        default: path.join(process.cwd(), 'package.json'),
-        requiresArg: true,
+      cmd: {
+        description: `${'Default:'.bold} ${DEPLOY_CMD.yellow}. Override the command used to deploy the app.`,
         type: 'string'
       },
-      'config-key': {
-        alias: 'k',
-        default: 'cloud',
+      project: {
+        alias: 'p',
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.project}`.yellow}. The project ID to use ${'inside'.italic} the build.`,
         requiresArg: true,
         type: 'string'
       },
       delete: {
-        alias: 'de',
         default: true,
+        description: `${'Default:'.bold} ${'true'.yellow}. Whether to delete the deployed app after the test finishes.`,
         type: 'boolean'
       },
-      'deploy-cmd': {
-        alias: 'dc',
-        default: 'gcloud',
+      config: {
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.config}`.yellow}. Specify a JSON config file to load. Options set in the config file supercede options set at the command line.`,
+        requiresArg: true,
+        type: 'string'
+      },
+      'config-key': {
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
         requiresArg: true,
         type: 'string'
       },
       msg: {
-        alias: 'm',
-        default: null,
-        requiresArg: true,
-        type: 'string'
-      },
-      'project-id': {
-        alias: 'p',
-        default: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
+        description: 'Set a message the should be found in the response to the rest request.',
         requiresArg: true,
         type: 'string'
       },
       'required-env-vars': {
-        alias: 'rev',
-        default: null,
+        alias: 'r',
+        description: 'Specify environment variables that must be set for the test to succeed.',
+        requiresArg: true,
+        type: 'string'
+      },
+      substitutions: {
+        description: `Specify variable substitutions for the deployment's yaml file.`,
         requiresArg: true,
         type: 'string'
       }
@@ -70,39 +82,148 @@ exports.builder = (yargs) => {
 };
 
 exports.handler = (opts) => {
-  opts.localPath = path.resolve(opts.localPath);
-  const pkg = require(path.join(opts.localPath, 'package.json'));
-  let config = require(opts.config) || {};
-
-  if (pkg === config) {
-    config = pkg[opts.configKey] || {};
+  if (opts.dryRun) {
+    utils.log('deploy', 'Beginning dry run.'.cyan);
   }
 
-  config.test || (config.test = pkg.name);
-  config.cwd = opts.localPath;
-  config.dryRun = opts.dryRun;
-  config.deployCmd = opts.deployCmd || config.deployCmd;
-  config.delete = opts.delete || config.delete;
-  config.projectId = opts.projectId || config.projectId;
-  config.msg = opts.msg || config.msg;
-  config.requiredEnvVars = opts.requiredEnvVars || config.requiredEnvVar || [];
-  if (config.requiredEnvVars && typeof config.requiredEnvVars === 'string') {
-    config.requiredEnvVars = config.requiredEnvVars.split(',');
+  buildPacks.loadConfig(opts);
+
+  opts.cmd || (opts.cmd = DEPLOY_CMD);
+  opts.yaml || (opts.yaml = buildPacks.config.test.deploy.yaml);
+  opts.version || (opts.version = path.parse(opts.localPath).base);
+
+  // Verify that required env vars are set, if any
+  opts.requiredEnvVars = opts.requiredEnvVars || _.get(buildPacks, 'config.test.app.requiredEnvVars', []);
+  if (opts.requiredEnvVars && typeof opts.requiredEnvVars === 'string') {
+    opts.requiredEnvVars = opts.requiredEnvVars.split(',');
   }
-  config.requiredEnvVars.forEach((envVar) => {
+  opts.requiredEnvVars.forEach((envVar) => {
     if (!process.env[envVar]) {
-      error(config, `You must set the ${envVar} environment variable!`);
+      utils.error('deploy', `Test requires that the ${envVar} environment variable be set!`);
       process.exit(1);
     }
   });
 
-  if (!config.projectId) {
-    error(config, 'You must provide a project ID!');
+  if (!opts.project) {
+    utils.error('deploy', 'You must provide a project ID!');
     process.exit(1);
   }
 
-  return deploy(config)
-    .catch((err) => {
-      error(config, err.stack || err.message);
-    });
+  return new Promise((resolve, reject) => {
+    opts.now = Date.now();
+
+    utils.log('deploy', `Deploying app in: ${opts.localPath.yellow}`);
+
+    // Manually set # of instances to 1
+    const tmpAppYaml = changeScaling(opts);
+
+    if (process.env.CLOUD_BUILD) {
+      try {
+        childProcess.execSync(`gcloud auth activate-service-account --key-file key.json`, {
+          cwd: opts.localPath,
+          stdio: 'inherit'
+        });
+      } catch (err) {
+        // Ignore error
+      }
+    } else {
+      utils.log('deploy', 'Using configured credentials.');
+    }
+
+    opts.args = [
+      'app',
+      'deploy',
+      path.parse(tmpAppYaml).base,
+      // Skip prompt
+      '-q',
+      `--project=${opts.project}`,
+      // Deploy over existing version so we don't have to clean up
+      `--version=${opts.version}`,
+      '--no-promote'
+    ];
+
+    utils.log('deploy', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+
+    if (opts.dryRun) {
+      utils.log('deploy', 'Dry run complete.'.cyan);
+      return;
+    }
+
+    const options = {
+      cwd: opts.localPath,
+      // shell: true,
+      stdio: 'inherit',
+      timeout: 12 * 60 * 1000 // 12-minute timeout
+    };
+
+    childProcess
+      .spawn(opts.cmd, opts.args, options)
+      .on('exit', (code, signal) => {
+        if (code || signal) {
+          utils.error('deploy', 'Deploy failed.');
+        } else {
+          utils.log('deploy', 'Deployment complete.'.green);
+        }
+
+        // Give app time to start
+        setTimeout(() => {
+          // Test versioned url of "default" module
+          let demoUrl = utils.getUrl(opts.version, opts.project);
+
+          // Test that app is running successfully
+          utils.testRequest(demoUrl, opts)
+            .then(() => {
+              utils.log('app', 'Test complete.'.green);
+              resolve();
+            }, (err) => {
+              utils.error('app', 'Test failed.', err);
+              reject(err);
+            });
+        }, 5000);
+      });
+  })
+  .then(() => {
+    if (opts.delete && !opts.dryRun) {
+      return utils.deleteVersion(opts).catch(() => {});
+    }
+  }, (err) => {
+    if (opts.delete && !opts.dryRun) {
+      return utils.deleteVersion(opts)
+        .catch(() => {})
+        .then(() => Promise.reject(err));
+    }
+    return Promise.reject(err);
+  })
+  .catch((err) => {
+    utils.error('deploy', err.message);
+    process.exit(1);
+  });
 };
+
+function changeScaling (opts) {
+  const oldYamlPath = path.join(opts.localPath, opts.yaml);
+  const newYamlPath = path.join(opts.localPath, `${opts.version}-${opts.now}.yaml`);
+
+  utils.log('deploy', 'Compiling:', newYamlPath.yellow);
+  let yaml = fs.readFileSync(oldYamlPath, 'utf8');
+  yaml += `\n\nmanual_scaling:\n  instances: 1\n`;
+
+  if (opts.substitutions) {
+    opts
+      .substitutions
+      .split(',')
+      .map((sub) => sub.split('='))
+      .forEach(([key, value]) => {
+        yaml = yaml.replace(key, value.startsWith('$') ? process.env[value.substring(1)] : value);
+      });
+  }
+
+  if (opts.dryRun) {
+    utils.log('deploy', 'Printing:', newYamlPath.yellow, `\n${yaml}`);
+  } else {
+    utils.log('deploy', 'Writing:', newYamlPath.yellow);
+    fs.writeFileSync(newYamlPath, yaml, 'utf8');
+  }
+
+  return newYamlPath;
+}

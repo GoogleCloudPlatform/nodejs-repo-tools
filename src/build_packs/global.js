@@ -13,6 +13,25 @@
  * limitations under the License.
  */
 
-exports.install = require('./install');
-exports.app = require('./app');
-exports.deploy = require('./deploy');
+module.exports = {
+  global: {
+    dryRun: false,
+    localPath: process.cwd(),
+    project: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
+  },
+  test: {
+    app: {},
+    build: {
+      builderProject: 'cloud-docs-samples',
+      ci: process.env.CI,
+      keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+      timeout: '20m'
+    },
+    deploy: {
+      cmd: 'gcloud',
+      yaml: 'app.yaml'
+    },
+    install: {},
+    run: {}
+  }
+};

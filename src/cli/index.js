@@ -15,24 +15,32 @@
 
 require('colors');
 
-require('yargs') // eslint-disable-line
+const buildPacks = require('../build_packs');
+
+buildPacks.detectBuildPack(process.argv);
+
+module.exports = require('yargs')
   .demand(1)
   .commandDir('commands')
   .options({
-    dryRun: {
-      alias: 'dr',
-      default: false,
-      description: `Print the actions that ${'would'.italic} be taken, but don't actually do anything.`,
-      global: true,
-      type: 'boolean'
-    },
-    localPath: {
-      alias: 'l',
-      default: process.cwd(),
-      description: `Use this option to set the ${'current working directory'.bold} of the command.`,
+    'build-pack': {
+      alias: 'b',
+      description: `${'Choices:'.bold} ${buildPacks.packs.filter((pack) => pack !== 'global').map((pack) => pack.yellow).join(', ')}. ${buildPacks.selected ? 'Selected:'.bold : 'Detected:'.bold} ${`${buildPacks.current}`.green}. The build pack to use. The tool will attempt to detect which build to use.`,
       global: true,
       requiresArg: true,
       type: 'string'
+    },
+    'local-path': {
+      alias: 'l',
+      description: `${'Current:'.bold} ${`${buildPacks.global.global.localPath}`.yellow}. Use this option to set the current working directory of the command.`,
+      global: true,
+      requiresArg: true,
+      type: 'string'
+    },
+    'dry-run': {
+      description: `${'Default:'.bold} ${`${buildPacks.global.global.dryRun}`.yellow}. Print the actions that ${'would'.italic} be taken, but don't actually do anything.`,
+      global: true,
+      type: 'boolean'
     }
   })
   .wrap(120)
@@ -40,5 +48,4 @@ require('yargs') // eslint-disable-line
   .epilogue('For more information, see https://github.com/GoogleCloudPlatform/nodejs-repo-tools')
   .help()
   .strict()
-  .version(require('../../package.json').version)
-  .argv;
+  .version(require('../../package.json').version);

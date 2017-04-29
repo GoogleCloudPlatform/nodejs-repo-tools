@@ -15,83 +15,167 @@
 
 require('colors');
 
-const { app } = require('../../../api/testRunner');
-const { error } = require('../../../api/utils');
-const path = require('path');
+const _ = require('lodash');
+const childProcess = require('child_process');
+
+const buildPacks = require('../../../build_packs');
+const utils = require('../../../utils');
+
+const START_CMD = buildPacks.config.test.app.cmd;
+const START_ARGS = buildPacks.config.test.app.args;
+const COMMAND = `samples test app ${'[options]'.yellow}`;
+const DESCRIPTION = `Start an app and test it with a GET request.`;
+const USAGE = `Usage:
+  ${COMMAND.bold}
+Description:
+  ${DESCRIPTION}`;
 
 exports.command = 'app';
-exports.description = 'Start an app and send it a GET request.';
-
+exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
+    .usage(USAGE)
     .options({
+      cmd: {
+        description: `${'Default:'.bold} ${START_CMD.yellow}. Override the command used to start the app.`,
+        type: 'string'
+      },
+      args: {
+        description: `${'Default:'.bold} ${START_ARGS.join(' ').yellow}. Override the args passed to the start command.`,
+        type: 'string'
+      },
+      port: {
+        description: `Override the port the app should listen on. By default the command will find an open port.`,
+        type: 'number'
+      },
+      start: {
+        default: true,
+        description: `${'Default:'.bold} ${'true'.yellow}. Whether to start the app in addition to sending it a request.`,
+        type: 'boolean'
+      },
       config: {
-        alias: 'c',
-        default: path.join(process.cwd(), 'package.json'),
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.config}`.yellow}. Specify a JSON config file to load. Options set in the config file supercede options set at the command line.`,
         requiresArg: true,
         type: 'string'
       },
       'config-key': {
-        alias: 'k',
-        default: 'cloud',
+        description: `${'Default:'.bold} ${`${buildPacks.config.global.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
         requiresArg: true,
         type: 'string'
       },
+      url: {
+        description: `Override the request url.`,
+        type: 'string'
+      },
       msg: {
-        alias: 'm',
-        default: null,
+        description: 'Set a message the should be found in the response to the rest request.',
         requiresArg: true,
         type: 'string'
       },
       'required-env-vars': {
-        alias: 'rev',
-        default: null,
+        alias: 'r',
+        description: 'Specify environment variables that must be set for the test to succeed.',
         requiresArg: true,
         type: 'string'
-      },
-      'start-cmd': {
-        alias: 'sc',
-        default: 'node',
-        requiresArg: true,
-        type: 'string'
-      },
-      'start-args': {
-        alias: 'sa',
-        default: ['app.js'],
-        requiresArg: true,
-        type: 'array'
       }
     });
 };
 
 exports.handler = (opts) => {
-  opts.localPath = path.resolve(opts.localPath);
-  const pkg = require(path.join(opts.localPath, 'package.json'));
-  let config = require(opts.config) || {};
-
-  if (pkg === config) {
-    config = pkg[opts.configKey] || {};
+  if (opts.dryRun) {
+    utils.log('app', 'Beginning dry run.'.cyan);
   }
 
-  config.test || (config.test = pkg.name);
-  config.cwd = opts.localPath;
-  config.dryRun = opts.dryRun;
-  config.msg = opts.msg || config.msg;
-  config.requiredEnvVars = opts.requiredEnvVars || config.requiredEnvVars || [];
-  if (config.requiredEnvVars && typeof config.requiredEnvVars === 'string') {
-    config.requiredEnvVars = config.requiredEnvVars.split(',');
+  buildPacks.loadConfig(opts);
+
+  opts.cmd || (opts.cmd = START_CMD);
+  if (opts.args) {
+    // TODO: Splitting like this isn't accurate enough
+    opts.args = opts.args.split(' ');
+  } else {
+    opts.args = START_ARGS;
   }
-  config.requiredEnvVars.forEach((envVar) => {
+  opts.port || (opts.port = buildPacks.config.test.app.port);
+  opts.msg || (opts.msg = buildPacks.config.test.app.msg);
+
+  // Verify that required env vars are set, if any
+  opts.requiredEnvVars = opts.requiredEnvVars || buildPacks.config.test.app.requiredEnvVars || [];
+  if (opts.requiredEnvVars && typeof opts.requiredEnvVars === 'string') {
+    opts.requiredEnvVars = opts.requiredEnvVars.split(',');
+  }
+  opts.requiredEnvVars.forEach((envVar) => {
     if (!process.env[envVar]) {
-      error(config, `You must set the ${envVar} environment variable!`);
+      utils.error('app', `Test requires that the ${envVar} environment variable be set!`);
       process.exit(1);
     }
   });
-  config.startCmd || (config.startCmd = opts.startCmd);
-  config.startArgs || (config.startArgs = opts.startArgs);
 
-  return app(config)
-    .catch((err) => {
-      error(config, err.stack || err.message);
-    });
+  if (!opts.start) {
+    utils.testRequest(opts.url || `http://localhost:${opts.port || buildPacks.config.test.app.port || 8080}`, opts)
+      .then(() => utils.log('app', 'Test complete.'.green), (err) => utils.error('app', 'Test failed.', err));
+    return;
+  }
+
+  utils.getPort(opts).then((port) => {
+    const options = {
+      cwd: opts.localPath,
+      stdio: 'inherit',
+      env: _.merge(_.merge({}, process.env), buildPacks.config.test.app.env || {})
+    };
+
+    options.env.PORT = port;
+
+    utils.log('app', `Installing dependencies in: ${opts.localPath.yellow}`);
+    utils.log('app', `Using port: ${`${options.env.PORT}`.yellow}`);
+    utils.log('app', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+
+    if (opts.dryRun) {
+      utils.log('app', `Verifying ${opts.url.yellow || `http://localhost:${options.env.PORT}`.yellow}.`);
+      utils.log('app', 'Dry run complete.'.cyan);
+      return;
+    }
+
+    let requestErr = null;
+
+    // Start the app
+    const child = childProcess
+      .spawn(opts.cmd, opts.args, options)
+      .on('exit', (code, signal) => {
+        if (code || signal !== 'SIGTERM' || requestErr) {
+          utils.error('app', 'Test failed.', requestErr);
+        } else {
+          utils.log('app', 'Test complete.'.green);
+        }
+      });
+
+    utils.log('app', `Child process ID:`, `${child.pid}`.yellow);
+
+    function cleanup () {
+      // Try different ways of killing the child process
+      try {
+        process.kill(child.pid, 'SIGTERM');
+      } catch (err) {
+        // Ignore error
+      }
+      try {
+        child.kill('SIGTERM');
+      } catch (err) {
+        // Ignore error
+      }
+      process.removeListener('exit', cleanup);
+    }
+
+    // Be prepared to cleanup the child process
+    process.on('exit', cleanup);
+
+    // Give the app time to start up
+    setTimeout(() => {
+      // Test that the app is working
+      utils.testRequest(opts.url || `http://localhost:${options.env.PORT}`, opts)
+        .then(() => cleanup(), (err) => {
+          requestErr = err;
+          cleanup();
+        });
+    }, 3000);
+  });
 };
