@@ -22,5 +22,8 @@ cache:
   directories:
   - $HOME/node_modules/
 
+before_install:
+  - yarn global add semistandard
+
 script:
   - yarn test

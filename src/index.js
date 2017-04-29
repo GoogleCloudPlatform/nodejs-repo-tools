@@ -22,7 +22,7 @@ const proxyquire = require('proxyquire').noPreserveCache();
 const sinon = require(`sinon`);
 const supertest = require('supertest');
 
-const utils = require('./api/utils');
+const utils = require('./utils');
 
 exports.getRequest = (config) => {
   if (process.env.E2E_TESTS) {

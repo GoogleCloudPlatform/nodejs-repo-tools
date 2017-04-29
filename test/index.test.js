@@ -18,5 +18,5 @@ const test = require('ava');
 test('has correct exports', (t) => {
   const repoTools = require('../');
 
-  t.is(typeof repoTools.install, 'function');
+  t.is(typeof repoTools.getRequest, 'function');
 });
