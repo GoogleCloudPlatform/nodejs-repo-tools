@@ -92,9 +92,10 @@ class BuildPacks {
       }
     }
 
+    this.config = {};
+    _.merge(this.config, this.global);
+
     if (buildPack) {
-      this.config = {};
-      _.merge(this.config, this.global);
       _.merge(this.config, this[buildPack]);
     }
   }

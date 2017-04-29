@@ -19,6 +19,9 @@ module.exports = {
     localPath: process.cwd(),
     project: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
   },
+  lint: {
+    args: []
+  },
   test: {
     app: {},
     build: {
