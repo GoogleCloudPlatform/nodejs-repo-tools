@@ -1,0 +1,31 @@
+{
+  "name": "test-samples-nodejs-snippet",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Google Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
+  },
+  "engines": {
+    "node": ">=4.3.2"
+  },
+  "scripts": {
+    "lint": "../../../../bin/samples lint",
+    "pretest": "npm run lint",
+    "test": "ava -T 20s --verbose test/*.test.js"
+  },
+  "dependencies": {
+    "@google-cloud/translate": "0.8.1"
+  },
+  "devDependencies": {
+    "ava": "0.19.1",
+    "proxyquire": "1.7.11",
+    "sinon": "2.1.0"
+  },
+  "cloud-repo-tools": {
+    "requiresKeyFile": true,
+    "requiresProjectId": true
+  }
+}

@@ -21,14 +21,14 @@ const childProcess = require('child_process');
 const buildPacks = require('../../../build_packs');
 const utils = require('../../../utils');
 
-const START_CMD = buildPacks.config.test.app.cmd;
-const START_ARGS = buildPacks.config.test.app.args;
 const COMMAND = `samples test app ${'[options]'.yellow}`;
 const DESCRIPTION = `Start an app and test it with a GET request.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
-  ${DESCRIPTION}`;
+  ${DESCRIPTION}
+
+  Override the args passed to the configured start command by appending ${'-- "your" "args" "here"'.bold} when you run the ${'test app'.bold} command.`;
 
 exports.command = 'app';
 exports.description = DESCRIPTION;
@@ -37,11 +37,7 @@ exports.builder = (yargs) => {
     .usage(USAGE)
     .options({
       cmd: {
-        description: `${'Default:'.bold} ${START_CMD.yellow}. Override the command used to start the app.`,
-        type: 'string'
-      },
-      args: {
-        description: `${'Default:'.bold} ${START_ARGS.join(' ').yellow}. Override the args passed to the start command.`,
+        description: `${'Default:'.bold} ${buildPacks.config.test.app.cmd.yellow}. The command used to start the app.`,
         type: 'string'
       },
       port: {
@@ -91,15 +87,10 @@ exports.handler = (opts) => {
     utils.log('app', 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.loadConfig(opts);
+  buildPacks.expandConfig(opts);
 
-  opts.cmd || (opts.cmd = START_CMD);
-  if (opts.args) {
-    // TODO: Splitting like this isn't accurate enough
-    opts.args = opts.args.split(' ');
-  } else {
-    opts.args = START_ARGS;
-  }
+  opts.cmd || (opts.cmd = buildPacks.config.test.app.cmd);
+  opts.args || (opts.args = buildPacks.config.test.app.args);
   opts.port || (opts.port = buildPacks.config.test.app.port);
   opts.msg || (opts.msg = buildPacks.config.test.app.msg);
   opts.code || (opts.code = buildPacks.config.test.app.code);
@@ -131,12 +122,12 @@ exports.handler = (opts) => {
 
     options.env.PORT = port;
 
-    utils.log('app', `Installing dependencies in: ${opts.localPath.yellow}`);
+    utils.log('app', `Starting app in: ${opts.localPath.yellow}`);
     utils.log('app', `Using port: ${`${options.env.PORT}`.yellow}`);
     utils.log('app', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
     if (opts.dryRun) {
-      utils.log('app', `Verifying ${`${opts.url || `http://localhost:${options.env.PORT}`}`.yellow}.`);
+      utils.log('app', `Verifying: ${`${opts.url || `http://localhost:${options.env.PORT}`}`.yellow}.`);
       utils.log('app', 'Dry run complete.'.cyan);
       return;
     }

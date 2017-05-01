@@ -23,12 +23,14 @@ const utils = require('../../../utils');
 const TEST_CMD = buildPacks.config.test.run.cmd;
 const TEST_ARGS = buildPacks.config.test.run.args;
 const TEST_CMD_STR = `${TEST_CMD} ${TEST_ARGS.join(' ')}`.trim();
-const COMMAND = `samples test run ${'[options]'.yellow}`;
-const DESCRIPTION = `Run an app's system/unit tests by running: ${TEST_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const COMMAND = `samples test run ${'[options] [--] [args...]'.yellow}`;
+const DESCRIPTION = `Run ${TEST_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
-  ${DESCRIPTION}`;
+  ${DESCRIPTION}
+
+  Override the args passed to the configured test command by appending ${'-- "your" "args" "here"'.bold} when you run the ${'test run'.bold} command.`;
 
 exports.command = 'run';
 exports.description = DESCRIPTION;
@@ -37,14 +39,12 @@ exports.builder = (yargs) => {
     .usage(USAGE)
     .options({
       cmd: {
-        description: 'TODO',
-        type: 'string'
-      },
-      args: {
-        description: 'TODO',
+        description: `${'Default:'.bold} ${`${TEST_CMD}`.yellow}. The test command to use.`,
         type: 'string'
       }
-    });
+    })
+    .example('samples test run -l=~/projects/some/dir', `Runs the test command in the specified directory.`)
+    .example('samples test run --cmd=npm -- run system-test', `Runs ${'npm run system-test'.bold} instead of the default command.`);
 };
 
 exports.handler = (opts) => {
@@ -52,15 +52,10 @@ exports.handler = (opts) => {
     utils.log('run', 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.loadConfig(opts);
+  buildPacks.expandConfig(opts);
 
-  opts.cmd || (opts.cmd = TEST_CMD);
-  if (opts.args) {
-    // TODO: Splitting like this isn't accurate enough
-    opts.args = opts.args.split(' ');
-  } else {
-    opts.args = TEST_ARGS;
-  }
+  opts.cmd || (opts.cmd = buildPacks.config.test.run.cmd);
+  opts.args || (opts.args = buildPacks.config.test.run.args);
 
   utils.log('run', `Executing tests in: ${opts.localPath.yellow}`);
   utils.log('run', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);

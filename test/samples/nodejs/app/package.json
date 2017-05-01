@@ -1,0 +1,32 @@
+{
+  "name": "test-samples-nodejs-app",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Google Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
+  },
+  "engines": {
+    "node": ">=4.3.2"
+  },
+  "scripts": {
+    "lint": "../../../../bin/samples lint",
+    "pretest": "npm run lint",
+    "test": "../../../../bin/samples test app"
+  },
+  "dependencies": {
+    "express": "4.15.2"
+  },
+  "cloud-repo-tools": {
+    "requiresKeyFile": true,
+    "requiresProjectId": true,
+    "test": {
+      "app": {
+        "args": ["app.js"],
+        "msg": "Hello, world!"
+      }
+    }
+  }
+}

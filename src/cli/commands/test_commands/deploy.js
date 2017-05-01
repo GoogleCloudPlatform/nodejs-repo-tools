@@ -86,7 +86,7 @@ exports.handler = (opts) => {
     utils.log('deploy', 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.loadConfig(opts);
+  buildPacks.expandConfig(opts);
 
   opts.cmd || (opts.cmd = DEPLOY_CMD);
   opts.yaml || (opts.yaml = buildPacks.config.test.deploy.yaml);

@@ -15,12 +15,94 @@
 
 'use strict';
 
+const childProcess = require('child_process');
 const got = require('got');
 const net = require('net');
+const url = require('url');
 
 const { spawn } = require('child_process');
 
 const MAX_TRIES = 8;
+
+exports.parseArgs = (args = '') => {
+  if (Array.isArray(args)) {
+    return args;
+  }
+
+  const parsed = [];
+  let arg = '';
+  let inQuote = false;
+  let quoteChar = null;
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === `'`) {
+      if (inQuote) {
+        if (args[i - 1] === `\\`) {
+          arg += args[i];
+        } else {
+          if (quoteChar === `'`) {
+            arg += args[i];
+            inQuote = false;
+            quoteChar = null;
+          } else {
+            arg += args[i];
+          }
+        }
+      } else {
+        if (args[i - 1] === `\\`) {
+          arg += args[i];
+        } else {
+          arg += args[i];
+          quoteChar = `'`;
+          inQuote = true;
+        }
+      }
+    } else if (args[i] === `"`) {
+      if (inQuote) {
+        if (args[i - 1] === `\\`) {
+          arg += args[i];
+        } else {
+          if (quoteChar === `"`) {
+            arg += args[i];
+            inQuote = false;
+            quoteChar = null;
+          } else {
+            arg += args[i];
+          }
+        }
+      } else {
+        if (args[i - 1] === `\\`) {
+          arg += args[i];
+        } else {
+          arg += args[i];
+          quoteChar = `"`;
+          inQuote = true;
+        }
+      }
+    } else if (/\s/.test(args[i])) {
+      if (inQuote) {
+        arg += args[i];
+      } else if (arg) {
+        parsed.push(arg);
+        arg = ``;
+      } else {
+        args = ``;
+      }
+    } else {
+      arg += args[i];
+    }
+
+    if (i === args.length - 1) {
+      if (inQuote) {
+        throw new Error(`Unclosed quote in: ${args}`);
+      } else if (arg) {
+        parsed.push(arg);
+      }
+    }
+  }
+
+  return parsed;
+};
 
 exports.getUrl = (version, project) => {
   return `https://${version}-dot-${project}.appspot-preview.com`;
@@ -45,6 +127,31 @@ exports.error = (config, ...args) => {
 
 exports.log = (config, ...args) => {
   console.log(`${(typeof config === 'string' ? config : config.test).bold}:`, ...args);
+};
+
+exports.getRepoPath = (repository, cwd) => {
+  repository || (repository = {});
+  if (typeof repository === 'string') {
+    repository = {
+      url: repository
+    };
+  }
+
+  if (!repository.url) {
+    let pushUrl = childProcess.execSync('git remote get-url --push origin', {
+      cwd,
+      stdout: 'silent'
+    }).toString().trim();
+    const start = pushUrl.indexOf('github.com');
+    if (start >= 0) {
+      pushUrl = pushUrl.substring(start + 11);
+      if (pushUrl) {
+        return `/${pushUrl.replace('.git', '')}`;
+      }
+    }
+  }
+
+  return url.parse(repository.url).path.replace('.git', '');
 };
 
 let portrange = 45032;
@@ -74,7 +181,7 @@ exports.getPort = (config) => {
 };
 
 exports.testRequest = (url, config, numTry) => {
-  exports.log('app', 'Verifying', url.yellow);
+  exports.log('app', `Verifying: ${url.yellow}`);
   if (!numTry) {
     numTry = 1;
   }

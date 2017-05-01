@@ -15,6 +15,7 @@
 
 const _ = require('lodash');
 const fs = require('fs-extra');
+const parser = require('yargs-parser');
 const path = require('path');
 
 const utils = require('../utils');
@@ -38,27 +39,21 @@ class BuildPacks {
   detectBuildPack (args = process.argv) {
     let buildPack, localPath;
 
-    args.forEach((arg, i) => {
-      if (arg === '--build-pack' || arg === '--buildPack' || arg === 'b') {
-        if (args[i + 1] in packs) {
-          buildPack = args[i + 1];
-        }
-      } else if (arg.startsWith('--build-pack=')) {
-        buildPack = arg.replace('--build-pack=', '');
-      } else if (arg.startsWith('--buildPack=')) {
-        buildPack = arg.replace('--buildPack=', '');
-      } else if (arg.startsWith('-b=')) {
-        buildPack = arg.replace('-b=', '');
-      } else if (arg === '--local-path' || arg === '--localPath' || arg === '-l') {
-        localPath = args[i + 1];
-      }
-    });
+    const argv = parser(args);
+
+    buildPack = argv.buildPack || argv.b;
+    localPath = argv.localPath || argv.l;
 
     if (localPath) {
       localPath = path.resolve(localPath);
     } else {
       localPath = process.cwd();
-      process.argv.push(`--local-path=${localPath}`);
+      const index = process.argv.indexOf('--');
+      if (index >= 0) {
+        process.argv.splice(index, 0, `--local-path=${localPath}`);
+      } else {
+        process.argv.push(`--local-path=${localPath}`);
+      }
     }
 
     this.cwd = localPath;
@@ -74,6 +69,9 @@ class BuildPacks {
       this.current = buildPack;
     } else {
       packs.forEach((pack) => {
+        if (pack === 'global') {
+          return;
+        }
         try {
           if (this[pack].detect(localPath)) {
             buildPack = pack;
@@ -85,7 +83,12 @@ class BuildPacks {
       });
 
       if (buildPack) {
-        process.argv.push(`--build-pack=${buildPack}`);
+        const index = process.argv.indexOf('--');
+        if (index >= 0) {
+          process.argv.splice(index, 0, `--build-pack=${buildPack}`);
+        } else {
+          process.argv.push(`--build-pack=${buildPack}`);
+        }
 
         this.selected = false;
         this.current = buildPack;
@@ -100,24 +103,41 @@ class BuildPacks {
     }
   }
 
-  loadConfig (opts) {
+  expandConfig (opts) {
     opts.localPath = path.resolve(opts.localPath);
+    opts.cwd = opts.localPath;
+    const base = path.parse(opts.localPath).base;
 
-    let config;
+    let config = {};
+    let name, repository;
     const configFilename = opts.config || this.config.global.config;
     const configKey = opts.configKey || this.config.global.configKey;
 
     if (configFilename) {
       config = require(path.join(opts.localPath, configFilename));
+      name = config.name;
+      repository = config.repository;
       if (configKey) {
-        config = config[configKey];
+        config = config[configKey] || {};
       }
 
       // Values in the config file take precedence
       _.merge(this.config, config);
     }
 
+    opts.name = opts.name || config.name || name || base;
     opts.project = opts.project || this.config.global.project;
+    opts.builderProject = opts.builderProject || this.config.test.build.builderProject;
+    opts.repository = config.repository || repository;
+
+    const args = process.argv.slice(2);
+
+    args.forEach((arg, i) => {
+      if (arg === '--') {
+        opts.args = args.slice(i + 1);
+        return false;
+      }
+    });
   }
 }
 

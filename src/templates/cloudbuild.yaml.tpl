@@ -5,13 +5,13 @@ steps:
     'SHA={{sha}}',
     'REPO_PATH={{repoPath}}',
     'CI={{ci}}',
-    'CONTEXT={{test}}',
+    'CONTEXT={{name}}',
     'GOOGLE_APPLICATION_CREDENTIALS={{keyFileName}}',
     'GCLOUD_PROJECT={{project}}',
     'GOOGLE_CLOUD_PROJECT={{project}}'
   ]
   entrypoint: 'samples'
-  args: ['test', 'install', '--cmd', '{{installCmd}}', '--args', '{{installArgs}}']
+  args: ['test', 'install', '--cmd', '{{installCmd}}', '--', {{#each installArgs}}'{{this}}'{{#if @last}}{{else}}, {{/if}}{{/each}}]
 {{#if run}}- name: 'gcr.io/$PROJECT_ID/nodejs'
   env: [
     'CLOUD_BUILD=true',
@@ -20,7 +20,7 @@ steps:
     'GOOGLE_CLOUD_PROJECT={{project}}'
   ]
   entrypoint: 'samples'
-  args: ['test', 'run', '--cmd', '{{testCmd}}', '--args', '{{testArgs}}']{{/if}}
+  args: ['test', 'run', '--cmd', '{{testCmd}}', '--', {{#each testArgs}}'{{this}}'{{#if @last}}{{else}}, {{/if}}{{/each}}]{{/if}}
 {{#if app}}- name: 'gcr.io/$PROJECT_ID/nodejs'
   env: [
     'CLOUD_BUILD=true',
@@ -29,7 +29,7 @@ steps:
     'GOOGLE_CLOUD_PROJECT={{project}}'
   ]
   entrypoint: 'samples'
-  args: ['test', 'app', '--cmd', '{{startCmd}}', '--args', '{{startArgs}}']{{/if}}
+  args: ['test', 'app', '--cmd', '{{startCmd}}', '--', {{#each startArgs}}'{{this}}'{{#if @last}}{{else}}, {{/if}}{{/each}}]{{/if}}
 {{#if deploy}}- name: 'gcr.io/$PROJECT_ID/nodejs'
   env: [
     'CLOUD_BUILD=true',

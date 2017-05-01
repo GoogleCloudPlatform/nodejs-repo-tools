@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
@@ -15,10 +15,17 @@
     "samples": "./bin/samples"
   },
   "main": "src/index.js",
+  "ava": {
+    "files": [
+      "test/**/*.test.js",
+      "!test/samples/**/*.test.js"
+    ]
+  },
   "scripts": {
     "lint": "node ./bin/samples lint",
     "check": "yarn check --strict-semver --integrity",
-    "test": "npm run lint && ava --verbose test/**/*.test.js"
+    "ava": "ava --verbose",
+    "test": "npm run lint && npm run ava"
   },
   "contributors": [
     {

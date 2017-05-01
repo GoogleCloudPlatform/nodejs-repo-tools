@@ -20,20 +20,22 @@ const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
 const string = require('string');
+
+const buildPacks = require('../../build_packs');
+const products = require('../../utils/products');
 const utils = require('../../utils');
 
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
 
-const tpl = path.join(__dirname, '../templates/readme.tpl');
+const tpl = path.join(__dirname, '../../templates/readme.tpl');
 
 function fillInMissing (samples) {
   samples.samples || (samples.samples = []);
 }
 
-function gatherHelpText (filename, samples) {
-  var dir = path.parse(filename).dir;
-  samples.samples.forEach((sample) => {
+function gatherHelpText (opts, buildPacks) {
+  buildPacks.config.samples.forEach((sample) => {
     if (typeof sample.usage === 'string') {
       sample.usage = {
         cmd: sample.usage,
@@ -41,71 +43,71 @@ function gatherHelpText (filename, samples) {
       };
     }
     if (!sample.help && sample.usage && typeof sample.usage.cmd === 'string') {
-      sample.help = execSync(sample.usage.cmd, {
-        cwd: dir
-      });
-    }
-  });
-}
-
-function parse (filename, cb) {
-  fs.stat(filename, (err) => {
-    if (err) {
-      cb(new Error(filename + ' does not exist!'));
-      return;
-    }
-
-    fs.readJson(filename, (err, samples) => {
-      if (err) {
-        cb(err);
-        return;
+      try {
+        sample.help = execSync(sample.usage.cmd, {
+          cwd: opts.localPath
+        }).toString().trim();
+      } catch (err) {
+        utils.error('generate', err.message);
+        process.exit(err.status);
       }
-
-      fillInMissing(samples);
-      gatherHelpText(filename, samples);
-
-      cb(null, samples);
-    });
+    }
   });
 }
+
+function expandOpts (opts, buildPacks) {
+  fillInMissing(opts, buildPacks);
+  gatherHelpText(opts, buildPacks);
+}
+
+const COMMAND = `samples generate ${'[options]'.yellow}`;
+const DESCRIPTION = `Generate a README in ${buildPacks.cwd.yellow}.`;
+const USAGE = `Usage:
+  ${COMMAND.bold}
+Description:
+  ${DESCRIPTION}`;
 
 exports.command = 'generate';
-exports.description = 'Generate a README.md file in the current directory.';
+exports.description = DESCRIPTION;
 
 exports.builder = (yargs) => {
   yargs
-    .options({
-      filename: {
-        alias: 'f',
-        default: path.join(process.cwd(), 'samples.json'),
-        type: 'string'
-      }
-    });
+    .usage(USAGE);
 };
 
 exports.handler = (opts) => {
-  const dir = path.parse(opts.filename).dir;
+  if (opts.dryRun) {
+    utils.log('generate', 'Beginning dry run.'.cyan);
+  }
 
-  parse(opts.filename, (err, json) => {
+  buildPacks.expandConfig(opts);
+
+  utils.log('generate', `Generating README in: ${opts.localPath.yellow}`);
+
+  expandOpts(opts, buildPacks);
+  opts.repoPath = utils.getRepoPath(opts.repository, opts.localPath) || null;
+  buildPacks.config.badgeUri = path.join('cloud-docs-samples-badges', opts.repoPath, opts.name);
+
+  Object.keys(products[buildPacks.config.product]).forEach((field) => {
+    buildPacks.config[field] = products[buildPacks.config.product][field];
+  });
+
+  const readmePath = path.join(opts.localPath, 'README.md');
+  utils.log('generate', 'Compiling:', readmePath.yellow);
+
+  const readme = handlebars.compile(fs.readFileSync(tpl, 'utf-8'))(buildPacks.config);
+
+  if (opts.dryRun) {
+    utils.log('generate', `Printing: ${readmePath.yellow}\n${readme}`);
+    return;
+  }
+
+  fs.writeFile(readmePath, readme, (err) => {
     if (err) {
-      console.log(err.message.red);
-      return;
+      utils.error('generate', err.stack || err.message);
+      process.exit(1);
     }
 
-    Object.keys(utils.products[json.id]).forEach((field) => {
-      json[field] = utils.products[json.id][field];
-    });
-
-    const template = handlebars.compile(fs.readFileSync(tpl, 'utf-8'));
-    const readmePath = path.join(dir, 'README.md');
-
-    fs.writeFile(readmePath, template(json), (err) => {
-      if (err) {
-        console.log('Failed to generated README.md'.red);
-        return;
-      }
-
-      console.log(('Generated ' + readmePath).green);
-    });
+    utils.log('generate', `Generated: ${readmePath}`.green);
   });
 };

@@ -52,6 +52,7 @@ exports.handler = (opts) => {
       .filter((file) => file)
       .map((file) => {
         // TODO: Do more escaping of user input
+        // TOOD: Also, this doesn't work right. samples lint \"**/*.js\" \"scripts/*\" doesn't work
         if (!file.startsWith(`'`)) {
           file = `'${file}`;
         }

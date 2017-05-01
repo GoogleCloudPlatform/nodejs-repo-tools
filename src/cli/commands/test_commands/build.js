@@ -15,13 +15,11 @@
 
 require('colors');
 
-const _ = require('lodash');
 const childProcess = require('child_process');
 const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
 const string = require('string');
-const url = require('url');
 
 const buildPacks = require('../../../build_packs');
 const utils = require('../../../utils');
@@ -116,6 +114,7 @@ exports.builder = (yargs) => {
         requiresArg: true,
         type: 'string'
       },
+      // TODO: Copy env vars into build?
       'start-cmd': {
         description: `${'Default:'.bold} ${`${buildPacks.config.test.app.cmd}`.yellow}. The command the web app test will use to start the app.`,
         requiresArg: true,
@@ -141,66 +140,46 @@ exports.builder = (yargs) => {
 };
 
 exports.handler = (opts) => {
-  opts.localPath = path.resolve(opts.localPath);
-  const base = path.parse(opts.localPath).base;
-  let configPath;
-  let topConfig = {};
-  let config = {};
-
-  _.mergeWith(opts, buildPacks.config.global, (objValue, srcValue) => objValue === undefined ? srcValue : objValue);
-  _.mergeWith(opts, buildPacks.config.test.build, (objValue, srcValue) => objValue === undefined ? srcValue : objValue);
-
-  opts.installCmd || (opts.installCmd = buildPacks.config.test.install.cmd);
-  opts.installArgs || (opts.installArgs = buildPacks.config.test.install.args.join(' '));
-  opts.testCmd || (opts.testCmd = buildPacks.config.test.run.cmd);
-  opts.testArgs || (opts.testArgs = buildPacks.config.test.run.args.join(' '));
-  opts.startCmd || (opts.startCmd = buildPacks.config.test.app.cmd);
-  opts.startArgs || (opts.startArgs = buildPacks.config.test.app.args.join(' '));
-  if (opts.run === undefined) {
-    opts.run = buildPacks.config.test.build.run;
-  }
-
-  // Load the config file, if any
-  if (opts.config && opts.config !== 'false') {
-    configPath = path.join(opts.localPath, opts.config);
-    try {
-      topConfig = require(configPath) || {};
-      if (opts.configKey) {
-        config = topConfig[opts.configKey] || {};
-      } else {
-        config = topConfig;
-      }
-    } catch (err) {
-      if (err.message.includes('Cannot find')) {
-        utils.error('base', `Could not locate ${configPath}`);
-      } else if (err.message.includes('JSON')) {
-        utils.error('base', `Failed to parse ${configPath}`);
-      }
-      utils.error('base', err.stack || err.message);
-      process.exit(1);
-    }
-  }
-
-  Object.assign(opts, config);
-  opts.test = config.test || config.name || topConfig.name || base;
-  opts.cwd = opts.localPath;
-  opts.cloudbuildYamlPath = path.join(opts.localPath, 'repo-tools-cloudbuild.yaml');
-
   if (opts.dryRun) {
     utils.log('build', 'Beginning dry run...'.cyan);
   }
 
-  if (opts.requiresKeyFile && !opts.keyFile) {
-    utils.error('opts', `Build target requires a key file but none was provided!`);
+  buildPacks.expandConfig(opts);
+
+  opts.keyFile || (opts.keyFile = buildPacks.config.test.build.keyFile);
+  opts.installCmd || (opts.installCmd = buildPacks.config.test.install.cmd);
+  if (opts.installArgs) {
+    opts.installArgs = utils.parseArgs(opts.installArgs);
+  } else {
+    opts.installArgs = buildPacks.config.test.install.args;
+  }
+  opts.testCmd || (opts.testCmd = buildPacks.config.test.run.cmd);
+  if (opts.testArgs) {
+    opts.testArgs = utils.parseArgs(opts.testArgs);
+  } else {
+    opts.testArgs = buildPacks.config.test.run.args;
+  }
+  opts.startCmd || (opts.startCmd = buildPacks.config.test.app.cmd);
+  if (opts.startArgs) {
+    opts.startArgs = utils.parseArgs(opts.startArgs);
+  } else {
+    opts.startArgs = buildPacks.config.test.app.args;
+  }
+  if (opts.run === undefined) {
+    opts.run = buildPacks.config.test.build.run;
+  }
+
+  opts.cloudbuildYamlPath = path.join(opts.localPath, 'repo-tools-cloudbuild.yaml');
+
+  if (buildPacks.config.requiresKeyFile && !opts.keyFile) {
+    utils.error('build', `Build target requires a key file but none was provided!`);
     process.exit(1);
-  } else if (opts.requiresProject && !opts.project) {
-    utils.error('opts', `Build target requires a project ID but none was provided!`);
+  } else if (buildPacks.config.requiresProject && !opts.project) {
+    utils.error('build', `Build target requires a project ID but none was provided!`);
     process.exit(1);
   }
 
-  utils.log('build', `Detected build target: ${(configPath || base).yellow}`);
-
-  opts.repoPath = getRepoPath(config.repository || topConfig.repository) || 'UNKNOWN';
+  opts.repoPath = utils.getRepoPath(opts.repository, opts.localPath) || 'UNKNOWN';
   if (opts.repoPath) {
     utils.log('build', `Detected repository: ${opts.repoPath.magenta}`);
   }
@@ -214,7 +193,7 @@ exports.handler = (opts) => {
 
   try {
     // Setup key file, if any
-    if (opts.keyFile && opts.requiresKeyFile) {
+    if (opts.keyFile && buildPacks.config.requiresKeyFile) {
       opts.keyFilePath = path.resolve(opts.keyFile);
       utils.log('build', `Copying: ${opts.keyFilePath.yellow}`);
       opts.keyFileName = path.parse(opts.keyFilePath).base;
@@ -279,21 +258,6 @@ function cleanup (opts) {
   try {
     fs.unlinkSync(opts.copiedKeyFilePath);
   } catch (err) {}
-}
-
-function getRepoPath (repository) {
-  repository || (repository = {});
-  if (typeof repository === 'string') {
-    repository = {
-      url: repository
-    };
-  }
-
-  if (!repository.url) {
-    throw new Error('Missing repository!');
-  }
-
-  return url.parse(repository.url).path.replace('.git', '');
 }
 
 function getHeadCommitSha (cwd) {

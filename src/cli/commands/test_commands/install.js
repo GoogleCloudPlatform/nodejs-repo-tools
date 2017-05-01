@@ -23,12 +23,14 @@ const utils = require('../../../utils');
 const INSTALL_CMD = buildPacks.config.test.install.cmd;
 const INSTALL_ARGS = buildPacks.config.test.install.args;
 const INSTALL_CMD_STR = `${INSTALL_CMD} ${INSTALL_ARGS.join(' ')}`.trim();
-const COMMAND = `samples test install ${'[options]'.yellow}`;
-const DESCRIPTION = `Install an application's dependencies by running: ${INSTALL_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const COMMAND = `samples test install ${'[options] [--] [args...]'.yellow}`;
+const DESCRIPTION = `Run ${INSTALL_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
-  ${DESCRIPTION}`;
+  ${DESCRIPTION}
+
+  Override the args passed to the configured install command by appending ${'-- "your" "args" "here"'.bold} when you run the ${'test install'.bold} command.`;
 
 exports.command = 'install';
 exports.description = DESCRIPTION;
@@ -37,14 +39,12 @@ exports.builder = (yargs) => {
     .usage(USAGE)
     .options({
       cmd: {
-        description: 'TODO',
-        type: 'string'
-      },
-      args: {
-        description: 'TODO',
+        description: `${'Default:'.bold} ${`${INSTALL_CMD}`.yellow}. The install command to use.`,
         type: 'string'
       }
-    });
+    })
+    .example('samples test install -l=~/projects/some/dir', `Runs the install command in the specified directory.`)
+    .example('samples test install --cmd=npm -- install --no-optional', `Runs ${'npm install --no-optional'.bold} instead of the default command.`);
 };
 
 exports.handler = (opts) => {
@@ -52,15 +52,10 @@ exports.handler = (opts) => {
     utils.log('install', 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.loadConfig(opts);
+  buildPacks.expandConfig(opts);
 
-  opts.cmd || (opts.cmd = INSTALL_CMD);
-  if (opts.args) {
-    // TODO: Splitting like this isn't accurate enough
-    opts.args = opts.args.split(' ');
-  } else {
-    opts.args = INSTALL_ARGS;
-  }
+  opts.cmd || (opts.cmd = buildPacks.config.test.install.cmd);
+  opts.args || (opts.args = buildPacks.config.test.install.args);
 
   utils.log('install', `Installing dependencies in: ${opts.localPath.yellow}`);
   utils.log('install', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
