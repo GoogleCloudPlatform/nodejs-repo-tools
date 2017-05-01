@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
@@ -9,7 +9,7 @@
     "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
   },
   "engines": {
-    "node": ">=4.3.2"
+    "node": ">=6"
   },
   "bin": {
     "samples": "./bin/samples"
