@@ -16,6 +16,22 @@
 const fs = require('fs-extra');
 const path = require('path');
 
+const SETUP = `
+1.  Read [Prerequisites][prereq] and [How to run a sample][run] first.
+1.  Install dependencies:
+
+        bundle install
+
+[prereq]: ../README.md#prerequisities
+[run]: ../README.md#how-to-run-a-sample`;
+
+const TESTS = `
+1.  Set the **GCLOUD_PROJECT** and **GOOGLE_APPLICATION_CREDENTIALS** environment variables.
+
+1.  Run the tests:
+
+        bundle exec rspec`;
+
 module.exports = {
   global: {
     config: '.cloud-repo-tools.json',
@@ -42,5 +58,9 @@ module.exports = {
       cmd: 'bundle',
       args: ['exec', 'rspec', '--format', 'documentation']
     }
+  },
+  readme: {
+    setup: SETUP,
+    tests: TESTS
   }
 };

@@ -16,20 +16,7 @@
 * [Running the tests](#running-the-tests)
 
 ## Setup
-
-1.  Read [Prerequisites][prereq] and [How to run a sample][run] first.
-1.  Install dependencies:
-
-    With `npm`:
-
-        npm install
-
-    With `yarn`:
-
-        yarn install
-
-[prereq]: ../README.md#prerequisities
-[run]: ../README.md#how-to-run-a-sample
+{{readme.setup}}
 
 ## Samples
 {{#each samples}}
@@ -61,16 +48,4 @@ __Usage:__ `{{{usage.text}}}`
 {{/each}}
 
 ## Running the tests
-
-1.  Set the `GCLOUD_PROJECT` and `GOOGLE_APPLICATION_CREDENTIALS` environment
-    variables.
-
-1.  Run the tests:
-
-    With `npm`:
-
-        npm test
-
-    With `yarn`:
-
-        yarn test
+{{readme.tests}}

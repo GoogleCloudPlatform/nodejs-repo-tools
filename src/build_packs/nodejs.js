@@ -16,6 +16,34 @@
 const fs = require('fs-extra');
 const path = require('path');
 
+const SETUP = `
+1.  Read [Prerequisites][prereq] and [How to run a sample][run] first.
+1.  Install dependencies:
+
+    With **npm**:
+
+        npm install
+
+    With **yarn**:
+
+        yarn install
+
+[prereq]: ../README.md#prerequisities
+[run]: ../README.md#how-to-run-a-sample`;
+
+const TESTS = `
+1.  Set the **GCLOUD_PROJECT** and **GOOGLE_APPLICATION_CREDENTIALS** environment variables.
+
+1.  Run the tests:
+
+    With **npm**:
+
+        npm test
+
+    With **yarn**:
+
+        yarn test`;
+
 module.exports = {
   global: {
     config: 'package.json',
@@ -42,5 +70,9 @@ module.exports = {
       cmd: 'yarn',
       args: ['test']
     }
+  },
+  readme: {
+    setup: SETUP,
+    tests: TESTS
   }
 };
