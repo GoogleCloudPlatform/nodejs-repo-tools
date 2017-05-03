@@ -114,15 +114,19 @@ class BuildPacks {
     const configKey = opts.configKey || this.config.global.configKey;
 
     if (configFilename) {
-      config = require(path.join(opts.localPath, configFilename));
-      name = config.name;
-      repository = config.repository;
-      if (configKey) {
-        config = config[configKey] || {};
-      }
+      try {
+        config = this[this.current].load(path.join(opts.localPath, configFilename));
+        name = config.name;
+        repository = config.repository;
+        if (configKey) {
+          config = config[configKey] || {};
+        }
 
-      // Values in the config file take precedence
-      _.merge(this.config, config);
+        // Values in the config file take precedence
+        _.merge(this.config, config);
+      } catch (err) {
+        // TODO: Print something here?
+      }
     }
 
     opts.name = opts.name || config.name || name || base;

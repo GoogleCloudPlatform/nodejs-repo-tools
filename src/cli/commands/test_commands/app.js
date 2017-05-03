@@ -116,7 +116,7 @@ exports.handler = (opts) => {
   utils.getPort(opts).then((port) => {
     const options = {
       cwd: opts.localPath,
-      stdio: 'inherit',
+      stdio: opts.silent ? 'ignore' : 'inherit',
       env: _.merge(_.merge({}, process.env), buildPacks.config.test.app.env || {})
     };
 

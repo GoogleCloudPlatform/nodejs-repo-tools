@@ -121,7 +121,7 @@ exports.handler = (opts) => {
       try {
         childProcess.execSync(`gcloud auth activate-service-account --key-file key.json`, {
           cwd: opts.localPath,
-          stdio: 'inherit'
+          stdio: opts.silent ? 'ignore' : 'inherit'
         });
       } catch (err) {
         // Ignore error
@@ -152,7 +152,7 @@ exports.handler = (opts) => {
     const options = {
       cwd: opts.localPath,
       // shell: true,
-      stdio: 'inherit',
+      stdio: opts.silent ? 'ignore' : 'inherit',
       timeout: 12 * 60 * 1000 // 12-minute timeout
     };
 

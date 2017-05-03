@@ -114,6 +114,16 @@ exports.builder = (yargs) => {
         requiresArg: true,
         type: 'string'
       },
+      'requires-key-file': {
+        description: `${'Default:'.bold} ${'false'.yellow}.`,
+        type: 'boolean'
+      },
+      'required-env-vars': {
+        alias: 'r',
+        description: 'Specify environment variables that must be pulled from the environment and injected into the build.',
+        requiresArg: true,
+        type: 'string'
+      },
       // TODO: Copy env vars into build?
       'start-cmd': {
         description: `${'Default:'.bold} ${`${buildPacks.config.test.app.cmd}`.yellow}. The command the web app test will use to start the app.`,
@@ -148,7 +158,8 @@ exports.handler = (opts) => {
 
   opts.keyFile || (opts.keyFile = buildPacks.config.test.build.keyFile);
   opts.installCmd || (opts.installCmd = buildPacks.config.test.install.cmd);
-  opts.ci = (opts.ci = buildPacks.config.test.build.ci);
+  opts.ci || (opts.ci = buildPacks.config.test.build.ci);
+  opts.requiresKeyFile || (opts.requiresKeyFile = buildPacks.config.requiresKeyFile);
   if (opts.installArgs) {
     opts.installArgs = utils.parseArgs(opts.installArgs);
   } else {
@@ -172,13 +183,29 @@ exports.handler = (opts) => {
 
   opts.cloudbuildYamlPath = path.join(opts.localPath, 'repo-tools-cloudbuild.yaml');
 
-  if (buildPacks.config.requiresKeyFile && !opts.keyFile) {
+  if (opts.requiresKeyFile && !opts.keyFile) {
     utils.error('build', `Build target requires a key file but none was provided!`);
     process.exit(1);
   } else if (buildPacks.config.requiresProject && !opts.project) {
     utils.error('build', `Build target requires a project ID but none was provided!`);
     process.exit(1);
   }
+
+  // Verify that required env vars are set, if any
+  opts.requiredEnvVars = opts.requiredEnvVars || buildPacks.config.test.build.requiredEnvVars || [];
+  if (opts.requiredEnvVars && typeof opts.requiredEnvVars === 'string') {
+    opts.requiredEnvVars = opts.requiredEnvVars.split(',');
+  }
+  opts.requiredEnvVars = opts.requiredEnvVars.map((envVar) => {
+    if (!process.env[envVar]) {
+      utils.error('app', `Test requires that the ${envVar} environment variable be set!`);
+      process.exit(1);
+    }
+    return {
+      key: envVar,
+      value: process.env[envVar]
+    };
+  });
 
   opts.repoPath = utils.getRepoPath(opts.repository, opts.localPath) || 'UNKNOWN';
   if (opts.repoPath) {
@@ -194,7 +221,7 @@ exports.handler = (opts) => {
 
   try {
     // Setup key file, if any
-    if (opts.keyFile && buildPacks.config.requiresKeyFile) {
+    if (opts.keyFile && opts.requiresKeyFile) {
       opts.keyFilePath = path.resolve(opts.keyFile);
       utils.log('build', `Copying: ${opts.keyFilePath.yellow}`);
       opts.keyFileName = path.parse(opts.keyFilePath).base;
@@ -230,7 +257,7 @@ exports.handler = (opts) => {
       try {
         childProcess.execSync(buildCmd, {
           cwd: opts.localPath,
-          stdio: 'inherit',
+          stdio: opts.silent ? 'ignore' : 'inherit',
           timeout: 20 * 60 * 1000
         });
         // Remove temp files

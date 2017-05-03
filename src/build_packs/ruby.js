@@ -18,10 +18,10 @@ const path = require('path');
 
 module.exports = {
   global: {
-    config: 'package.json',
-    configKey: 'cloud-repo-tools'
+    config: '.cloud-repo-tools.json',
+    configKey: null
   },
-  detect: (cwd) => fs.statSync(path.join(cwd, 'package.json')).isFile(),
+  detect: (cwd) => fs.statSync(path.join(cwd, 'Gemfile')).isFile(),
   load: (filename) => require(filename),
   lint: {
     cmd: 'semistandard',
@@ -29,18 +29,18 @@ module.exports = {
   },
   test: {
     app: {
-      cmd: 'node',
-      args: ['app.js']
+      cmd: 'bundle',
+      args: ['exec', 'ruby', 'app.rb']
     },
     build: {},
     deploy: {},
     install: {
-      cmd: 'yarn',
-      args: ['install', '--mutex', 'file:/tmp/.yarn-mutex']
+      cmd: 'bundle',
+      args: ['install']
     },
     run: {
-      cmd: 'yarn',
-      args: ['test']
+      cmd: 'bundle',
+      args: ['exec', 'rspec', '--format', 'documentation']
     }
   }
 };

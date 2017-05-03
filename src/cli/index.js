@@ -41,6 +41,11 @@ module.exports = require('yargs')
       description: `${'Default:'.bold} ${`${buildPacks.global.global.dryRun}`.yellow}. Print the actions that ${'would'.italic} be taken, but don't actually do anything.`,
       global: true,
       type: 'boolean'
+    },
+    'silent': {
+      description: `${'Default:'.bold} ${'false'.yellow}. If true, hide the output of shell commands.`,
+      global: true,
+      type: 'boolean'
     }
   })
   .wrap(120)

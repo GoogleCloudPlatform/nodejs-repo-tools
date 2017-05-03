@@ -1,0 +1,13 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud container builds submit . --config=cloudbuild.yaml
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/ruby', '.']
+
+# Print Ruby version.
+- name: 'gcr.io/$PROJECT_ID/ruby'
+  entrypoint: 'ruby'
+  args: ['--version']
+
+images: ['gcr.io/$PROJECT_ID/ruby']

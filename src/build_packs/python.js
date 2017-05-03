@@ -22,6 +22,7 @@ module.exports = {
     configKey: null
   },
   detect: (cwd) => fs.statSync(path.join(cwd, 'requirements.txt')).isFile(),
+  load: (filename) => require(filename),
   lint: {
     cmd: 'nox',
     args: ['lint']
