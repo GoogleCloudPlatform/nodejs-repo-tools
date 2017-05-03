@@ -1,5 +1,5 @@
 steps:
-- name: 'gcr.io/$PROJECT_ID/nodejs'
+- name: 'gcr.io/$PROJECT_ID/{{buildPack}}'
   env: [
     'CLOUD_BUILD=true',
     'SHA={{sha}}',
@@ -15,7 +15,7 @@ steps:
   ]
   entrypoint: 'samples'
   args: ['test', 'install', '--cmd', '{{installCmd}}', '--', {{#each installArgs}}'{{this}}'{{#if @last}}{{else}}, {{/if}}{{/each}}]
-{{#if run}}- name: 'gcr.io/$PROJECT_ID/nodejs'
+{{#if run}}- name: 'gcr.io/$PROJECT_ID/{{buildPack}}'
   env: [
     'CLOUD_BUILD=true',
     'GOOGLE_APPLICATION_CREDENTIALS={{keyFileName}}',
@@ -27,7 +27,7 @@ steps:
   ]
   entrypoint: 'samples'
   args: ['test', 'run', '--cmd', '{{testCmd}}', '--', {{#each testArgs}}'{{this}}'{{#if @last}}{{else}}, {{/if}}{{/each}}]{{/if}}
-{{#if app}}- name: 'gcr.io/$PROJECT_ID/nodejs'
+{{#if app}}- name: 'gcr.io/$PROJECT_ID/{{buildPack}}'
   env: [
     'CLOUD_BUILD=true',
     'GOOGLE_APPLICATION_CREDENTIALS={{keyFileName}}',
@@ -39,7 +39,7 @@ steps:
   ]
   entrypoint: 'samples'
   args: ['test', 'app', '--cmd', '{{startCmd}}', '--', {{#each startArgs}}'{{this}}'{{#if @last}}{{else}}, {{/if}}{{/each}}]{{/if}}
-{{#if deploy}}- name: 'gcr.io/$PROJECT_ID/nodejs'
+{{#if deploy}}- name: 'gcr.io/$PROJECT_ID/{{buildPack}}'
   env: [
     'CLOUD_BUILD=true',
     'GOOGLE_APPLICATION_CREDENTIALS={{keyFileName}}',

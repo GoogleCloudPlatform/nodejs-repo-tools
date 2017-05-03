@@ -160,6 +160,7 @@ exports.handler = (opts) => {
   opts.installCmd || (opts.installCmd = buildPacks.config.test.install.cmd);
   opts.ci || (opts.ci = buildPacks.config.test.build.ci);
   opts.requiresKeyFile || (opts.requiresKeyFile = buildPacks.config.requiresKeyFile);
+  opts.image || (opts.image = opts.buildPack);
   if (opts.installArgs) {
     opts.installArgs = utils.parseArgs(opts.installArgs);
   } else {
