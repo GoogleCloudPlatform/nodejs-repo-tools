@@ -33,6 +33,7 @@ const TESTS = `
         nox`;
 
 module.exports = {
+  display: 'Python',
   global: {
     config: '.cloud-repo-tools.json',
     configKey: null

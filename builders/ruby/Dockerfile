@@ -1,5 +1,5 @@
 # Use the base gcloud image, based on ubuntu:trusty
-FROM gcr.io/cloud-docs-samples/nodejs
+FROM gcr.io/cloud-docs-samples/base
 
 # Install Ruby
 RUN apt-get update -y && \

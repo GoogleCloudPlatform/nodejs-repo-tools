@@ -45,6 +45,7 @@ const TESTS = `
         yarn test`;
 
 module.exports = {
+  display: 'Node.js',
   global: {
     config: 'package.json',
     configKey: 'cloud-repo-tools'

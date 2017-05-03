@@ -33,6 +33,7 @@ const TESTS = `
         bundle exec rspec`;
 
 module.exports = {
+  display: 'Ruby',
   global: {
     config: '.cloud-repo-tools.json',
     configKey: null
