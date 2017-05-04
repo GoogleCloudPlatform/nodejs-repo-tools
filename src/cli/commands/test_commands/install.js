@@ -43,8 +43,10 @@ exports.builder = (yargs) => {
         type: 'string'
       }
     })
-    .example('samples test install -l=~/projects/some/dir', `Runs the install command in the specified directory.`)
-    .example('samples test install --cmd=npm -- install --no-optional', `Runs ${'npm install --no-optional'.bold} instead of the default command.`);
+    .example('Run the install command in the specified directory:')
+    .example(`- ${'samples test install -l=~/projects/some/dir'.cyan}`)
+    .example(`Runs ${'npm install --no-optional'.bold} instead of the default command:`)
+    .example(`- ${'samples test install --cmd=npm -- install --no-optional'.cyan}`);
 };
 
 exports.handler = (opts) => {

@@ -146,7 +146,10 @@ exports.builder = (yargs) => {
         type: 'string'
       }
     })
-    .example('samples test build -l=~/nodejs-docs-samples/appengine/cloudsql --app --deploy');
+    .example('Start a build in the current directory with default settings:')
+    .example(`- ${'$ samples test build'.cyan}`)
+    .example('Start a build that tests and deploys an App Engine app:')
+    .example(`- ${'$ samples test build -l=~/nodejs-docs-samples/appengine/cloudsql --app --deploy'.cyan}`);
 };
 
 exports.handler = (opts) => {

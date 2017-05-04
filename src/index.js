@@ -19,7 +19,7 @@ const assert = require('assert');
 const childProcess = require('child_process');
 const path = require('path');
 const proxyquire = require('proxyquire').noPreserveCache();
-const sinon = require(`sinon`);
+const sinon = require('sinon');
 const supertest = require('supertest');
 
 const utils = require('./utils');

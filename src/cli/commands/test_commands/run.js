@@ -43,8 +43,10 @@ exports.builder = (yargs) => {
         type: 'string'
       }
     })
-    .example('samples test run -l=~/projects/some/dir', `Runs the test command in the specified directory.`)
-    .example('samples test run --cmd=npm -- run system-test', `Runs ${'npm run system-test'.bold} instead of the default command.`);
+    .example('Run the test command in the specified directory:')
+    .example(`- ${'samples test run -l=~/projects/some/dir'.cyan}`)
+    .example(`Runs ${'npm run system-test'.bold} instead of the default command:`)
+    .example(`- ${'samples test install --cmd=npm -- run system-test'.cyan}`);
 };
 
 exports.handler = (opts) => {

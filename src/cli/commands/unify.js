@@ -15,8 +15,8 @@
 
 require('colors');
 
-const fs = require(`fs`);
-const path = require(`path`);
+const fs = require('fs');
+const path = require('path');
 
 exports.command = 'unify';
 exports.description = 'Recursively add sub-directory dependencies to the top-level package.json file.';

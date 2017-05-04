@@ -17,4 +17,4 @@
 
 const path = require('path');
 
-require(path.join(__dirname, '../src/cli')).parse(process.argv.slice(2));
+require('../src/cli').parse(process.argv.slice(2));
