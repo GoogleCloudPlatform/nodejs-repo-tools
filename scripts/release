@@ -38,4 +38,5 @@ run('pkg', ['.'])
   .then(() => run('gsutil', ['cp', '@google-cloud/*', `gs://cloud-docs-samples/releases/${version}/`]))
   .then(() => run('gsutil', ['acl', 'ch', '-u', 'AllUsers:R', `gs://cloud-docs-samples/releases/${version}/*`]))
   .then(() => run('gsutil', ['cp', `gs://cloud-docs-samples/releases/${version}/*`, 'gs://cloud-docs-samples/releases/latest/']))
-  .then(() => run('gsutil', ['acl', 'ch', '-u', 'AllUsers:R', 'gs://cloud-docs-samples/releases/latest/*']));
+  .then(() => run('gsutil', ['acl', 'ch', '-u', 'AllUsers:R', 'gs://cloud-docs-samples/releases/latest/*']))
+  .catch(console.error);

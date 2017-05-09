@@ -35,7 +35,7 @@
     "lint": "node ./bin/samples lint",
     "check": "yarn check --strict-semver --integrity",
     "ava": "ava --verbose",
-    "release": "pkg .",
+    "release": "node scripts/release",
     "test": "npm run lint && npm run ava"
   },
   "contributors": [
