@@ -32,7 +32,8 @@ module.exports = {
     },
     deploy: {
       cmd: 'gcloud',
-      yaml: 'app.yaml'
+      yaml: 'app.yaml',
+      tries: 1
     },
     install: {},
     run: {}

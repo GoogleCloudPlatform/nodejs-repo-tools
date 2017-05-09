@@ -77,6 +77,11 @@ exports.builder = (yargs) => {
         description: `Specify variable substitutions for the deployment's yaml file.`,
         requiresArg: true,
         type: 'string'
+      },
+      tries: {
+        description: `${'Default:'.bold} ${'1'.yellow}. Number of times to attempt deployment. Deployment will only be attempted again if the previous deployment fails. Must be greater than zero.`,
+        requiresArg: true,
+        type: 'number'
       }
     });
 };
@@ -91,6 +96,13 @@ exports.handler = (opts) => {
   opts.cmd || (opts.cmd = DEPLOY_CMD);
   opts.yaml || (opts.yaml = buildPacks.config.test.deploy.yaml);
   opts.version || (opts.version = path.parse(opts.localPath).base);
+  if (opts.tries === undefined) {
+    opts.tries = buildPacks.config.test.deploy.tries;
+  }
+  if (opts.tries < 1) {
+    // Must try at least once
+    opts.tries = 1;
+  }
 
   // Verify that required env vars are set, if any
   opts.requiredEnvVars = opts.requiredEnvVars || _.get(buildPacks, 'config.test.app.requiredEnvVars', []);
@@ -156,31 +168,45 @@ exports.handler = (opts) => {
       timeout: 12 * 60 * 1000 // 12-minute timeout
     };
 
-    childProcess
-      .spawn(opts.cmd, opts.args, options)
-      .on('exit', (code, signal) => {
-        if (code || signal) {
-          utils.error('deploy', 'Deploy failed.');
-        } else {
-          utils.log('deploy', 'Deployment complete.'.green);
-        }
+    let triesRemaining = opts.tries;
 
-        // Give app time to start
-        setTimeout(() => {
-          // Test versioned url of "default" module
-          let demoUrl = utils.getUrl(opts.version, opts.project);
+    function attemptDeploy () {
+      if (triesRemaining >= 1) {
+        triesRemaining--;
 
-          // Test that app is running successfully
-          utils.testRequest(demoUrl, opts)
-            .then(() => {
-              utils.log('app', 'Test complete.'.green);
-              resolve();
-            }, (err) => {
-              utils.error('app', 'Test failed.', err);
-              reject(err);
-            });
-        }, 5000);
-      });
+        childProcess
+          .spawn(opts.cmd, opts.args, options)
+          .on('exit', (code, signal) => {
+            if (code || signal) {
+              utils.error('deploy', 'Deploy failed.');
+            } else {
+              utils.log('deploy', 'Deployment complete.'.green);
+            }
+
+            // Give app time to start
+            setTimeout(() => {
+              // Test versioned url of "default" module
+              let demoUrl = utils.getUrl(opts.version, opts.project);
+
+              // Test that app is running successfully
+              utils.testRequest(demoUrl, opts)
+                .then(() => {
+                  utils.log('app', 'Test complete.'.green);
+                  resolve();
+                }, (err) => {
+                  utils.error('app', 'Test failed.', err);
+
+                  // Try the test again if any available tries remain
+                  attemptDeploy();
+                });
+            }, 5000);
+          });
+      } else {
+        reject(new Error('Exhausted available deployment attempts.'));
+      }
+    }
+
+    attemptDeploy();
   })
   .then(() => {
     if (opts.delete && !opts.dryRun) {

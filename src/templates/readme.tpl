@@ -22,13 +22,13 @@
 {{#each samples}}
 
 ### {{name}}
-
+{{#if body}}
+{{body}}{{else}}
 {{#if ref}}
 
 View the [README]({{ref}}).
 
 {{else}}
-
 View the [documentation][{{id}}_{{@index}}_docs] or the [source code][{{id}}_{{@index}}_code].{{#if description}}
 
 {{{description}}}{{/if}}{{#if usage}}
@@ -43,8 +43,7 @@ __Usage:__ `{{{usage.text}}}`
 
 {{/if}}
 [{{id}}_{{@index}}_docs]: {{docs_link}}
-[{{id}}_{{@index}}_code]: {{file}}
-{{/if}}
+[{{id}}_{{@index}}_code]: {{file}}{{/if}}{{/if}}
 {{/each}}
 
 ## Running the tests
