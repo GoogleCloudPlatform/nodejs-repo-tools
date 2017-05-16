@@ -22,7 +22,7 @@ const SETUP = `
 
         bundle install
 
-[prereq]: ../README.md#prerequisities
+[prereq]: ../README.md#prerequisites
 [run]: ../README.md#how-to-run-a-sample`;
 
 const TESTS = `
