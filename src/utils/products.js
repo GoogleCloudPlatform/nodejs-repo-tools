@@ -50,6 +50,10 @@ module.exports = {
     name: 'Stackdriver Debugger',
     description: `[Stackdriver Debugger](https://cloud.google.com/debugger/docs/) is a feature of Google Cloud Platform that lets you inspect the state of a Java, Python, or Go application, at any code location, without stopping or slowing down the running app. Stackdriver Debugger makes it easier to view the application state without adding logging statements.`
   },
+  dlp: {
+    name: 'Google Cloud Data Loss Prevention (DLP) API',
+    description: `The [Data Loss Prevention API](https://cloud.google.com/dlp/docs/) provides programmatic access to a powerful detection engine for personally identifiable information and other privacy-sensitive data in unstructured data streams.`
+  },
   dns: {
     name: 'Google Cloud DNS',
     description: `[Cloud DNS](https://cloud.google.com/dns/docs/) allows you to publish your domain names using Google's infrastructure for production-quality, high-volume DNS services. Google's global network of anycast name servers provide reliable, low-latency authoritative name lookups for your domains from anywhere in the world.`
