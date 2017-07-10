@@ -51,6 +51,25 @@ exports.runAsync = (cmd, cwd, cb) => {
   });
 };
 
+exports.runAsyncWithIO = (cmd, cwd, cb) => {
+  return new Promise((resolve, reject) => {
+    childProcess.exec(cmd, { cwd: cwd }, (err, stdout, stderr) => {
+      const result = {
+        err: err,
+        stdout: stdout ? stdout.toString().trim() : null,
+        stderr: stderr ? stderr.toString().trim() : null
+      };
+      if (err) {
+        reject(result);
+        return;
+      }
+      if (stdout) {
+        resolve(result);
+      }
+    });
+  });
+};
+
 class Try {
   constructor (test) {
     this._maxTries = 10;
