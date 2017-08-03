@@ -24,6 +24,7 @@ cache:
 
 before_install:
   - yarn global add semistandard
+  - openssl aes-256-cbc -K $AES_256_KEY -iv $AES_256_IV -in key.json.enc -out key.json -d
 
 script:
   - yarn test
