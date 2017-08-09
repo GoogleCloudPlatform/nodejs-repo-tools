@@ -28,7 +28,11 @@ exports.getRequest = (config) => {
   if (process.env.E2E_TESTS) {
     return supertest(utils.getUrl(config));
   }
-  return supertest(proxyquire(path.join(config.cwd, config.cmd || 'app'), {}));
+  return supertest(proxyquire(path.join(config.cwd, config.cmd || 'app'), {
+    process: {
+      env: config.env || process.env
+    }
+  }));
 };
 
 exports.run = (cmd, cwd) => {
