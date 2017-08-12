@@ -67,9 +67,7 @@ exports.runAsyncWithIO = (cmd, cwd, cb) => {
         reject(result);
         return;
       }
-      if (stdout) {
-        resolve(result);
-      }
+      resolve(result);
     });
   });
 };
