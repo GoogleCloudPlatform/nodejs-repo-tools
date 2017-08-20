@@ -12,9 +12,9 @@
     "node": ">=4.3.2"
   },
   "scripts": {
-    "lint": "../../../../bin/samples lint",
+    "lint": "../../../../bin/tools lint",
     "pretest": "npm run lint",
-    "test": "../../../../bin/samples test app"
+    "test": "../../../../bin/tools test app"
   },
   "dependencies": {
     "express": "4.15.2"

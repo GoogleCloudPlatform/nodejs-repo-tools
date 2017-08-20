@@ -17,14 +17,17 @@ require('colors');
 
 const { spawn } = require('child_process');
 
-const buildPacks = require('../../build_packs');
-const { error, log } = require('../../utils');
+const buildPack = require('../../build_packs').getBuildPack();
+const { logger } = require('../../utils');
 
-const LINT_CMD = buildPacks.config.lint.cmd;
-const LINT_ARGS = buildPacks.config.lint.args;
+const CLI_CMD = 'lint';
+// Currently, the base lint command/args are not configurable from the
+// command-line.
+const LINT_CMD = buildPack.config.lint.cmd;
+const LINT_ARGS = buildPack.config.lint.args;
 const LINT_CMD_STR = `${LINT_CMD} ${LINT_ARGS.join(' ')}`.trim();
-const COMMAND = `samples lint ${'[files...]'.yellow}`;
-const DESCRIPTION = `Lint samples by running: ${LINT_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const COMMAND = `tools ${CLI_CMD} ${'[files...]'.yellow}`;
+const DESCRIPTION = `Lint files by running: ${LINT_CMD_STR.bold} in ${buildPack._cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
@@ -33,7 +36,7 @@ Positional arguments:
   ${'files'.bold} (variadic)
     The files to lint.`;
 
-exports.command = 'lint [files..]';
+exports.command = `${CLI_CMD} [files..]`;
 exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs.usage(USAGE);
@@ -43,32 +46,20 @@ exports.handler = (opts) => {
   let args = LINT_ARGS;
 
   if (opts.dryRun) {
-    log('lint', 'Beginning dry run.'.cyan);
+    logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
   if (opts.files && opts.files.length > 0) {
     args = opts
       .files
-      .filter((file) => file)
-      .map((file) => {
-        // TODO: Do more escaping of user input
-        // TOOD: Also, this doesn't work right. samples lint \"**/*.js\" \"scripts/*\" doesn't work
-        if (!file.startsWith(`'`)) {
-          file = `'${file}`;
-        }
-        if (!file.endsWith(`'`)) {
-          file = `${file}'`;
-        }
-
-        return file;
-      });
+      .filter((file) => file);
   }
 
-  log('lint', 'Linting files in:', opts.localPath.yellow);
-  log('lint', 'Running:', cmd.yellow, args.join(' ').yellow);
+  logger.log(CLI_CMD, 'Linting files in:', opts.localPath.yellow);
+  logger.log(CLI_CMD, 'Running:', cmd.yellow, args.join(' ').yellow);
 
   if (opts.dryRun) {
-    log('lint', 'Dry run complete.'.cyan);
+    logger.log(CLI_CMD, 'Dry run complete.'.cyan);
     return;
   }
 
@@ -80,10 +71,10 @@ exports.handler = (opts) => {
   spawn(cmd, args, options)
     .on('exit', (code, signal) => {
       if (code !== 0 || signal) {
-        error('lint', 'Linting failed.'.red);
+        logger.error(CLI_CMD, 'Linting failed.'.red);
         process.exit(code || 1);
       } else {
-        log('lint', 'Looks good!'.green);
+        logger.log(CLI_CMD, 'Looks good!'.green);
       }
     });
 };

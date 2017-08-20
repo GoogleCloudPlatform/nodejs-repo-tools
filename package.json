@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "1.4.17",
+  "version": "2.0.0-beta.1",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
@@ -12,7 +12,8 @@
     "node": ">=6"
   },
   "bin": {
-    "samples": "./bin/samples"
+    "tools": "./bin/tools",
+    "repo-tools": "./bin/tools"
   },
   "main": "src/index.js",
   "files": [
@@ -31,12 +32,16 @@
       "./src/cli/commands/**/*.js"
     ]
   },
+  "semistandard": {
+    "ignore": [
+      "test/samples/nodejs/snippet/lint_error.js"
+    ]
+  },
   "scripts": {
-    "lint": "node ./bin/samples lint",
-    "check": "yarn check --strict-semver --integrity",
-    "ava": "ava --verbose",
+    "lint": "node ./bin/tools lint",
     "release": "node scripts/release",
-    "test": "npm run lint && npm run ava"
+    "pretest": "npm run lint",
+    "test": "nyc --cache ava --verbose"
   },
   "contributors": [
     {
@@ -49,14 +54,15 @@
     }
   ],
   "dependencies": {
-    "ava": "0.21.0",
+    "ava": "0.22.0",
     "colors": "1.1.2",
     "fs-extra": "4.0.1",
     "got": "7.1.0",
     "handlebars": "4.0.10",
     "lodash": "4.17.4",
+    "nyc": "11.1.0",
     "proxyquire": "1.8.0",
-    "sinon": "3.2.0",
+    "sinon": "3.2.1",
     "string": "3.3.3",
     "supertest": "3.0.0",
     "yargs": "8.0.2"

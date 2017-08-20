@@ -13,29 +13,17 @@
  * limitations under the License.
  */
 
+const buildPack = require('../build_packs').getBuildPack();
+
 module.exports = {
-  global: {
-    dryRun: false,
-    localPath: process.cwd(),
-    project: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
+  config: {
+    description: `${'Default:'.bold} ${`${buildPack.config.global.config}`.yellow}. Specify a .json or .js config file to load. Options set in the config file supercede options set at the command line. A .js file must export a function which returns a config object.`,
+    requiresArg: true,
+    type: 'string'
   },
-  lint: {
-    args: []
-  },
-  test: {
-    app: {},
-    build: {
-      builderProject: 'cloud-docs-samples',
-      ci: process.env.CI,
-      keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-      timeout: '20m'
-    },
-    deploy: {
-      cmd: 'gcloud',
-      yaml: 'app.yaml',
-      tries: 1
-    },
-    install: {},
-    run: {}
+  'config-key': {
+    description: `${'Default:'.bold} ${`${buildPack.config.global.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
+    requiresArg: true,
+    type: 'string'
   }
 };

@@ -18,10 +18,12 @@ require('colors');
 const _ = require('lodash');
 const childProcess = require('child_process');
 
-const buildPacks = require('../../../build_packs');
+const buildPack = require('../../../build_packs').getBuildPack();
+const options = require('../../options');
 const utils = require('../../../utils');
 
-const COMMAND = `samples test app ${'[options]'.yellow}`;
+const CLI_CMD = 'app';
+const COMMAND = `tools test ${CLI_CMD} ${'[options]'.yellow}`;
 const DESCRIPTION = `Start an app and test it with a GET request.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
@@ -30,14 +32,14 @@ Description:
 
   Override the args passed to the configured start command by appending ${'-- "your" "args" "here"'.bold} when you run the ${'test app'.bold} command.`;
 
-exports.command = 'app';
+exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
     .usage(USAGE)
     .options({
       cmd: {
-        description: `${'Default:'.bold} ${buildPacks.config.test.app.cmd.yellow}. The command used to start the app.`,
+        description: `${'Default:'.bold} ${buildPack.config.test.app.cmd.yellow}. The command used to start the app.`,
         type: 'string'
       },
       port: {
@@ -49,16 +51,8 @@ exports.builder = (yargs) => {
         description: `${'Default:'.bold} ${'true'.yellow}. Whether to start the app in addition to sending it a request.`,
         type: 'boolean'
       },
-      config: {
-        description: `${'Default:'.bold} ${`${buildPacks.config.global.config}`.yellow}. Specify a JSON config file to load. Options set in the config file supercede options set at the command line.`,
-        requiresArg: true,
-        type: 'string'
-      },
-      'config-key': {
-        description: `${'Default:'.bold} ${`${buildPacks.config.global.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
-        requiresArg: true,
-        type: 'string'
-      },
+      config: options.config,
+      'config-key': options['config-key'],
       url: {
         description: `Override the request url.`,
         type: 'string'
@@ -84,32 +78,31 @@ exports.builder = (yargs) => {
 
 exports.handler = (opts) => {
   if (opts.dryRun) {
-    utils.log('app', 'Beginning dry run.'.cyan);
+    utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.expandConfig(opts);
+  buildPack.expandConfig(opts);
 
-  opts.cmd || (opts.cmd = buildPacks.config.test.app.cmd);
-  opts.args || (opts.args = buildPacks.config.test.app.args);
-  opts.port || (opts.port = buildPacks.config.test.app.port);
-  opts.msg || (opts.msg = buildPacks.config.test.app.msg);
-  opts.code || (opts.code = buildPacks.config.test.app.code);
+  opts.cmd || (opts.cmd = buildPack.config.test.app.cmd);
+  opts.args || (opts.args = buildPack.config.test.app.args);
+  opts.port || (opts.port = buildPack.config.test.app.port);
+  opts.msg || (opts.msg = buildPack.config.test.app.msg);
+  opts.code || (opts.code = buildPack.config.test.app.code);
 
   // Verify that required env vars are set, if any
-  opts.requiredEnvVars = opts.requiredEnvVars || buildPacks.config.test.app.requiredEnvVars || [];
+  opts.requiredEnvVars = opts.requiredEnvVars || buildPack.config.test.app.requiredEnvVars || [];
   if (opts.requiredEnvVars && typeof opts.requiredEnvVars === 'string') {
     opts.requiredEnvVars = opts.requiredEnvVars.split(',');
   }
   opts.requiredEnvVars.forEach((envVar) => {
     if (!process.env[envVar]) {
-      utils.error('app', `Test requires that the ${envVar} environment variable be set!`);
-      process.exit(1);
+      utils.logger.fatal(CLI_CMD, `Test requires that the ${envVar} environment variable be set!`);
     }
   });
 
   if (!opts.start) {
-    utils.testRequest(opts.url || `http://localhost:${opts.port || buildPacks.config.test.app.port || 8080}`, opts)
-      .then(() => utils.log('app', 'Test complete.'.green), (err) => utils.error('app', 'Test failed.', err));
+    utils.testRequest(opts.url || `http://localhost:${opts.port || buildPack.config.test.app.port || 8080}`, opts)
+      .then(() => utils.logger.log(CLI_CMD, 'Test complete.'.green), (err) => utils.logger.error(CLI_CMD, 'Test failed.', err));
     return;
   }
 
@@ -117,18 +110,18 @@ exports.handler = (opts) => {
     const options = {
       cwd: opts.localPath,
       stdio: opts.silent ? 'ignore' : 'inherit',
-      env: _.merge(_.merge({}, process.env), buildPacks.config.test.app.env || {})
+      env: _.merge(_.merge({}, process.env), buildPack.config.test.app.env || {})
     };
 
     options.env.PORT = port;
 
-    utils.log('app', `Starting app in: ${opts.localPath.yellow}`);
-    utils.log('app', `Using port: ${`${options.env.PORT}`.yellow}`);
-    utils.log('app', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+    utils.logger.log(CLI_CMD, `Starting app in: ${opts.localPath.yellow}`);
+    utils.logger.log(CLI_CMD, `Using port: ${`${options.env.PORT}`.yellow}`);
+    utils.logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
     if (opts.dryRun) {
-      utils.log('app', `Verifying: ${`${opts.url || `http://localhost:${options.env.PORT}`}`.yellow}.`);
-      utils.log('app', 'Dry run complete.'.cyan);
+      utils.logger.log(CLI_CMD, `Verifying: ${`${opts.url || `http://localhost:${options.env.PORT}`}`.yellow}.`);
+      utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
       return;
     }
 
@@ -139,13 +132,13 @@ exports.handler = (opts) => {
       .spawn(opts.cmd, opts.args, options)
       .on('exit', (code, signal) => {
         if (code || signal !== 'SIGTERM' || requestErr) {
-          utils.error('app', 'Test failed.', requestErr);
+          utils.logger.error(CLI_CMD, 'Test failed.', requestErr);
         } else {
-          utils.log('app', 'Test complete.'.green);
+          utils.logger.log(CLI_CMD, 'Test complete.'.green);
         }
       });
 
-    utils.log('app', `Child process ID:`, `${child.pid}`.yellow);
+    utils.logger.log(CLI_CMD, `Child process ID:`, `${child.pid}`.yellow);
 
     function cleanup () {
       // Try different ways of killing the child process
@@ -175,7 +168,6 @@ exports.handler = (opts) => {
         });
     }, 3000);
   }).catch((err) => {
-    utils.error('app', err.stack || err.message);
-    process.exit(1);
+    utils.logger.fatal(CLI_CMD, err.stack || err.message);
   });
 };

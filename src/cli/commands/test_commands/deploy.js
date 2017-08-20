@@ -20,18 +20,20 @@ const childProcess = require('child_process');
 const fs = require('fs-extra');
 const path = require('path');
 
-const buildPacks = require('../../../build_packs');
+const buildPack = require('../../../build_packs').getBuildPack();
+const options = require('../../options');
 const utils = require('../../../utils');
 
-const DEPLOY_CMD = buildPacks.config.test.deploy.cmd;
-const COMMAND = `samples test deploy ${'[options]'.yellow}`;
+const CLI_CMD = 'deploy';
+const DEPLOY_CMD = buildPack.config.test.deploy.cmd;
+const COMMAND = `tools test ${CLI_CMD} ${'[options]'.yellow}`;
 const DESCRIPTION = `Deploy an app and test it with a GET request.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
   ${DESCRIPTION}`;
 
-exports.command = 'deploy';
+exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
@@ -43,7 +45,7 @@ exports.builder = (yargs) => {
       },
       project: {
         alias: 'p',
-        description: `${'Default:'.bold} ${`${buildPacks.config.global.project}`.yellow}. The project ID to use ${'inside'.italic} the build.`,
+        description: `${'Default:'.bold} ${`${buildPack.config.global.project}`.yellow}. The project ID to use ${'inside'.italic} the build.`,
         requiresArg: true,
         type: 'string'
       },
@@ -52,16 +54,8 @@ exports.builder = (yargs) => {
         description: `${'Default:'.bold} ${'true'.yellow}. Whether to delete the deployed app after the test finishes.`,
         type: 'boolean'
       },
-      config: {
-        description: `${'Default:'.bold} ${`${buildPacks.config.global.config}`.yellow}. Specify a JSON config file to load. Options set in the config file supercede options set at the command line.`,
-        requiresArg: true,
-        type: 'string'
-      },
-      'config-key': {
-        description: `${'Default:'.bold} ${`${buildPacks.config.global.configKey}`.yellow}. Specify the key under which options are nested in the config file.`,
-        requiresArg: true,
-        type: 'string'
-      },
+      config: options.config,
+      'config-key': options['config-key'],
       msg: {
         description: 'Set a message the should be found in the response to the rest request.',
         requiresArg: true,
@@ -88,16 +82,16 @@ exports.builder = (yargs) => {
 
 exports.handler = (opts) => {
   if (opts.dryRun) {
-    utils.log('deploy', 'Beginning dry run.'.cyan);
+    utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.expandConfig(opts);
+  buildPack.expandConfig(opts);
 
   opts.cmd || (opts.cmd = DEPLOY_CMD);
-  opts.yaml || (opts.yaml = buildPacks.config.test.deploy.yaml);
+  opts.yaml || (opts.yaml = buildPack.config.test.deploy.yaml);
   opts.version || (opts.version = path.parse(opts.localPath).base);
   if (opts.tries === undefined) {
-    opts.tries = buildPacks.config.test.deploy.tries;
+    opts.tries = buildPack.config.test.deploy.tries;
   }
   if (opts.tries < 1) {
     // Must try at least once
@@ -105,26 +99,24 @@ exports.handler = (opts) => {
   }
 
   // Verify that required env vars are set, if any
-  opts.requiredEnvVars = opts.requiredEnvVars || _.get(buildPacks, 'config.test.app.requiredEnvVars', []);
+  opts.requiredEnvVars = opts.requiredEnvVars || _.get(buildPack, 'config.test.app.requiredEnvVars', []);
   if (opts.requiredEnvVars && typeof opts.requiredEnvVars === 'string') {
     opts.requiredEnvVars = opts.requiredEnvVars.split(',');
   }
   opts.requiredEnvVars.forEach((envVar) => {
     if (!process.env[envVar]) {
-      utils.error('deploy', `Test requires that the ${envVar} environment variable be set!`);
-      process.exit(1);
+      utils.logger.fatal(CLI_CMD, `Test requires that the ${envVar} environment variable be set!`);
     }
   });
 
   if (!opts.project) {
-    utils.error('deploy', 'You must provide a project ID!');
-    process.exit(1);
+    utils.logger.fatal(CLI_CMD, 'You must provide a project ID!');
   }
 
   return new Promise((resolve, reject) => {
     opts.now = Date.now();
 
-    utils.log('deploy', `Deploying app in: ${opts.localPath.yellow}`);
+    utils.logger.log(CLI_CMD, `Deploying app in: ${opts.localPath.yellow}`);
 
     // Manually set # of instances to 1
     const tmpAppYaml = changeScaling(opts);
@@ -139,7 +131,7 @@ exports.handler = (opts) => {
         // Ignore error
       }
     } else {
-      utils.log('deploy', 'Using configured credentials.');
+      utils.logger.log(CLI_CMD, 'Using configured credentials.');
     }
 
     opts.args = [
@@ -154,10 +146,10 @@ exports.handler = (opts) => {
       '--no-promote'
     ];
 
-    utils.log('deploy', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+    utils.logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
     if (opts.dryRun) {
-      utils.log('deploy', 'Dry run complete.'.cyan);
+      utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
       return;
     }
 
@@ -178,9 +170,9 @@ exports.handler = (opts) => {
           .spawn(opts.cmd, opts.args, options)
           .on('exit', (code, signal) => {
             if (code || signal) {
-              utils.error('deploy', 'Deploy failed.');
+              utils.logger.error(CLI_CMD, 'Deploy failed.');
             } else {
-              utils.log('deploy', 'Deployment complete.'.green);
+              utils.logger.log(CLI_CMD, 'Deployment complete.'.green);
             }
 
             // Give app time to start
@@ -191,10 +183,10 @@ exports.handler = (opts) => {
               // Test that app is running successfully
               utils.testRequest(demoUrl, opts)
                 .then(() => {
-                  utils.log('app', 'Test complete.'.green);
+                  utils.logger.log(CLI_CMD, 'Test complete.'.green);
                   resolve();
                 }, (err) => {
-                  utils.error('app', 'Test failed.', err);
+                  utils.logger.error(CLI_CMD, 'Test failed.', err);
 
                   // Try the test again if any available tries remain
                   attemptDeploy();
@@ -221,8 +213,7 @@ exports.handler = (opts) => {
     return Promise.reject(err);
   })
   .catch((err) => {
-    utils.error('deploy', err.message);
-    process.exit(1);
+    utils.logger.fatal(CLI_CMD, err.message);
   });
 };
 
@@ -230,7 +221,7 @@ function changeScaling (opts) {
   const oldYamlPath = path.join(opts.localPath, opts.yaml);
   const newYamlPath = path.join(opts.localPath, `${opts.version}-${opts.now}.yaml`);
 
-  utils.log('deploy', 'Compiling:', newYamlPath.yellow);
+  utils.logger.log(CLI_CMD, 'Compiling:', newYamlPath.yellow);
   let yaml = fs.readFileSync(oldYamlPath, 'utf8');
   yaml += `\n\nmanual_scaling:\n  instances: 1\n`;
 
@@ -245,9 +236,9 @@ function changeScaling (opts) {
   }
 
   if (opts.dryRun) {
-    utils.log('deploy', 'Printing:', newYamlPath.yellow, `\n${yaml}`);
+    utils.logger.log(CLI_CMD, 'Printing:', newYamlPath.yellow, `\n${yaml}`);
   } else {
-    utils.log('deploy', 'Writing:', newYamlPath.yellow);
+    utils.logger.log(CLI_CMD, 'Writing:', newYamlPath.yellow);
     fs.writeFileSync(newYamlPath, yaml, 'utf8');
   }
 

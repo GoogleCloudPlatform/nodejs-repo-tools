@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Copyright 2017, Google, Inc.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +13,4 @@
  * limitations under the License.
  */
 
-const path = require('path');
-
-require('../src/cli').parse(process.argv.slice(2));
+console.log('foo') // missing semicolon

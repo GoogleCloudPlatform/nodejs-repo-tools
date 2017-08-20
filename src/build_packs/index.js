@@ -13,136 +13,104 @@
  * limitations under the License.
  */
 
-const _ = require('lodash');
+require('colors');
+
 const fs = require('fs-extra');
 const parser = require('yargs-parser');
 const path = require('path');
 
-const utils = require('../utils');
+const { logger } = require('../utils');
 
-const packs = fs
+const packs = exports.packs = fs
   .readdirSync(__dirname)
-  .filter((name) => name !== 'index.js')
-  .map((name) => name.replace('.js', ''));
+  .filter((name) => name !== 'index.js' && name !== 'build_pack.js')
+  .map((name) => {
+    return {
+      name: name.replace('.js', ''),
+      BuildPack: require(`./${name}`)
+    };
+  });
 
-class BuildPacks {
-  constructor (packs) {
-    this.config = {};
-    this.current = null;
-    this.packs = packs;
+let currentBuildPack;
 
-    packs.forEach((pack) => {
-      this[pack] = require(path.join(__dirname, pack));
-    });
+/**
+ * This methods examines the arguments passed to the current process in order
+ * to infer which build pack to use. If localPath wasn't specified then it
+ * will add it to the process args.
+ *
+ * @param {*} args
+ */
+exports.getBuildPack = (args = process.argv) => {
+  if (currentBuildPack) {
+    // Return the cached build pack
+    return currentBuildPack;
   }
 
-  detectBuildPack (args = process.argv) {
-    let buildPack, localPath;
+  logger.debug('Detecting buildPack...');
 
-    const argv = parser(args);
+  let buildPackName, localPath;
+  const argv = parser(args);
 
-    buildPack = argv.buildPack || argv.b;
-    localPath = argv.localPath || argv.l;
+  buildPackName = argv.buildPack || argv.b;
+  localPath = argv.localPath || argv.l;
 
-    if (localPath) {
-      localPath = path.resolve(localPath);
+  if (localPath) {
+    localPath = path.resolve(localPath);
+    logger.debug(`Using provided localPath: ${localPath.yellow}`);
+  } else {
+    logger.debug('Inferring localPath...');
+    localPath = process.cwd();
+    const index = process.argv.indexOf('--');
+    if (index >= 0) {
+      process.argv.splice(index, 0, `--local-path=${localPath}`);
     } else {
-      localPath = process.cwd();
-      const index = process.argv.indexOf('--');
-      if (index >= 0) {
-        process.argv.splice(index, 0, `--local-path=${localPath}`);
-      } else {
-        process.argv.push(`--local-path=${localPath}`);
-      }
+      process.argv.push(`--local-path=${localPath}`);
     }
-
-    this.cwd = localPath;
-
-    // Use the build pack selected by the user
-    if (buildPack) {
-      if (packs.indexOf(buildPack) === -1) {
-        utils.error('cli', `Invalid build pack: ${buildPack}`);
-        process.exit(1);
-      }
-
-      this.selected = true;
-      this.current = buildPack;
-    } else {
-      packs.forEach((pack) => {
-        if (pack === 'global') {
-          return;
-        }
-        try {
-          if (this[pack].detect(localPath)) {
-            buildPack = pack;
-            return false;
-          }
-        } catch (err) {
-          // Ignore error
-        }
-      });
-
-      if (buildPack) {
-        const index = process.argv.indexOf('--');
-        if (index >= 0) {
-          process.argv.splice(index, 0, `--build-pack=${buildPack}`);
-        } else {
-          process.argv.push(`--build-pack=${buildPack}`);
-        }
-
-        this.selected = false;
-        this.current = buildPack;
-      }
-    }
-
-    this.config = {};
-    _.merge(this.config, this.global);
-
-    if (buildPack) {
-      _.merge(this.config, this[buildPack]);
-    }
+    logger.debug(`Inferred localPath: ${localPath.yellow}`);
   }
 
-  expandConfig (opts) {
-    opts.localPath = path.resolve(opts.localPath);
-    opts.cwd = opts.localPath;
-    const base = path.parse(opts.localPath).base;
-
-    let config = {};
-    let name, repository;
-    const configFilename = opts.config || this.config.global.config;
-    const configKey = opts.configKey || this.config.global.configKey;
-
-    if (configFilename) {
-      try {
-        config = this[this.current].load(path.join(opts.localPath, configFilename));
-        name = config.name;
-        repository = config.repository;
-        if (configKey) {
-          config = config[configKey] || {};
-        }
-
-        // Values in the config file take precedence
-        _.merge(this.config, config);
-      } catch (err) {
-        // TODO: Print something here?
-      }
+  // Try to load the build pack selected by the user
+  if (buildPackName) {
+    // Otherwise try to infer the build pack
+    const pack = packs.find((pack) => pack.name === buildPackName);
+    if (!pack) {
+      logger.fatal('cli', `Invalid buildPack: ${buildPackName}`);
     }
-
-    opts.name = opts.name || config.name || name || base;
-    opts.project = opts.project || this.config.global.project;
-    opts.builderProject = opts.builderProject || this.config.test.build.builderProject;
-    opts.repository = config.repository || repository;
-
-    const args = process.argv.slice(2);
-
-    args.forEach((arg, i) => {
-      if (arg === '--') {
-        opts.args = args.slice(i + 1);
-        return false;
-      }
+    logger.debug(`Using specified buildPack: ${buildPackName.yellow}`);
+    currentBuildPack = new pack.BuildPack({}, {
+      _name: buildPackName,
+      _selected: true,
+      _cwd: localPath
     });
+    return;
   }
-}
+  logger.debug('Inferring buildPack...');
 
-module.exports = new BuildPacks(packs);
+  // Otherwise try to infer the build pack
+  const pack = packs.find((pack) => {
+    try {
+      return pack.BuildPack.detect(localPath);
+    } catch (err) {
+      // Ignore error
+    }
+  });
+
+  if (pack) {
+    const index = process.argv.indexOf('--');
+    const buildPackArg = `--build-pack=${pack.name}`;
+    if (index >= 0) {
+      process.argv.splice(index, 0, buildPackArg);
+    } else {
+      process.argv.push(buildPackArg);
+    }
+    logger.debug(`Inferred buildPack: ${pack.name.yellow}`);
+    currentBuildPack = new pack.BuildPack({}, {
+      _name: pack.name,
+      _detected: true,
+      _cwd: localPath
+    });
+    return;
+  }
+
+  logger.fatal('cli', 'Could not infer build pack!');
+};

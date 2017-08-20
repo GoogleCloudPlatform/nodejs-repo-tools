@@ -16,6 +16,7 @@ sudo: false
 language: node_js
 node_js:
 - "6"
+- "8"
 
 cache:
   yarn: true
@@ -23,8 +24,11 @@ cache:
   - $HOME/node_modules/
 
 before_install:
-  - yarn global add semistandard
+  - yarn global add nyc codecov add semistandard
   - openssl aes-256-cbc -K $AES_256_KEY -iv $AES_256_IV -in key.json.enc -out key.json -d
 
 script:
   - yarn test
+
+after_script:
+  - nyc report --reporter=lcov > coverage.lcov && codecov

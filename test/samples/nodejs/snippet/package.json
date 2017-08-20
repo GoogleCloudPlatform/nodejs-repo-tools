@@ -12,7 +12,7 @@
     "node": ">=4.3.2"
   },
   "scripts": {
-    "lint": "../../../../bin/samples lint",
+    "lint": "../../../../bin/tools lint",
     "pretest": "npm run lint",
     "test": "ava -T 20s --verbose test/*.test.js"
   },
@@ -23,6 +23,11 @@
     "ava": "0.19.1",
     "proxyquire": "1.7.11",
     "sinon": "2.1.0"
+  },
+  "semistandard": {
+    "ignore": [
+      "lint_error.js"
+    ]
   },
   "cloud-repo-tools": {
     "requiresKeyFile": true,

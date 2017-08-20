@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-'use strict';
+require('colors');
 
 const childProcess = require('child_process');
 const got = require('got');
@@ -116,18 +116,33 @@ exports.finalize = (err, resolve, reject) => {
   }
 };
 
-exports.error = (config, ...args) => {
-  console.error(`${(typeof config === 'string' ? config : config.test).bold.red}:`, ...(args.map((arg) => {
-    if (arg.red) {
-      return arg.red;
+const logger = {
+  error (config, ...args) {
+    console.error(`${(typeof config === 'string' ? config : config.test).bold.red}:`, ...(args.map((arg) => {
+      if (arg.red) {
+        return arg.red;
+      }
+      return arg;
+    })));
+  },
+
+  fatal (...args) {
+    this.error(...args);
+    process.exit(1);
+  },
+
+  log (config, ...args) {
+    console.log(`${(typeof config === 'string' ? config : config.test).bold}:`, ...args);
+  },
+
+  debug (...args) {
+    if (process.argv.indexOf('--debug') !== -1) {
+      console.log('debug'.bold, ...args);
     }
-    return arg;
-  })));
+  }
 };
 
-exports.log = (config, ...args) => {
-  console.log(`${(typeof config === 'string' ? config : config.test).bold}:`, ...args);
-};
+exports.logger = logger;
 
 exports.getRepoPath = (repository, cwd) => {
   repository || (repository = {});
@@ -152,6 +167,30 @@ exports.getRepoPath = (repository, cwd) => {
   }
 
   return url.parse(repository.url).path.replace('.git', '');
+};
+
+/**
+ * Generates a markdown badge for displaying a "Release Quality'.
+ *
+ * @param {string} releaseQuality One of: (ga, beta, alpha, eap).
+ * @returns {string} The markdown badge.
+ */
+exports.createReleaseQualityBadge = (releaseQuality) => {
+  releaseQuality = releaseQuality.toUpperCase();
+  let badge = '';
+  if (releaseQuality === 'GA') {
+    badge = 'General%20Availability%20(GA)-brightgreen';
+  } else if (releaseQuality === 'BETA') {
+    badge = 'Beta-yellow';
+  } else if (releaseQuality === 'ALPHA') {
+    badge = 'Alpha-yellow';
+  } else if (releaseQuality === 'EAP') {
+    badge = 'EAP-yellow';
+  } else {
+    logger.error('generate', `Expected "release_quality" to be one of: (ga, beta, alpha, eap)! Actual: "${releaseQuality}"`);
+    process.exit(1);
+  }
+  return `[![Release quality](https://img.shields.io/badge/Release%20quality-${badge}.svg?style=flat)](https://cloud.google.com/terms/launch-stages)`;
 };
 
 let portrange = 45032;
@@ -181,7 +220,7 @@ exports.getPort = (config) => {
 };
 
 exports.testRequest = (url, config, numTry) => {
-  exports.log('app', `Verifying: ${url.yellow}`);
+  logger.log('app', `Verifying: ${url.yellow}`);
   if (!numTry) {
     numTry = 1;
   }
@@ -242,7 +281,7 @@ exports.deleteVersion = (config) => {
   return new Promise((resolve, reject) => {
     const cmd = config.deleteCmd || 'gcloud';
 
-    exports.log(config, 'Deleting deployment...');
+    logger.log(config, 'Deleting deployment...');
     // Keep track off whether "done" has been called yet
     let calledDone = false;
 
@@ -261,7 +300,7 @@ exports.deleteVersion = (config) => {
       timeout: 4 * 60 * 1000
     });
 
-    exports.log(config, `Delete command: ${(cmd + ' ' + args.join(' ')).yellow}`);
+    logger.log(config, `Delete command: ${(cmd + ' ' + args.join(' ')).yellow}`);
 
     child.on('error', finish);
 

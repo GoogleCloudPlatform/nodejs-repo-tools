@@ -17,14 +17,15 @@ require('colors');
 
 const childProcess = require('child_process');
 
-const buildPacks = require('../../../build_packs');
+const buildPack = require('../../../build_packs').getBuildPack();
 const utils = require('../../../utils');
 
-const TEST_CMD = buildPacks.config.test.run.cmd;
-const TEST_ARGS = buildPacks.config.test.run.args;
+const CLI_CMD = 'run';
+const TEST_CMD = buildPack.config.test.run.cmd;
+const TEST_ARGS = buildPack.config.test.run.args;
 const TEST_CMD_STR = `${TEST_CMD} ${TEST_ARGS.join(' ')}`.trim();
-const COMMAND = `samples test run ${'[options] [--] [args...]'.yellow}`;
-const DESCRIPTION = `Run ${TEST_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const COMMAND = `tools test ${CLI_CMD} ${'[options] [--] [args...]'.yellow}`;
+const DESCRIPTION = `Run ${TEST_CMD_STR.bold} in ${buildPack._cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
@@ -32,7 +33,7 @@ Description:
 
   Override the args passed to the configured test command by appending ${'-- "your" "args" "here"'.bold} when you run the ${'test run'.bold} command.`;
 
-exports.command = 'run';
+exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
@@ -44,26 +45,26 @@ exports.builder = (yargs) => {
       }
     })
     .example('Run the test command in the specified directory:')
-    .example(`- ${'samples test run -l=~/projects/some/dir'.cyan}`)
+    .example(`- ${'tools test run -l=~/projects/some/dir'.cyan}`)
     .example(`Runs ${'npm run system-test'.bold} instead of the default command:`)
-    .example(`- ${'samples test install --cmd=npm -- run system-test'.cyan}`);
+    .example(`- ${'tools test install --cmd=npm -- run system-test'.cyan}`);
 };
 
 exports.handler = (opts) => {
   if (opts.dryRun) {
-    utils.log('run', 'Beginning dry run.'.cyan);
+    utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.expandConfig(opts);
+  buildPack.expandConfig(opts);
 
-  opts.cmd || (opts.cmd = buildPacks.config.test.run.cmd);
-  opts.args || (opts.args = buildPacks.config.test.run.args);
+  opts.cmd || (opts.cmd = buildPack.config.test.run.cmd);
+  opts.args || (opts.args = buildPack.config.test.run.args);
 
-  utils.log('run', `Executing tests in: ${opts.localPath.yellow}`);
-  utils.log('run', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+  utils.logger.log(CLI_CMD, `Executing tests in: ${opts.localPath.yellow}`);
+  utils.logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
   if (opts.dryRun) {
-    utils.log('run', 'Dry run complete.'.cyan);
+    utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
     return;
   }
 
@@ -76,10 +77,10 @@ exports.handler = (opts) => {
     .spawn(opts.cmd, opts.args, options)
     .on('exit', (code, signal) => {
       if (code !== 0 || signal) {
-        utils.error('run', 'Test failed.'.red);
+        utils.logger.error(CLI_CMD, 'Test failed.'.red);
         process.exit(code || 1);
       } else {
-        utils.log('run', 'Test complete.'.green);
+        utils.logger.log(CLI_CMD, 'Test complete.'.green);
       }
     });
 };

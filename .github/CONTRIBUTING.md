@@ -1,5 +1,12 @@
 # How to become a contributor and submit your own code
 
+**Table of contents**
+
+* [Contributor License Agreements](#contributor-license-agreements)
+* [Contributing a patch](#contributing-a-patch)
+* [Running the tests](#running-the-tests)
+* [Releasing the library](#releasing-the-library)
+
 ## Contributor License Agreements
 
 We'd love to accept your sample apps and patches! Before we can take them, we
@@ -33,3 +40,35 @@ accept your pull requests.
    recommended coding standards for this organization.
 1. Ensure that your code has an appropriate set of unit tests which all pass.
 1. Submit a pull request.
+
+## Running the tests
+
+1.  [Prepare your environment for Node.js setup][setup].
+1.  Install [SemistandardJS](https://github.com/Flet/semistandard).
+
+        npm install -g semistandard
+
+1.  Install dependencies:
+
+        npm install
+
+1.  Run the tests:
+
+        npm test
+
+[setup]: https://cloud.google.com/nodejs/docs/setup
+
+## Releasing the library
+
+1.  Run the tests, see above.
+1.  Bump the version in `package.json`.
+1.  Commit and push changes. Commit message should be the new version number.
+1.  Publish to `npm`:
+
+        npm publish .
+
+1.  Run the release script:
+
+        npm run release
+
+    You will need access to the `cloud-docs-samples` project to run this script.

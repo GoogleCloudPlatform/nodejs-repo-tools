@@ -34,10 +34,6 @@ const TESTS = `
 
 module.exports = {
   display: 'Ruby',
-  global: {
-    config: '.cloud-repo-tools.json',
-    configKey: null
-  },
   detect: (cwd) => fs.statSync(path.join(cwd, 'Gemfile')).isFile(),
   load: (filename) => require(filename),
   lint: {

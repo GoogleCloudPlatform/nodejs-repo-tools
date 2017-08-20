@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
+const _ = require('lodash');
 const fs = require('fs-extra');
 const path = require('path');
+
+const { BuildPack } = require('./build_pack');
 
 const SETUP = `
 1.  Read [Prerequisites][prereq] and [How to run a sample][run] first.
@@ -44,14 +47,8 @@ const TESTS = `
 
         yarn test`;
 
-module.exports = {
+const nodejsConfig = {
   display: 'Node.js',
-  global: {
-    config: 'package.json',
-    configKey: 'cloud-repo-tools'
-  },
-  detect: (cwd) => fs.statSync(path.join(cwd, 'package.json')).isFile(),
-  load: (filename) => require(filename),
   lint: {
     cmd: 'semistandard',
     args: []
@@ -72,8 +69,35 @@ module.exports = {
       args: ['test']
     }
   },
-  readme: {
-    setup: SETUP,
-    tests: TESTS
+  generate: {
+    lib_readme: {
+      lib_install_cmd: 'npm install --save {{name}}',
+      quickstart_filename: 'samples/quickstart.js',
+      getLibPkgName (buildPack) {
+        return require(path.join(buildPack._cwd, 'package.json')).name;
+      }
+    },
+    samples_readme: {
+      setup: SETUP,
+      tests: TESTS
+    }
+  }
+};
+
+/**
+ * @class NodejsBuildPack
+ * @returns {NodejsBuildPack} A new {@link NodejsBuildPack} instance.
+ */
+module.exports = class NodejsBuildPack extends BuildPack {
+  constructor (config = {}, innerOpts = {}) {
+    super(_.merge(nodejsConfig, _.cloneDeep(config)), innerOpts);
+  }
+
+  static detect (cwd) {
+    return fs.statSync(path.join(cwd, 'package.json')).isFile();
+  }
+
+  getLibInstallCmd (opts) {
+    return `npm install --save ${opts.libPkgName}`;
   }
 };

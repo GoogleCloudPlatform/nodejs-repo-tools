@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Copyright 2017, Google, Inc.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,23 +15,8 @@
  * limitations under the License.
  */
 
-require('colors');
+// Infer the build pack to use
+require('../src/build_packs').getBuildPack(process.argv);
 
-const COMMAND = `tools test <command> ${'[options]'.yellow}`;
-const DESCRIPTION = `Run a test sub-command.`;
-const USAGE = `Usage:
-  ${COMMAND.bold}
-Description:
-  ${DESCRIPTION}`;
-
-exports.command = 'test';
-exports.description = DESCRIPTION;
-
-exports.builder = (yargs) => {
-  yargs
-    .demand(1)
-    .usage(USAGE)
-    .commandDir('test_commands');
-};
-
-exports.handler = () => {};
+// Run the main CLI
+require('../src/cli').parse(process.argv.slice(2));

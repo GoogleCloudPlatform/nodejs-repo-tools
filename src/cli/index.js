@@ -16,8 +16,7 @@
 require('colors');
 
 const buildPacks = require('../build_packs');
-
-buildPacks.detectBuildPack(process.argv);
+const buildPack = buildPacks.getBuildPack();
 
 module.exports = require('yargs')
   .demand(1)
@@ -25,20 +24,20 @@ module.exports = require('yargs')
   .options({
     'build-pack': {
       alias: 'b',
-      description: `${'Choices:'.bold} ${buildPacks.packs.filter((pack) => pack !== 'global').map((pack) => pack.yellow).join(', ')}. ${buildPacks.selected ? 'Selected:'.bold : 'Detected:'.bold} ${`${buildPacks.current}`.green}. The build pack to use. The tool will attempt to detect which build to use.`,
+      description: `${'Choices:'.bold} ${buildPacks.packs.map((pack) => pack.name.yellow).join(', ')}. ${buildPack._selected ? 'Selected:'.bold : 'Detected:'.bold} ${`${buildPack._name}`.green}. The build pack to use. The tool will attempt to detect which build to use.`,
       global: true,
       requiresArg: true,
       type: 'string'
     },
     'local-path': {
       alias: 'l',
-      description: `${'Current:'.bold} ${`${buildPacks.global.global.localPath}`.yellow}. Use this option to set the current working directory of the command.`,
+      description: `${'Current:'.bold} ${`${buildPack.config.global.localPath}`.yellow}. Use this option to set the current working directory of the command.`,
       global: true,
       requiresArg: true,
       type: 'string'
     },
     'dry-run': {
-      description: `${'Default:'.bold} ${`${buildPacks.global.global.dryRun}`.yellow}. Print the actions that ${'would'.italic} be taken, but don't actually do anything.`,
+      description: `${'Default:'.bold} ${`${buildPack.config.global.dryRun}`.yellow}. Print the actions that ${'would'.italic} be taken, but don't actually do anything.`,
       global: true,
       type: 'boolean'
     },

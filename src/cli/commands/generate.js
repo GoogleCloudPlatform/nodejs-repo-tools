@@ -15,27 +15,24 @@
 
 require('colors');
 
+const _ = require('lodash');
 const execSync = require('child_process').execSync;
 const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
 const string = require('string');
 
-const buildPacks = require('../../build_packs');
+const buildPack = require('../../build_packs').getBuildPack();
+const options = require('../options');
 const products = require('../../utils/products');
 const utils = require('../../utils');
 
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
+handlebars.registerHelper('release_quality', utils.createReleaseQualityBadge);
 
-const tpl = path.join(__dirname, '../../templates/readme.tpl');
-
-function fillInMissing (samples) {
-  samples.samples || (samples.samples = []);
-}
-
-function gatherHelpText (opts, buildPacks) {
-  buildPacks.config.samples.forEach((sample) => {
+function gatherHelpText (opts, buildPack) {
+  (buildPack.config.samples || []).forEach((sample) => {
     if (typeof sample.usage === 'string') {
       sample.usage = {
         cmd: sample.usage,
@@ -48,66 +45,161 @@ function gatherHelpText (opts, buildPacks) {
           cwd: opts.localPath
         }).toString().trim();
       } catch (err) {
-        utils.error('generate', err.message);
+        utils.logger.logger.error('generate', err.message);
         process.exit(err.status);
       }
     }
   });
 }
 
-function expandOpts (opts, buildPacks) {
-  fillInMissing(opts, buildPacks);
-  gatherHelpText(opts, buildPacks);
+function expandOpts (opts, buildPack) {
+  opts.samples || (opts.samples = []);
+  gatherHelpText(opts, buildPack);
 }
 
-const COMMAND = `samples generate ${'[options]'.yellow}`;
-const DESCRIPTION = `Generate a README in ${buildPacks.cwd.yellow}.`;
+const RE_REGION_TAG_START = /\[START ([\w_-]+)\]/g;
+const RE_REGION_TAG_END = /\[END ([\w_-]+)\]/g;
+
+function getQuickstart (filename) {
+  if (!path.isAbsolute(filename)) {
+    filename = path.join(buildPack._cwd, filename);
+  }
+  const content = fs.readFileSync(filename, 'utf-8');
+  const lines = content.split('\n');
+  let inRegion = false;
+  let firstIdx = -1;
+  let lastIdx = -1;
+
+  lines.forEach((line, i) => {
+    if (!inRegion) {
+      const matches = line.match(RE_REGION_TAG_START);
+      if (matches && matches[0] && matches[0].indexOf('quickstart') !== -1) {
+        inRegion = true;
+        if (firstIdx === -1) {
+          firstIdx = i + 1;
+        }
+      }
+    } else {
+      const matches = line.match(RE_REGION_TAG_END);
+      if (matches && matches[0] && matches[0].indexOf('quickstart') !== -1) {
+        inRegion = false;
+        if (lastIdx === -1) {
+          lastIdx = i;
+        }
+      }
+    }
+  });
+
+  return lines.slice(firstIdx, lastIdx).join('\n    ');
+}
+
+const TARGETS = buildPack.config.generate;
+let availableTargetsStr = '';
+Object.keys(TARGETS).forEach((target) => {
+  availableTargetsStr += `  ${target.yellow}:  ${TARGETS[target].description}\n`;
+});
+
+const CLI_CMD = 'generate';
+const COMMAND = `tools ${CLI_CMD} <targets..> ${'[options]'.yellow}`;
+const DESCRIPTION = `Generate the given target(s) in ${buildPack._cwd.yellow}.`;
+
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
-  ${DESCRIPTION}`;
+  ${DESCRIPTION}
 
-exports.command = 'generate';
+${'Available targets:'.bold}
+
+${availableTargetsStr}`;
+
+exports.command = `${CLI_CMD} <targets..>`;
 exports.description = DESCRIPTION;
 
 exports.builder = (yargs) => {
   yargs
-    .usage(USAGE);
+    .usage(USAGE)
+    .options({
+      config: options.config,
+      'config-key': options.configKey,
+      data: {
+        description: `${'Default:'.bold} ${`{}`.yellow}. JSON string, to be passed to the template.`,
+        requiresArg: true,
+        type: 'string'
+      }
+    });
 };
 
 exports.handler = (opts) => {
   if (opts.dryRun) {
-    utils.log('generate', 'Beginning dry run.'.cyan);
+    utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.expandConfig(opts);
+  if (opts.targets.indexOf('all') !== -1) {
+    // Generate all targets
+    opts.targets = Object.keys(TARGETS);
+    opts.targets.splice(opts.targets.indexOf('all'), 1);
+    opts.targets.splice(opts.targets.indexOf('lib_samples_readme'), 1);
+    opts.targets.splice(opts.targets.indexOf('samples_readme'), 1);
+  }
 
-  utils.log('generate', `Generating README in: ${opts.localPath.yellow}`);
+  buildPack.expandConfig(opts);
+  utils.logger.log(CLI_CMD, `Generating ${opts.targets.join(', ')} in: ${opts.localPath.yellow}`);
 
-  expandOpts(opts, buildPacks);
+  // The badgeUri is used for test status badges
   opts.repoPath = utils.getRepoPath(opts.repository, opts.localPath) || null;
-  buildPacks.config.badgeUri = path.join('cloud-docs-samples-badges', opts.repoPath, opts.name);
+  buildPack.config.cloudBuildBadgeUri = path.join('cloud-docs-samples-badges', opts.repoPath, opts.name);
 
-  Object.keys(products[buildPacks.config.product]).forEach((field) => {
-    buildPacks.config[field] = products[buildPacks.config.product][field];
-  });
-
-  const readmePath = path.join(opts.localPath, 'README.md');
-  utils.log('generate', 'Compiling:', readmePath.yellow);
-
-  const readme = handlebars.compile(fs.readFileSync(tpl, 'utf-8'))(buildPacks.config);
-
-  if (opts.dryRun) {
-    utils.log('generate', `Printing: ${readmePath.yellow}\n${readme}`);
-    return;
+  // Load associated product information, if any
+  if (buildPack.config.product) {
+    Object.keys(products[buildPack.config.product]).forEach((field) => {
+      buildPack.config[field] = products[buildPack.config.product][field];
+    });
   }
 
-  fs.writeFile(readmePath, readme, (err) => {
-    if (err) {
-      utils.error('generate', err.stack || err.message);
-      process.exit(1);
+  // Generate each specified target
+  opts.targets.forEach((target) => {
+    const targetConfig = TARGETS[target];
+    const targetPath = path.join(opts.localPath, targetConfig.filename);
+    utils.logger.log(CLI_CMD, 'Compiling:', targetPath.yellow);
+
+    if (target === 'lib_samples_readme' || target === 'samples_readme') {
+      // Prepare config for the samples, if any
+      expandOpts(opts, buildPack);
     }
 
-    utils.log('generate', `Generated: ${readmePath}`.green);
+    // Prepare the data for the template
+    const data = _.merge(opts, targetConfig.data || {}, buildPack.config);
+    data.lib_pkg_name = buildPack.config.generate.lib_readme.getLibPkgName(buildPack);
+    // Other data prep
+    if (target === 'lib_readme') {
+      if (buildPack.config.generate.lib_readme.quickstart_filename) {
+        data.quickstart = getQuickstart(path.join(opts.localPath, buildPack.config.generate.lib_readme.quickstart_filename), 'utf-8');
+      }
+      data.lib_install_cmd = buildPack.config.generate.lib_readme.lib_install_cmd.replace('{{name}}', data.lib_pkg_name);
+    }
+
+    // Load the target's template
+    const tpl = path.join(__dirname, `../../templates/${target}.tpl`);
+    // Validate the data for the given target is sufficient
+    if (targetConfig.validate) {
+      targetConfig.validate(data);
+    }
+    // Generate the content
+    const generated = handlebars.compile(fs.readFileSync(tpl, 'utf-8'))(data);
+
+    if (opts.dryRun) {
+      utils.logger.log(CLI_CMD, `Printing: ${targetPath.yellow}\n${generated}`);
+      return;
+    }
+
+    // Write the content to the target's filename
+    fs.writeFile(targetPath, generated, (err) => {
+      if (err) {
+        utils.logger.logger.error('generate', err.stack || err.message);
+        process.exit(1);
+      }
+
+      utils.logger.log(CLI_CMD, `Generated: ${targetPath}`.green);
+    });
   });
 };

@@ -17,14 +17,15 @@ require('colors');
 
 const childProcess = require('child_process');
 
-const buildPacks = require('../../../build_packs');
+const buildPack = require('../../../build_packs').getBuildPack();
 const utils = require('../../../utils');
 
-const INSTALL_CMD = buildPacks.config.test.install.cmd;
-const INSTALL_ARGS = buildPacks.config.test.install.args;
+const CLI_CMD = 'install';
+const INSTALL_CMD = buildPack.config.test.install.cmd;
+const INSTALL_ARGS = buildPack.config.test.install.args;
 const INSTALL_CMD_STR = `${INSTALL_CMD} ${INSTALL_ARGS.join(' ')}`.trim();
-const COMMAND = `samples test install ${'[options] [--] [args...]'.yellow}`;
-const DESCRIPTION = `Run ${INSTALL_CMD_STR.bold} in ${buildPacks.cwd.yellow}.`;
+const COMMAND = `tools test ${CLI_CMD} ${'[options] [--] [args...]'.yellow}`;
+const DESCRIPTION = `Run ${INSTALL_CMD_STR.bold} in ${buildPack._cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
@@ -32,7 +33,7 @@ Description:
 
   Override the args passed to the configured install command by appending ${'-- "your" "args" "here"'.bold} when you run the ${'test install'.bold} command.`;
 
-exports.command = 'install';
+exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
   yargs
@@ -44,26 +45,26 @@ exports.builder = (yargs) => {
       }
     })
     .example('Run the install command in the specified directory:')
-    .example(`- ${'samples test install -l=~/projects/some/dir'.cyan}`)
+    .example(`- ${'tools test install -l=~/projects/some/dir'.cyan}`)
     .example(`Runs ${'npm install --no-optional'.bold} instead of the default command:`)
-    .example(`- ${'samples test install --cmd=npm -- install --no-optional'.cyan}`);
+    .example(`- ${'tools test install --cmd=npm -- install --no-optional'.cyan}`);
 };
 
 exports.handler = (opts) => {
   if (opts.dryRun) {
-    utils.log('install', 'Beginning dry run.'.cyan);
+    utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
-  buildPacks.expandConfig(opts);
+  buildPack.expandConfig(opts);
 
-  opts.cmd || (opts.cmd = buildPacks.config.test.install.cmd);
-  opts.args || (opts.args = buildPacks.config.test.install.args);
+  opts.cmd || (opts.cmd = buildPack.config.test.install.cmd);
+  opts.args || (opts.args = buildPack.config.test.install.args);
 
-  utils.log('install', `Installing dependencies in: ${opts.localPath.yellow}`);
-  utils.log('install', 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+  utils.logger.log(CLI_CMD, `Installing dependencies in: ${opts.localPath.yellow}`);
+  utils.logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
   if (opts.dryRun) {
-    utils.log('install', 'Dry run complete.'.cyan);
+    utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
     return;
   }
 
@@ -76,10 +77,10 @@ exports.handler = (opts) => {
     .spawn(opts.cmd, opts.args, options)
     .on('exit', (code, signal) => {
       if (code !== 0 || signal) {
-        utils.error('install', 'Install failed.'.red);
+        utils.logger.error(CLI_CMD, 'Install failed.'.red);
         process.exit(code || 1);
       } else {
-        utils.log('install', 'Installation complete.'.green);
+        utils.logger.log(CLI_CMD, 'Installation complete.'.green);
       }
     });
 };
