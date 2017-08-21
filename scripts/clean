@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-// Infer the build pack to use
-require('../cjs/build_packs').getBuildPack(process.argv);
+var fs = require('fs-extra');
+var path = require('path');
 
-// Run the main CLI
-require('../cjs/cli').parse(process.argv.slice(2));
+var pathname = path.join(__dirname, '../cjs');
+
+console.log('Removing ' + pathname + '...');
+fs.remove(pathname);
+console.log('Removed ' + pathname);

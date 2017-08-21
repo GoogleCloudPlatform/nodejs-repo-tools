@@ -15,20 +15,29 @@
 sudo: false
 language: node_js
 node_js:
+- "4"
 - "6"
+- "7"
 - "8"
 
 cache:
+  # We need yarn installed for the tests to work
   yarn: true
   directories:
   - $HOME/node_modules/
 
 before_install:
-  - yarn global add nyc codecov add semistandard
+  - npm install -g npm
+  - npm install -g nyc codecov semistandard
   - openssl aes-256-cbc -K $AES_256_KEY -iv $AES_256_IV -in key.json.enc -out key.json -d
 
 script:
-  - yarn test
+  - npm run build
+  - if [[ $TRAVIS_NODE_VERSION = "4" ]]; then
+        node bin/tools --help;
+    else
+        npm test;
+    fi
 
 after_script:
   - nyc report --reporter=lcov > coverage.lcov && codecov

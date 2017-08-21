@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
@@ -9,15 +9,17 @@
     "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=4"
   },
   "bin": {
     "tools": "./bin/tools",
     "repo-tools": "./bin/tools"
   },
-  "main": "src/index.js",
+  "module": "src/index.js",
+  "main": "cjs/index.js",
   "files": [
     "bin/",
+    "cjs/",
     "src/"
   ],
   "ava": {
@@ -38,10 +40,13 @@
     ]
   },
   "scripts": {
+    "clean": "node ./scripts/clean",
     "lint": "node ./bin/tools lint",
-    "release": "node scripts/release",
-    "pretest": "npm run lint",
-    "test": "nyc --cache ava --verbose"
+    "build": "npm run clean && babel src --out-dir cjs",
+    "prepublishOnly": "npm run lint && npm run build",
+    "release": "node ./scripts/release",
+    "pretest": "npm run lint && npm run build",
+    "test": "node ./bin/tools test run --cmd nyc -- --cache ava --verbose"
   },
   "contributors": [
     {
@@ -53,6 +58,18 @@
       "email": "anassri@google.com"
     }
   ],
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "4.8.4"
+          }
+        }
+      ]
+    ]
+  },
   "dependencies": {
     "ava": "0.22.0",
     "colors": "1.1.2",
@@ -66,5 +83,10 @@
     "string": "3.3.3",
     "supertest": "3.0.0",
     "yargs": "8.0.2"
+  },
+  "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-preset-env": "1.6.0",
+    "babel-register": "6.26.0"
   }
 }

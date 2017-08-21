@@ -28,7 +28,7 @@ const utils = require('../../../utils');
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
 
-const tpl = path.join(__dirname, '../../../templates/cloudbuild.yaml.tpl');
+const tpl = path.join(__dirname, '../../../../templates/cloudbuild.yaml.tpl');
 
 const CLI_CMD = 'build';
 const COMMAND = `tools test ${CLI_CMD} ${'[options]'.yellow}`;

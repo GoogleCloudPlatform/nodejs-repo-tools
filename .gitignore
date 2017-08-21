@@ -2,3 +2,5 @@ node_modules
 *.log
 settings.json
 @google-cloud
+cjs
+.nyc_output

@@ -37,17 +37,16 @@ Via download (Windows):
 
 ## CLI usage
 
-Usage: `samples --help`
+Usage: `repo-tools --help` or `tools --help`
 
 ```
 Commands:
-  generate        Generate a README in /Users/jdobry/projects/nodejs-repo-tools.
-  init            Create a new samples.json file in the current directory.
-  lint [files..]  Run a linter.
-  list            List samples.
-  test            Test command sub-group.
-  unify           Recursively add sub-directory dependencies to the top-level package.json file.
-  validate        Validate the samples.json file in the current directory.
+  exec                  Run a given command in /Users/jdobry/projects/nodejs-repo-tools.
+  generate <targets..>  Generate the given target(s) in /Users/jdobry/projects/nodejs-repo-tools.
+  lint [files..]        Lint files by running: semistandard in /Users/jdobry/projects/nodejs-repo-tools.
+  list                  List samples.
+  test                  Run a test sub-command.
+  unify                 (Node.js only) Recursively add sub-directory dependencies to the top-level package.json file.
 
 Options:
   --build-pack, -b  Choices: nodejs, python, ruby. Detected: nodejs. The build pack to use. The tool will attempt to

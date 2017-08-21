@@ -179,7 +179,7 @@ exports.handler = (opts) => {
     }
 
     // Load the target's template
-    const tpl = path.join(__dirname, `../../templates/${target}.tpl`);
+    const tpl = path.join(__dirname, `../../../templates/${target}.tpl`);
     // Validate the data for the given target is sufficient
     if (targetConfig.validate) {
       targetConfig.validate(data);
