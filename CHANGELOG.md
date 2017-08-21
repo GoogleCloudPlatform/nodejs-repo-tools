@@ -1,3 +1,7 @@
+##### 2.0.0-beta.3 - 21 August 2017
+
+- Added `yargs-parser` to list of dependencies.
+
 ##### 2.0.0-beta.2 - 21 August 2017
 
 - Add use of babel-preset-env to prepublish step to product a Node.js v4
