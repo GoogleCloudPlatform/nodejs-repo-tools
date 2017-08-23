@@ -1,3 +1,7 @@
+##### 2.0.0-beta.4 - 23 August 2017
+
+- Fix: `utils.fatal` => `utils.logger.fatal`
+
 ##### 2.0.0-beta.3 - 21 August 2017
 
 - Added `yargs-parser` to list of dependencies.

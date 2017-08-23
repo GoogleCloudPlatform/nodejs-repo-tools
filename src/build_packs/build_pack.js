@@ -77,7 +77,7 @@ const globalOpts = {
       filename: 'README.md',
       validate (data) {
         if (!data.samples || !data.samples.length) {
-          utils.fatal('generate', `In order to generate lib_samples_readme, config must contain a non-empty "samples" array!`);
+          utils.logger.fatal('generate', `In order to generate lib_samples_readme, config must contain a non-empty "samples" array!`);
         }
       }
     },
@@ -86,7 +86,7 @@ const globalOpts = {
       filename: 'README.md',
       validate (data) {
         if (!data.samples || !data.samples.length) {
-          utils.fatal('generate', `In order to generate samples_readme, config must contain a non-empty "samples" array!`);
+          utils.logger.fatal('generate', `In order to generate samples_readme, config must contain a non-empty "samples" array!`);
         }
       }
     }

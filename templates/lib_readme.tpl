@@ -40,7 +40,7 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 
 1.  Select or create a Cloud Platform project.
 
-    [Go to the projects page][console]
+    [Go to the projects page][projects]
 
 1.  Enable billing for your project.
 
@@ -53,7 +53,7 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 1.  [Set up authentication with a service account][auth] so you can access the
     API from your local workstation.
 
-[console]: https://console.cloud.google.com/
+[projects]: https://console.cloud.google.com/project
 [billing]: https://support.google.com/cloud/answer/6293499#enable-billing
 [enable_api]: https://console.cloud.google.com/flows/enableapi?apiid={{api_id}}
 [auth]: https://cloud.google.com/docs/authentication/getting-started
