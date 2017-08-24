@@ -2,7 +2,7 @@
 FROM gcr.io/cloud-docs-samples/base
 
 # Install Yarn
-ENV YARN_VERSION 0.22.0
+ENV YARN_VERSION 0.27.5
 
 RUN set -ex \
   && for key in \
@@ -19,6 +19,6 @@ RUN set -ex \
   && mv yarn.js /usr/local/bin/yarn \
   && chmod +x /usr/local/bin/yarn
 
-RUN yarn global add nyc codecov semistandard
+RUN yarn global add nyc codecov semistandard node-gyp
 
 ENTRYPOINT ["node"]
