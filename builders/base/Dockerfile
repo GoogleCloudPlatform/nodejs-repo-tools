@@ -18,7 +18,7 @@ RUN curl -O https://storage.googleapis.com/cloud-docs-samples/releases/latest/no
 ENV PATH $PATH:/usr/local/bin
 
 # Install the Cloud SQL Proxy
-RUN wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O /usr/local/bin/cloud_sql_proxy \
+RUN curl -o /usr/local/bin/cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 \
     && chmod +x /usr/local/bin/cloud_sql_proxy
 
 ENTRYPOINT ["gcloud"]
