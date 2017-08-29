@@ -179,7 +179,7 @@ exports.createReleaseQualityBadge = (releaseQuality) => {
   releaseQuality = releaseQuality.toUpperCase();
   let badge = '';
   if (releaseQuality === 'GA') {
-    badge = 'General%20Availability%20(GA)-brightgreen';
+    badge = 'General%20Availability%20%28GA%29-brightgreen';
   } else if (releaseQuality === 'BETA') {
     badge = 'Beta-yellow';
   } else if (releaseQuality === 'ALPHA') {

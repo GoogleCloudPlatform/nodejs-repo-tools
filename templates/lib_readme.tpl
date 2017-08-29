@@ -65,20 +65,22 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 {{#if quickstart}}
 ### Using the client library
 
-    {{{quickstart}}}
+```{{syntax_highlighting_ext}}
+{{{quickstart}}}
+```
 {{/if}}
 
 {{#if samples.length}}
 ## Samples
 
-Samples are in the [`samples/`](samples) directory. The samples' `README.md`
+Samples are in the [`samples/`](https://github.com{{../repoPath}}/blob/master/samples) directory. The samples' `README.md`
 has instructions for running the samples.
 {{#each samples}}
 
 ### {{name}}
 {{#if ref}}
 
-View the [README](samples/{{ref}}).
+View the [README](https://github.com{{../repoPath}}/blob/master/samples/{{ref}}).
 
 {{else}}
 View the [documentation][{{id}}_{{@index}}_docs] or the [source code][{{id}}_{{@index}}_code].{{#if description}}
@@ -86,7 +88,7 @@ View the [documentation][{{id}}_{{@index}}_docs] or the [source code][{{id}}_{{@
 {{{description}}}{{/if}}
 
 [{{id}}_{{@index}}_docs]: {{docs_link}}
-[{{id}}_{{@index}}_code]: samples/{{file}}{{/if}}
+[{{id}}_{{@index}}_code]: https://github.com{{../repoPath}}/blob/master/samples/{{file}}{{/if}}
 {{/each}}
 {{/if}}
 

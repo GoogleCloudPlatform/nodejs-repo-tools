@@ -1,3 +1,10 @@
+##### 2.0.0-beta.5 - 29 August 2017
+
+- Fix Release Quality badge in lib_readme
+- #23 - Add syntax highlighting to quickstart sample in lib_readme
+- Fix relative Github links in lib_readme
+- #22 - Add support for year ranges in the license file.
+
 ##### 2.0.0-beta.4 - 23 August 2017
 
 - Fix: `utils.fatal` => `utils.logger.fatal`

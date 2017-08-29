@@ -30,6 +30,25 @@ const utils = require('../../utils');
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
 handlebars.registerHelper('release_quality', utils.createReleaseQualityBadge);
+handlebars.registerHelper('syntax_highlighting_ext', (opts) => {
+  const repoPath = path.parse(opts.data.root.repoPath).name.replace('google', '').replace('cloud', '');
+  if (repoPath.includes('csharp') || repoPath.includes('dotnet')) {
+    return 'cs';
+  } else if (repoPath.includes('go')) {
+    return 'go';
+  } else if (repoPath.includes('java')) {
+    return 'java';
+  } else if (repoPath.includes('node')) {
+    return 'js';
+  } else if (repoPath.includes('php')) {
+    return 'php';
+  } else if (repoPath.includes('python')) {
+    return 'python';
+  } else if (repoPath.includes('ruby')) {
+    return 'ruby';
+  }
+  return '';
+});
 
 function gatherHelpText (opts, buildPack) {
   (buildPack.config.samples || []).forEach((sample) => {
@@ -90,7 +109,7 @@ function getQuickstart (filename) {
     }
   });
 
-  return lines.slice(firstIdx, lastIdx).join('\n    ');
+  return lines.slice(firstIdx, lastIdx).join('\n');
 }
 
 const TARGETS = buildPack.config.generate;
@@ -184,6 +203,7 @@ exports.handler = (opts) => {
     if (targetConfig.validate) {
       targetConfig.validate(data);
     }
+
     // Generate the content
     const generated = handlebars.compile(fs.readFileSync(tpl, 'utf-8'))(data);
 
