@@ -1,3 +1,7 @@
+##### 2.0.0-beta.6 - 29 August 2017
+
+- Added `templates/` to distribution (it was missing)
+
 ##### 2.0.0-beta.5 - 29 August 2017
 
 - Fix Release Quality badge in lib_readme
