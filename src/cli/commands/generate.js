@@ -30,6 +30,12 @@ const utils = require('../../utils');
 handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
 handlebars.registerHelper('trim', (str) => string(str).trim().s);
 handlebars.registerHelper('release_quality', utils.createReleaseQualityBadge);
+handlebars.registerHelper('if_eq', (left, right, opts) => {
+  if (left === right) {
+    return opts.fn(this);
+  }
+  return opts.inverse(this);
+});
 handlebars.registerHelper('syntax_highlighting_ext', (opts) => {
   const repoPath = path.parse(opts.data.root.repoPath).name.replace('google', '').replace('cloud', '');
   if (repoPath.includes('csharp') || repoPath.includes('dotnet')) {
@@ -198,14 +204,19 @@ exports.handler = (opts) => {
     }
 
     // Load the target's template
-    const tpl = path.join(__dirname, `../../../templates/${target}.tpl`);
+    let tpl;
+    try {
+      tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${opts.buildPack}/${target}.tpl`), 'utf-8');
+    } catch (err) {
+      tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${target}.tpl`), 'utf-8');
+    }
     // Validate the data for the given target is sufficient
     if (targetConfig.validate) {
       targetConfig.validate(data);
     }
 
     // Generate the content
-    const generated = handlebars.compile(fs.readFileSync(tpl, 'utf-8'))(data);
+    const generated = handlebars.compile(tpl)(data);
 
     if (opts.dryRun) {
       utils.logger.log(CLI_CMD, `Printing: ${targetPath.yellow}\n${generated}`);

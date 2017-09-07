@@ -4,6 +4,7 @@
 
 {{release_quality release_quality}}
 [![CircleCI](https://img.shields.io/circleci/project/github{{repoPath}}.svg?style=flat)](https://circleci.com/gh{{repoPath}})
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/github{{repoPath}}?svg=true)](https://ci.appveyor.com/project{{repoPath}})
 [![codecov](https://img.shields.io/codecov/c/github{{repoPath}}/repo-migration.svg?style=flat)](https://codecov.io/gh{{repoPath}})
 
 > Node.js idiomatic client for [{{short_name}}][product-docs].
@@ -96,27 +97,30 @@ View the [documentation][{{id}}_{{@index}}_docs] or the [source code][{{id}}_{{@
 
 This library follows [Semantic Versioning](http://semver.org/).
 
-Please note it is currently under active development. Any release versioned
-`0.x.y` is subject to backwards-incompatible changes at any time.
-
-**GA**: Libraries defined at the **General Availability (GA)** quality level are
-stable. The code surface will not change in backwards-incompatible ways unless
-absolutely necessary (e.g. because of critical security issues) or with an
-extensive deprecation period. Issues and requests against **GA** libraries are
-addressed with the highest priority.
+{{#if_eq release_quality 'ga'}}
+This library is considered to be **General Availability (GA)**. This means it
+is stable; the code surface will not change in backwards-incompatible ways
+unless absolutely necessary (e.g. because of critical security issues) or with
+an extensive deprecation period. Issues and requests against **GA** libraries
+are addressed with the highest priority.
 
 Please note that the auto-generated portions of the **GA** libraries (the ones
 in modules such as `v1` or `v2`) are considered to be of **Beta** quality, even
 if the libraries that wrap them are **GA**.
+{{/if_eq}}
+{{#if_eq release_quality 'beta'}}
+This library is considered to be in **beta**. This means it is expected to be
+mostly stable while we work toward a general availability release; however,
+complete stability is not guaranteed. We will address issues and requests
+against beta libraries with a high priority.
+{{/if_eq}}
+{{#if_eq release_quality 'alpha'}}
+This library is considered to be in **alpha**. This means it is still a
+work-in-progress and under active development. Any release is subject to
+backwards-incompatible changes at any time.
+{{/if_eq}}
 
-**Beta**: Libraries defined at the **Beta** quality level are expected to be
-mostly stable, while we work towards their release candidate. We will address
-issues and requests with a higher priority.
-
-**Alpha**: Libraries defined at the **Alpha** quality level are still a
-work-in-progress and are more likely to get backwards-incompatible updates.
-
-See also: [Google Cloud Platform Launch Stages][launch_stages]
+More Information: [Google Cloud Platform Launch Stages][launch_stages]
 
 [launch_stages]: https://cloud.google.com/terms/launch-stages
 

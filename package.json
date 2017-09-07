@@ -1,9 +1,19 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "2.0.0-beta.6",
+  "version": "2.0.0-beta.7",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Jason Dobry",
+      "email": "jdobry@google.com"
+    },
+    {
+      "name": "Ace Nassri",
+      "email": "anassri@google.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
@@ -31,35 +41,34 @@
   },
   "pkg": {
     "scripts": [
-      "./src/build_packs/*.js",
-      "./src/cli/commands/**/*.js"
+      "./cjs/build_packs/*.js",
+      "./cjs/cli/commands/**/*.js"
     ]
   },
   "semistandard": {
     "ignore": [
-      "test/samples/nodejs/snippet/lint_error.js"
+      "test/samples/nodejs/snippet/lint_error.js",
+      "cjs/**/*.js"
     ]
   },
-  "scripts": {
-    "clean": "node ./scripts/clean",
-    "lint": "node ./bin/tools lint",
-    "build": "npm run clean && babel src --out-dir cjs",
-    "prepublishOnly": "npm run lint && npm run build",
-    "release": "node ./scripts/release",
-    "pretest": "npm run lint && npm run build",
-    "test": "node ./bin/tools test run --cmd nyc -- --cache ava --verbose"
+  "nyc": {
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "include": [
+      "cjs/**/*.js"
+    ]
   },
-  "contributors": [
-    {
-      "name": "Jason Dobry",
-      "email": "jdobry@google.com"
-    },
-    {
-      "name": "Ace Nassri",
-      "email": "anassri@google.com"
-    }
-  ],
   "babel": {
+    "env": {
+      "test": {
+        "plugins": [
+          "istanbul"
+        ]
+      }
+    },
     "presets": [
       [
         "env",
@@ -71,6 +80,15 @@
       ]
     ]
   },
+  "scripts": {
+    "clean": "node ./scripts/clean",
+    "lint": "semistandard",
+    "build": "npm run clean && babel src --out-dir cjs",
+    "prepublishOnly": "npm run lint && npm run build",
+    "release": "npm run prepublishOnly && node ./scripts/release",
+    "pretest": "npm run lint && npm run build",
+    "test": "cross-env NODE_ENV=test nyc --cache ava --verbose -T 1m"
+  },
   "dependencies": {
     "ava": "0.22.0",
     "colors": "1.1.2",
@@ -78,7 +96,7 @@
     "got": "7.1.0",
     "handlebars": "4.0.10",
     "lodash": "4.17.4",
-    "nyc": "11.1.0",
+    "nyc": "11.2.1",
     "proxyquire": "1.8.0",
     "sinon": "3.2.1",
     "string": "3.3.3",
@@ -88,7 +106,10 @@
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
+    "babel-plugin-istanbul": "4.1.4",
     "babel-preset-env": "1.6.0",
-    "babel-register": "6.26.0"
+    "babel-register": "6.26.0",
+    "cross-env": "5.0.5",
+    "semistandard": "11.0.0"
   }
 }

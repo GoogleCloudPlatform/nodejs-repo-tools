@@ -4,3 +4,5 @@ settings.json
 @google-cloud
 cjs
 .nyc_output
+package-lock.json
+yarn.lock

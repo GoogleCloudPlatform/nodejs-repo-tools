@@ -53,6 +53,14 @@ const globalOpts = {
       description: 'Generate a CODE_OF_CONDUCT.md file.',
       filename: 'CODE_OF_CONDUCT.md'
     },
+    contributing: {
+      description: 'Generate a .github/CONTRIBUTING.md file.',
+      filename: '.github/CONTRIBUTING.md'
+    },
+    issue_template: {
+      description: 'Generate a .github/ISSUE_TEMPLATE.md file.',
+      filename: '.github/ISSUE_TEMPLATE.md'
+    },
     license: {
       description: 'Generate a LICENSE file.',
       filename: 'LICENSE',
@@ -80,6 +88,10 @@ const globalOpts = {
           utils.logger.fatal('generate', `In order to generate lib_samples_readme, config must contain a non-empty "samples" array!`);
         }
       }
+    },
+    pr_template: {
+      description: 'Generate a .github/PULL_REQUEST_TEMPLATE.md file.',
+      filename: '.github/PULL_REQUEST_TEMPLATE.md'
     },
     samples_readme: {
       description: 'Generate a generate samples README.md file.',

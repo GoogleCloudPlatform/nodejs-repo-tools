@@ -36,12 +36,12 @@ exports.getRequest = (config) => {
 };
 
 exports.run = (cmd, cwd) => {
-  return childProcess.execSync(cmd, { cwd: cwd }).toString().trim();
+  return childProcess.execSync(cmd, { cwd: cwd, shell: true }).toString().trim();
 };
 
 exports.runAsync = (cmd, cwd, cb) => {
   return new Promise((resolve, reject) => {
-    childProcess.exec(cmd, { cwd: cwd }, (err, stdout, stderr) => {
+    childProcess.exec(cmd, { cwd: cwd, shell: true }, (err, stdout, stderr) => {
       if (err) {
         reject(err);
         return;
@@ -57,7 +57,7 @@ exports.runAsync = (cmd, cwd, cb) => {
 
 exports.runAsyncWithIO = (cmd, cwd, cb) => {
   return new Promise((resolve, reject) => {
-    childProcess.exec(cmd, { cwd: cwd }, (err, stdout, stderr) => {
+    childProcess.exec(cmd, { cwd: cwd, shell: true }, (err, stdout, stderr) => {
       const result = {
         err: err,
         stdout: stdout ? stdout.toString().trim() : null,
@@ -69,6 +69,51 @@ exports.runAsyncWithIO = (cmd, cwd, cb) => {
       }
       resolve(result);
     });
+  });
+};
+
+exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
+  return new Promise((resolve, reject) => {
+    let done = false;
+    let stdout = '';
+    let stderr = '';
+
+    function finish (err) {
+      if (!done) {
+        done = true;
+        const results = {
+          stdout: stdout.trim(),
+          stderr: stderr.trim(),
+          output: stdout.trim() + stderr.trim(),
+          err: err
+        };
+        if (err) {
+          reject(results);
+        } else {
+          resolve(results);
+        }
+      }
+    }
+
+    const child = childProcess.spawn(cmd, args, { cwd: cwd, shell: true });
+    child.stdout.on('data', (chunk) => {
+      if (debug || (debug !== false && process.env.DEBUG)) {
+        utils.logger.log(chunk.toString());
+      }
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      utils.logger.error(chunk.toString());
+      stderr += chunk.toString();
+    });
+    child
+      .on('error', finish)
+      .on('close', () => {
+        finish();
+      })
+      .on('exit', () => {
+        finish();
+      });
   });
 };
 

@@ -157,7 +157,8 @@ exports.handler = (opts) => {
       cwd: opts.localPath,
       // shell: true,
       stdio: opts.silent ? 'ignore' : 'inherit',
-      timeout: 12 * 60 * 1000 // 12-minute timeout
+      timeout: 12 * 60 * 1000, // 12-minute timeout
+      shell: true
     };
 
     let triesRemaining = opts.tries;

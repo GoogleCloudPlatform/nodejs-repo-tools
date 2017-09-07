@@ -65,7 +65,8 @@ exports.handler = (opts) => {
 
   const options = {
     cwd: opts.localPath,
-    stdio: 'inherit'
+    stdio: 'inherit',
+    shell: true
   };
 
   spawn(cmd, args, options)

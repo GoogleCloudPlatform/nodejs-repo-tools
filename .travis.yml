@@ -30,14 +30,8 @@ before_install:
   - npm install -g npm
   - npm install -g nyc codecov semistandard
   - openssl aes-256-cbc -K $AES_256_KEY -iv $AES_256_IV -in key.json.enc -out key.json -d
-
-script:
-  - npm run build
-  - if [[ $TRAVIS_NODE_VERSION = "4" ]]; then
-        node bin/tools --help;
-    else
-        npm test;
-    fi
+install:
+  - npm install
 
 after_script:
   - nyc report --reporter=lcov > coverage.lcov && codecov

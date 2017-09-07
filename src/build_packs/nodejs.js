@@ -61,21 +61,29 @@ const nodejsConfig = {
     build: {},
     deploy: {},
     install: {
-      cmd: 'yarn',
-      args: ['install', '--mutex', 'file:/tmp/.yarn-mutex']
+      cmd: 'npm',
+      args: ['install']
     },
     run: {
-      cmd: 'yarn',
+      cmd: 'npm',
       args: ['test']
     }
   },
   generate: {
+    jsdoc: {
+      description: 'Generate JSDoc configuration.',
+      filename: '.jsdoc.js'
+    },
     lib_readme: {
       lib_install_cmd: 'npm install --save {{name}}',
       quickstart_filename: 'samples/quickstart.js',
       getLibPkgName (buildPack) {
         return require(path.join(buildPack._cwd, 'package.json')).name;
       }
+    },
+    nycrc: {
+      description: 'Generate nyc configuration.',
+      filename: '.nycrc'
     },
     samples_readme: {
       setup: SETUP,

@@ -70,7 +70,8 @@ exports.handler = (opts) => {
 
   const options = {
     cwd: opts.localPath,
-    stdio: opts.silent ? 'ignore' : 'inherit'
+    stdio: opts.silent ? 'ignore' : 'inherit',
+    shell: true
   };
 
   childProcess

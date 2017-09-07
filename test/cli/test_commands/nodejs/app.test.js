@@ -69,64 +69,61 @@ test.serial('should do a dry run test', async (t) => {
 });
 
 test.serial('should run test with defaults', async (t) => {
-  const output = await tools.runAsync(`${binPath} test run`, samplePath);
+  const results = await tools.spawnAsyncWithIO(binPath, ['test', 'run'], samplePath);
 
-  t.regex(output, new RegExp(`run: Executing tests in: ${samplePath}`));
-  t.regex(output, new RegExp(`run: Running: ${buildPack.config.test.run.cmd} ${buildPack.config.test.run.args.join(' ')}`));
-  t.regex(output, new RegExp(`run: Test complete.`));
+  t.regex(results.output, new RegExp(`run: Executing tests in: ${samplePath}`));
+  t.regex(results.output, new RegExp(`run: Running: ${buildPack.config.test.run.cmd} ${buildPack.config.test.run.args.join(' ')}`));
+  t.regex(results.output, new RegExp(`run: Test complete.`));
 });
 
 test.serial('should run test with overrides', async (t) => {
   const cmd = 'npm';
-  const args = 'run test --foo="bar"';
+  const results = await tools.spawnAsyncWithIO(binPath, ['test', 'run', `--cmd=${cmd}`, '--', 'run', 'test', '--foo="bar"'], samplePath);
 
-  const output = await tools.runAsync(`${binPath} test run --cmd=${cmd} -- ${args}`, samplePath);
-
-  t.regex(output, new RegExp(`run: Executing tests in: ${samplePath}`));
-  t.regex(output, new RegExp(`run: Running: ${cmd} run test --foo=bar`));
-  t.regex(output, new RegExp(`run: Test complete.`));
+  t.regex(results.output, new RegExp(`run: Executing tests in: ${samplePath}`));
+  t.regex(results.output, new RegExp(`run: Running: npm run test --foo=bar`));
+  t.regex(results.output, new RegExp(`run: Test complete.`));
 });
 
 // test app
 
 test.serial('should do a dry run web app test', async (t) => {
-  const output = await tools.runAsync(`${binPath} test app --dry-run`, samplePath);
+  const results = await tools.spawnAsyncWithIO(binPath, ['test', 'app', '--dry-run'], samplePath);
 
-  t.regex(output, new RegExp(`app: Starting app in: ${samplePath}`));
-  t.regex(output, new RegExp(`app: Using port:`));
-  t.regex(output, new RegExp(`app: Running: ${buildPack.config.test.app.cmd} ${buildPack.config.test.app.args.join(' ')}`));
-  t.regex(output, new RegExp(`app: Verifying: http://localhost:`));
-  t.regex(output, new RegExp(`app: Dry run complete.`));
+  t.regex(results.output, new RegExp(`app: Starting app in: ${samplePath}`));
+  t.regex(results.output, new RegExp(`app: Using port:`));
+  t.regex(results.output, new RegExp(`app: Running: ${buildPack.config.test.app.cmd} ${buildPack.config.test.app.args.join(' ')}`));
+  t.regex(results.output, new RegExp(`app: Verifying: http://localhost:`));
+  t.regex(results.output, new RegExp(`app: Dry run complete.`));
 });
 
 test.serial('should test web app with defaults', async (t) => {
-  const output = await tools.runAsync(`${binPath} test app`, samplePath);
+  const results = await tools.spawnAsyncWithIO(binPath, ['test', 'app'], samplePath);
 
-  t.regex(output, new RegExp(`app: Starting app in: ${samplePath}`));
-  t.regex(output, new RegExp(`app: Using port:`));
-  t.regex(output, new RegExp(`app: Running: ${buildPack.config.test.app.cmd} ${buildPack.config.test.app.args.join(' ')}`));
-  t.regex(output, new RegExp(`app: Verifying: http://localhost:`));
-  t.regex(output, new RegExp(`app: Test complete.`));
+  t.regex(results.output, new RegExp(`app: Starting app in: ${samplePath}`));
+  t.regex(results.output, new RegExp(`app: Using port:`));
+  t.regex(results.output, new RegExp(`app: Running: ${buildPack.config.test.app.cmd} ${buildPack.config.test.app.args.join(' ')}`));
+  t.regex(results.output, new RegExp(`app: Verifying: http://localhost:`));
+  t.regex(results.output, new RegExp(`app: Test complete.`));
 });
 
 test.serial('should test web app with overrides', async (t) => {
   const cmd = 'node';
-  const args = 'app.js --foo "bar"';
+  const results = await tools.spawnAsyncWithIO(binPath, ['test', 'app', `--cmd=${cmd}`, '--', 'app.js', '--foo', '"bar"'], samplePath);
 
-  const output = await tools.runAsync(`${binPath} test app --cmd=${cmd} -- ${args}`, samplePath);
-
-  t.regex(output, new RegExp(`app: Starting app in: ${samplePath}`));
-  t.regex(output, new RegExp(`app: Using port:`));
-  t.regex(output, new RegExp(`app: Running: ${cmd} app.js --foo bar`));
-  t.regex(output, new RegExp(`app: Verifying: http://localhost:`));
-  t.regex(output, new RegExp(`app: Test complete.`));
+  t.regex(results.output, new RegExp(`app: Starting app in: ${samplePath}`));
+  t.regex(results.output, new RegExp(`app: Using port:`));
+  t.regex(results.output, new RegExp(`app: Running: node app.js --foo bar`));
+  t.regex(results.output, new RegExp(`app: Verifying: http://localhost:`));
+  t.regex(results.output, new RegExp(`app: Test complete.`));
 });
 
 // test build
 
 test.serial('should do a dry run build with defaults', async (t) => {
-  const output = await tools.runAsync(`${binPath} test build --dry-run --config package.json --config-key cloud-repo-tools`, samplePath);
+  const results = await tools.spawnAsyncWithIO(binPath, ['test', 'build', '--dry-run', '--config', 'package.json', '--config-key', 'cloud-repo-tools'], samplePath);
   let keyFilePath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  const output = results.output;
 
   if (keyFilePath) {
     keyFilePath = path.parse(keyFilePath).base;
@@ -155,7 +152,7 @@ test.serial('should do a dry run build with defaults', async (t) => {
   t.regex(output, new RegExp(`    'GOOGLE_CLOUD_PROJECT=${process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || ''}'`));
   t.is(output.includes(`  ]`), true);
   t.regex(output, new RegExp(`  entrypoint: 'samples'`));
-  t.is(output.includes(`  args: ['test', 'install', '--cmd', 'yarn', '--', 'install', '--mutex', 'file:/tmp/.yarn-mutex']`), true);
+  t.is(output.includes(`  args: ['test', 'install', '--cmd', 'npm', '--', 'install']`), true);
   t.is(output.includes(`- name: 'gcr.io/$PROJECT_ID/nodejs'`), true);
   t.is(output.includes(`  env: [`), true);
   t.regex(output, new RegExp(`    'CLOUD_BUILD=true',`));
@@ -164,6 +161,6 @@ test.serial('should do a dry run build with defaults', async (t) => {
   t.regex(output, new RegExp(`    'GOOGLE_CLOUD_PROJECT=${process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || ''}'`));
   t.is(output.includes(`  ]`), true);
   t.regex(output, new RegExp(`  entrypoint: 'samples'`));
-  t.is(output.includes(`  args: ['test', 'run', '--cmd', 'yarn', '--', 'test']`), true);
+  t.is(output.includes(`  args: ['test', 'run', '--cmd', 'npm', '--', 'test']`), true);
   t.regex(output, new RegExp(`build: Dry run complete.`));
 });

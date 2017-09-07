@@ -110,7 +110,8 @@ exports.handler = (opts) => {
     const options = {
       cwd: opts.localPath,
       stdio: opts.silent ? 'ignore' : 'inherit',
-      env: _.merge(_.merge({}, process.env), buildPack.config.test.app.env || {})
+      env: _.merge(_.merge({}, process.env), buildPack.config.test.app.env || {}),
+      shell: true
     };
 
     options.env.PORT = port;

@@ -28,25 +28,19 @@ accept your pull requests.
 
 ## Contributing A Patch
 
-1. Submit an issue describing your proposed change to the repo in question.
-1. The repo owner will respond to your issue promptly.
-1. If your proposed change is accepted, and you haven't already done so, sign a
-   Contributor License Agreement (see details above).
-1. Fork the desired repo, develop and test your code changes.
-1. Ensure that your code adheres to the existing style in the sample to which
-   you are contributing. Refer to the
-   [Google Cloud Platform Samples Style Guide]
-   (https://github.com/GoogleCloudPlatform/Template/wiki/style.html) for the
-   recommended coding standards for this organization.
-1. Ensure that your code has an appropriate set of unit tests which all pass.
-1. Submit a pull request.
+1.  Submit an issue describing your proposed change to the repo in question.
+1.  The repo owner will respond to your issue promptly.
+1.  If your proposed change is accepted, and you haven't already done so, sign a
+    Contributor License Agreement (see details above).
+1.  Fork the desired repo, develop and test your code changes.
+1.  Ensure that your code adheres to the existing style in the code to which
+    you are contributing.
+1.  Ensure that your code has an appropriate set of tests which all pass.
+1.  Submit a pull request.
 
 ## Running the tests
 
 1.  [Prepare your environment for Node.js setup][setup].
-1.  Install [SemistandardJS](https://github.com/Flet/semistandard).
-
-        npm install -g semistandard
 
 1.  Install dependencies:
 
@@ -54,23 +48,6 @@ accept your pull requests.
 
 1.  Run the tests:
 
-        export GCLOUD_PROJECT=your-project-id
-        export GOOGLE_APPLICATION_CREDENTIALS=/path/to/keyfile.json
         npm test
 
 [setup]: https://cloud.google.com/nodejs/docs/setup
-
-## Releasing the library
-
-1.  Run the tests, see above.
-1.  Bump the version in `package.json`.
-1.  Commit and push changes. Commit message should be the new version number.
-1.  Publish to `npm`:
-
-        npm publish .
-
-1.  Run the release script:
-
-        npm run release
-
-    You will need access to the `cloud-docs-samples` project to run this script.

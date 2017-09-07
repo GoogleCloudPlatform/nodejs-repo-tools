@@ -1,3 +1,8 @@
+##### 2.0.0-beta.7 - 07 September 2017
+
+- Added 6 new targets to the `generate` command.
+- Added `shell: true` to improve stability of CLI commands.
+
 ##### 2.0.0-beta.6 - 29 August 2017
 
 - Added `templates/` to distribution (it was missing)

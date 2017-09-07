@@ -179,18 +179,18 @@ exports.createReleaseQualityBadge = (releaseQuality) => {
   releaseQuality = releaseQuality.toUpperCase();
   let badge = '';
   if (releaseQuality === 'GA') {
-    badge = 'General%20Availability%20%28GA%29-brightgreen';
+    badge = 'general%20availability%20%28GA%29-brightgreen';
   } else if (releaseQuality === 'BETA') {
-    badge = 'Beta-yellow';
+    badge = 'beta-yellow';
   } else if (releaseQuality === 'ALPHA') {
-    badge = 'Alpha-yellow';
+    badge = 'alpha-yellow';
   } else if (releaseQuality === 'EAP') {
     badge = 'EAP-yellow';
   } else {
     logger.error('generate', `Expected "release_quality" to be one of: (ga, beta, alpha, eap)! Actual: "${releaseQuality}"`);
     process.exit(1);
   }
-  return `[![Release quality](https://img.shields.io/badge/Release%20quality-${badge}.svg?style=flat)](https://cloud.google.com/terms/launch-stages)`;
+  return `[![release level](https://img.shields.io/badge/release%20level-${badge}.svg?style=flat)](https://cloud.google.com/terms/launch-stages)`;
 };
 
 let portrange = 45032;

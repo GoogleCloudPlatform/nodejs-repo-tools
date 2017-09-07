@@ -24,7 +24,9 @@
     "requiresProjectId": true,
     "test": {
       "app": {
-        "args": ["app.js"],
+        "args": [
+          "app.js"
+        ],
         "msg": "Hello, world!"
       }
     }
