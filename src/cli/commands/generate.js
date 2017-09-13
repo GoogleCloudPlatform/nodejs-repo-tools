@@ -45,7 +45,7 @@ handlebars.registerHelper('syntax_highlighting_ext', (opts) => {
   } else if (repoPath.includes('java')) {
     return 'java';
   } else if (repoPath.includes('node')) {
-    return 'js';
+    return 'javascript';
   } else if (repoPath.includes('php')) {
     return 'php';
   } else if (repoPath.includes('python')) {
