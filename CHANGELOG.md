@@ -1,3 +1,7 @@
+##### 2.0.0-beta.8 - 18 September 2017
+
+- Updates to `templates/nodejs/jsdoc.tpl`
+
 ##### 2.0.0-beta.7 - 07 September 2017
 
 - Added 6 new targets to the `generate` command.
