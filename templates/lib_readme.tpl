@@ -80,7 +80,7 @@ has instructions for running the samples.
 | Sample                      | Documentation                      | Source Code                       |
 | --------------------------- | ---------------------------------- | --------------------------------- |
 {{#each samples}}
-| {{name}} | [documentation][{{docs_link}}] | [source code][https://github.com{{../repoPath}}/blob/master/samples/{{file}}] |
+| {{name}} | [documentation]({{docs_link}}) | [source code](https://github.com{{../repoPath}}/blob/master/samples/{{file}}) |
 {{/each}}
 {{/if}}
 

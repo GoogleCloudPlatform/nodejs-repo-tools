@@ -1,3 +1,7 @@
+##### 2.0.0-beta.10 - 18 September 2017
+
+- Fixed type in `lib_readme` template.
+
 ##### 2.0.0-beta.9 - 18 September 2017
 
 - Make `lib_readme` quickstart sample region tag configurable.
