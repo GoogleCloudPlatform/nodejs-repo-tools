@@ -85,9 +85,15 @@ function expandOpts (opts, buildPack) {
 const RE_REGION_TAG_START = /\[START ([\w_-]+)\]/g;
 const RE_REGION_TAG_END = /\[END ([\w_-]+)\]/g;
 
-function getQuickstart (filename) {
+function getQuickstart (filename, opts) {
   if (!path.isAbsolute(filename)) {
     filename = path.join(buildPack._cwd, filename);
+  }
+  let regionTag = 'quickstart';
+  try {
+    regionTag = buildPack.config.generate.lib_readme.quickstart_region_tag || 'quickstart';
+  } catch (err) {
+
   }
   const content = fs.readFileSync(filename, 'utf-8');
   const lines = content.split('\n');
@@ -98,7 +104,7 @@ function getQuickstart (filename) {
   lines.forEach((line, i) => {
     if (!inRegion) {
       const matches = line.match(RE_REGION_TAG_START);
-      if (matches && matches[0] && matches[0].indexOf('quickstart') !== -1) {
+      if (matches && matches[0] && matches[0].indexOf(regionTag) !== -1) {
         inRegion = true;
         if (firstIdx === -1) {
           firstIdx = i + 1;
@@ -106,7 +112,7 @@ function getQuickstart (filename) {
       }
     } else {
       const matches = line.match(RE_REGION_TAG_END);
-      if (matches && matches[0] && matches[0].indexOf('quickstart') !== -1) {
+      if (matches && matches[0] && matches[0].indexOf(regionTag) !== -1) {
         inRegion = false;
         if (lastIdx === -1) {
           lastIdx = i;
@@ -198,7 +204,7 @@ exports.handler = (opts) => {
     // Other data prep
     if (target === 'lib_readme') {
       if (buildPack.config.generate.lib_readme.quickstart_filename) {
-        data.quickstart = getQuickstart(path.join(opts.localPath, buildPack.config.generate.lib_readme.quickstart_filename), 'utf-8');
+        data.quickstart = getQuickstart(path.join(opts.localPath, buildPack.config.generate.lib_readme.quickstart_filename), buildPack);
       }
       data.lib_install_cmd = buildPack.config.generate.lib_readme.lib_install_cmd.replace('{{name}}', data.lib_pkg_name);
     }

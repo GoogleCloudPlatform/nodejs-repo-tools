@@ -1,3 +1,8 @@
+##### 2.0.0-beta.9 - 18 September 2017
+
+- Make `lib_readme` quickstart sample region tag configurable.
+- Improve the look of the samples list in `lib_readme`.
+
 ##### 2.0.0-beta.8 - 18 September 2017
 
 - Updates to `templates/nodejs/jsdoc.tpl`
