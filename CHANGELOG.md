@@ -1,6 +1,10 @@
+##### 2.0.0-beta.11 - 19 September 2017
+
+- Small tweak to the `lib_readme` template.
+
 ##### 2.0.0-beta.10 - 18 September 2017
 
-- Fixed type in `lib_readme` template.
+- Fixed typo in `lib_readme` template.
 
 ##### 2.0.0-beta.9 - 18 September 2017
 

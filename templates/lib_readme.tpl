@@ -28,9 +28,6 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 {{#if samples.length}}
 * [Samples](#samples)
 {{/if}}
-{{#each samples}}
-  * [{{name}}](#{{slugify name}})
-{{/each}}
 * [Versioning](#versioning)
 * [Contributing](#contributing)
 * [License](#license)
