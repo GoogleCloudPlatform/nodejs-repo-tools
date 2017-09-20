@@ -22,7 +22,9 @@ const proxyquire = require('proxyquire').noPreserveCache();
 const sinon = require('sinon');
 const supertest = require('supertest');
 
-const utils = require('./utils');
+const utils = exports.utils = require('./utils');
+
+exports.buildPacks = require('./build_packs');
 
 exports.getRequest = (config) => {
   if (process.env.E2E_TESTS) {
@@ -63,6 +65,7 @@ exports.runAsyncWithIO = (cmd, cwd, cb) => {
         stdout: stdout ? stdout.toString().trim() : null,
         stderr: stderr ? stderr.toString().trim() : null
       };
+      result.output = (result.stdout || '') + (result.stderr || '');
       if (err) {
         reject(result);
         return;
@@ -207,5 +210,8 @@ exports.checkCredentials = (t) => {
   } else {
     assert(process.env.GCLOUD_PROJECT, `Must set GCLOUD_PROJECT environment variable!`);
     assert(process.env.GOOGLE_APPLICATION_CREDENTIALS, `Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!`);
+    if (typeof t === 'function') {
+      t();
+    }
   }
 };

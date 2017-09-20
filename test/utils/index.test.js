@@ -17,7 +17,7 @@ const path = require('path');
 const test = require('ava');
 
 const toolsPath = path.join(__dirname, '../../');
-const utils = require(path.join(toolsPath, 'src/utils'));
+const utils = require(toolsPath).utils;
 
 test.serial('parseArgs: should parse args', (t) => {
   t.deepEqual(utils.parseArgs(`foo`), [`foo`]);

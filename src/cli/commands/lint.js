@@ -26,7 +26,7 @@ const CLI_CMD = 'lint';
 const LINT_CMD = buildPack.config.lint.cmd;
 const LINT_ARGS = buildPack.config.lint.args;
 const LINT_CMD_STR = `${LINT_CMD} ${LINT_ARGS.join(' ')}`.trim();
-const COMMAND = `tools ${CLI_CMD} ${'[files...]'.yellow}`;
+const COMMAND = `tools ${CLI_CMD} -- ${'[files...]'.yellow}`;
 const DESCRIPTION = `Lint files by running: ${LINT_CMD_STR.bold} in ${buildPack._cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
@@ -36,27 +36,30 @@ Positional arguments:
   ${'files'.bold} (variadic)
     The files to lint.`;
 
-exports.command = `${CLI_CMD} [files..]`;
+exports.command = `${CLI_CMD}`;
 exports.description = DESCRIPTION;
 exports.builder = (yargs) => {
-  yargs.usage(USAGE);
+  yargs
+    .usage(USAGE)
+    .options({
+      cmd: {
+        description: `${'Default:'.bold} ${`${LINT_CMD}`.yellow}. The lint command to use.`,
+        type: 'string'
+      }
+    });
 };
 exports.handler = (opts) => {
-  const cmd = LINT_CMD;
-  let args = LINT_ARGS;
-
   if (opts.dryRun) {
     logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
-  if (opts.files && opts.files.length > 0) {
-    args = opts
-      .files
-      .filter((file) => file);
-  }
+  buildPack.expandConfig(opts);
+
+  opts.cmd || (opts.cmd = buildPack.config.lint.cmd);
+  opts.args || (opts.args = buildPack.config.lint.args);
 
   logger.log(CLI_CMD, 'Linting files in:', opts.localPath.yellow);
-  logger.log(CLI_CMD, 'Running:', cmd.yellow, args.join(' ').yellow);
+  logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
   if (opts.dryRun) {
     logger.log(CLI_CMD, 'Dry run complete.'.cyan);
@@ -69,7 +72,7 @@ exports.handler = (opts) => {
     shell: true
   };
 
-  spawn(cmd, args, options)
+  spawn(opts.cmd, opts.args, options)
     .on('exit', (code, signal) => {
       if (code !== 0 || signal) {
         logger.error(CLI_CMD, 'Linting failed.'.red);

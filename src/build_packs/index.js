@@ -31,6 +31,11 @@ const packs = exports.packs = fs
     };
   });
 
+exports.BuildPack = require('./build_pack');
+exports.NodejsBuildPack = require('./nodejs');
+exports.PythonBuildPack = require('./python');
+exports.RubyBuildPack = require('./ruby');
+
 let currentBuildPack;
 
 /**

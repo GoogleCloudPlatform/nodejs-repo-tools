@@ -9,22 +9,26 @@
     "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
   },
   "engines": {
-    "node": ">=4.3.2"
+    "node": ">=4"
   },
   "scripts": {
     "lint": "../../../../bin/tools lint",
     "pretest": "npm run lint",
-    "test": "ava -T 20s --verbose test/*.test.js"
+    "mocha": "mocha --timeout 20000 test/*.test.js",
+    "test": "../../../../bin/tools test run --cmd npm -- run mocha"
   },
   "dependencies": {
-    "@google-cloud/translate": "0.8.1"
+    "@google-cloud/translate": "1.0.0"
   },
   "devDependencies": {
-    "ava": "0.19.1",
-    "proxyquire": "1.7.11",
-    "sinon": "2.1.0"
+    "mocha": "3.5.3"
   },
   "semistandard": {
+    "globals": [
+      "before",
+      "describe",
+      "it"
+    ],
     "ignore": [
       "lint_error.js"
     ]

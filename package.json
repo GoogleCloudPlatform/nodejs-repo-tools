@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "2.0.0-beta.11",
+  "version": "2.0.0-beta.12",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
@@ -14,10 +14,7 @@
       "email": "anassri@google.com"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
-  },
+  "repository": "GoogleCloudPlatform/nodejs-repo-tools",
   "engines": {
     "node": ">=4"
   },
@@ -46,29 +43,22 @@
     ]
   },
   "semistandard": {
+    "globals": [
+      "before",
+      "describe",
+      "it"
+    ],
     "ignore": [
       "test/samples/nodejs/snippet/lint_error.js",
       "cjs/**/*.js"
     ]
   },
   "nyc": {
-    "require": [
-      "babel-register"
-    ],
-    "sourceMap": false,
-    "instrument": false,
     "include": [
       "cjs/**/*.js"
     ]
   },
   "babel": {
-    "env": {
-      "test": {
-        "plugins": [
-          "istanbul"
-        ]
-      }
-    },
     "presets": [
       [
         "env",
@@ -87,29 +77,27 @@
     "prepublishOnly": "npm run lint && npm run build",
     "release": "npm run prepublishOnly && node ./scripts/release",
     "pretest": "npm run lint && npm run build",
-    "test": "cross-env NODE_ENV=test nyc --cache ava --verbose -T 1m"
+    "cover": "nyc --cache ava -v -T 1m -s && nyc report",
+    "test": "node ./bin/tools test run --cmd npm -- run cover"
   },
   "dependencies": {
     "ava": "0.22.0",
     "colors": "1.1.2",
-    "fs-extra": "4.0.1",
+    "fs-extra": "4.0.2",
     "got": "7.1.0",
     "handlebars": "4.0.10",
     "lodash": "4.17.4",
     "nyc": "11.2.1",
     "proxyquire": "1.8.0",
-    "sinon": "3.2.1",
+    "sinon": "3.3.0",
     "string": "3.3.3",
     "supertest": "3.0.0",
-    "yargs": "8.0.2",
+    "yargs": "9.0.1",
     "yargs-parser": "7.0.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
-    "babel-plugin-istanbul": "4.1.4",
     "babel-preset-env": "1.6.0",
-    "babel-register": "6.26.0",
-    "cross-env": "5.0.5",
     "semistandard": "11.0.0"
   }
 }

@@ -27,6 +27,7 @@ const globalOpts = {
     configKey: null
   },
   lint: {
+    cmd: 'lint',
     args: []
   },
   test: {

@@ -22,8 +22,8 @@ const tools = require(toolsPath);
 
 const binPath = path.join(toolsPath, 'bin/tools');
 const samplePath = path.join(toolsPath, 'test/samples/nodejs/app');
-const BuildPack = require(path.join(toolsPath, 'src/build_packs/nodejs'));
-const buildPack = new BuildPack();
+const NodejsBuildPack = require(toolsPath).buildPacks.NodejsBuildPack;
+const buildPack = new NodejsBuildPack();
 
 // test install
 

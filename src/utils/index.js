@@ -166,7 +166,11 @@ exports.getRepoPath = (repository, cwd) => {
     }
   }
 
-  return url.parse(repository.url).path.replace('.git', '');
+  const result = url.parse(repository.url).path.replace('.git', '');
+  if (!result.startsWith('/')) {
+    return `/${result}`;
+  }
+  return result;
 };
 
 /**

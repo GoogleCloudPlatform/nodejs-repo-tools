@@ -70,6 +70,30 @@ const nodejsConfig = {
     }
   },
   generate: {
+    eslintignore: {
+      description: 'Generate .eslintignore',
+      filename: '.eslintignore'
+    },
+    eslintrc: {
+      description: 'Generate main ESLint configuration.',
+      filename: '.eslintrc.yml'
+    },
+    eslintrc_test: {
+      description: 'Generate ESLint configuration for unit tests.',
+      filename: 'test/.eslintrc.yml'
+    },
+    eslintrc_samples: {
+      description: 'Generate ESLint configuration for samples.',
+      filename: 'samples/.eslintrc.yml'
+    },
+    eslintrc_samples_test: {
+      description: 'Generate ESLint configuration for samples tests.',
+      filename: 'samples/system-test/.eslintrc.yml'
+    },
+    eslintrc_systemtest: {
+      description: 'Generate ESLint configuration for system tests.',
+      filename: 'system-test/.eslintrc.yml'
+    },
     jsdoc: {
       description: 'Generate JSDoc configuration.',
       filename: '.jsdoc.js'
@@ -84,6 +108,10 @@ const nodejsConfig = {
     nycrc: {
       description: 'Generate nyc configuration.',
       filename: '.nycrc'
+    },
+    prettierrc: {
+      description: 'Generate .prettierrc',
+      filename: '.prettierrc'
     },
     samples_readme: {
       setup: SETUP,
@@ -103,6 +131,16 @@ module.exports = class NodejsBuildPack extends BuildPack {
 
   static detect (cwd) {
     return fs.statSync(path.join(cwd, 'package.json')).isFile();
+  }
+
+  expandConfig (opts) {
+    super.expandConfig(opts);
+    try {
+      const pkg = require(path.join(opts.localPath, 'package.json'));
+      opts.repository || (opts.repository = pkg.repository);
+    } catch (err) {
+      // Ignore error
+    }
   }
 
   getLibInstallCmd (opts) {

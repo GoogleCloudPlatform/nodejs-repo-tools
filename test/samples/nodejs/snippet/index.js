@@ -13,16 +13,18 @@
  * limitations under the License.
  */
 
-const translate = require('@google-cloud/translate')();
+'use strict';
 
-const text = 'Hello, world!';
+var translate = require('@google-cloud/translate')();
+
+var text = 'Hello, world!';
 
 translate.translate(text, 'ru')
-  .then((results) => {
-    const translation = results[0];
-    console.log(`Text: ${text}`);
-    console.log(`Translation: ${translation}`);
+  .then(function (results) {
+    var translation = results[0];
+    console.log('Text: ' + text);
+    console.log('Translation: ' + translation);
   })
-  .catch((err) => {
+  .catch(function (err) {
     console.error('ERROR:', err);
   });

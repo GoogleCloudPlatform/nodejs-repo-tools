@@ -1,3 +1,12 @@
+##### 2.0.0-beta.12 - 20 September 2017
+
+###### Breaking changes
+- Changed signature of `lint` command to match that of the `test` commands, i.e. using `--cmd` and `--` for args.
+
+###### Other
+- Improved repository URL handling
+- Upgraded dependencies
+
 ##### 2.0.0-beta.11 - 19 September 2017
 
 - Small tweak to the `lib_readme` template.

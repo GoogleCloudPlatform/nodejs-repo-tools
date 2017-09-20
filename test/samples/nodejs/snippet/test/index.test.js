@@ -13,21 +13,31 @@
  * limitations under the License.
  */
 
-const path = require('path');
-const test = require('ava');
-const tools = require('../../../../../');
-const translate = require('@google-cloud/translate')();
+'use strict';
 
-const cwd = path.join(__dirname, '..');
-const cmd = 'node index.js';
-const lang = 'ru';
-const text = 'Hello, world!';
+var assert = require('assert');
+var path = require('path');
+var tools = require('../../../../../');
+var translate = require('@google-cloud/translate')();
 
-test.before(tools.checkCredentials);
+var cwd = path.join(__dirname, '..');
+var cmd = 'node index.js';
+var lang = 'ru';
+var text = 'Hello, world!';
 
-test('should work', async (t) => {
-  const output = await tools.runAsync(cmd, cwd);
-  const [translation] = await translate.translate(text, lang);
-  t.is(output.includes(`Text: ${text}`), true);
-  t.is(output.includes(`Translation: ${translation}`), true);
+before(tools.checkCredentials);
+
+describe('snippet', function () {
+  it('should work', function () {
+    return Promise.all([
+      tools.runAsync(cmd, cwd),
+      translate.translate(text, lang)
+    ])
+      .then(function (results) {
+        var output = results[0];
+        var translation = results[1][0];
+        assert(output.includes('Text: ' + text));
+        assert(output.includes('Translation: ' + translation));
+      });
+  });
 });
