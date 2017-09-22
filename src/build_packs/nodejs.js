@@ -94,6 +94,10 @@ const nodejsConfig = {
       description: 'Generate ESLint configuration for system tests.',
       filename: 'system-test/.eslintrc.yml'
     },
+    gitignore: {
+      description: '.gitignore',
+      filename: '.gitignore',
+    },
     jsdoc: {
       description: 'Generate JSDoc configuration.',
       filename: '.jsdoc.js'
