@@ -70,7 +70,7 @@ function gatherHelpText (opts, buildPack) {
           cwd: opts.localPath
         }).toString().trim();
       } catch (err) {
-        utils.logger.logger.error('generate', err.message);
+        utils.logger.error('generate', err.message);
         process.exit(err.status);
       }
     }
@@ -232,7 +232,7 @@ exports.handler = (opts) => {
     // Write the content to the target's filename
     fs.writeFile(targetPath, generated, (err) => {
       if (err) {
-        utils.logger.logger.error('generate', err.stack || err.message);
+        utils.logger.error('generate', err.stack || err.message);
         process.exit(1);
       }
 
