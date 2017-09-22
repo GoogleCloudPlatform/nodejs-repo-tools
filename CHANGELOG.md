@@ -1,3 +1,9 @@
+##### 2.0.4 - 22 September 2017
+
+###### Backwards compatible changes
+- #39 - Add ability to hide "Enable API" if api_id doesn't exist
+- #40 - Add all API IDs to src/utils/products.js
+
 ##### 2.0.3 - 22 September 2017
 
 ###### Bug fixes
