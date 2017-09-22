@@ -1,3 +1,7 @@
+##### 2.0.0 - 22 September 2017
+
+Stable 2.0.0 release
+
 ##### 2.0.0-beta.12 - 20 September 2017
 
 ###### Breaking changes
