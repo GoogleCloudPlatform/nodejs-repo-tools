@@ -20,9 +20,9 @@ steps:
   entrypoint: 'yarn'
   args: ['--version']
 
-# Print samples version.
+# Print repo-tools version.
 - name: 'gcr.io/$PROJECT_ID/nodejs'
-  entrypoint: 'samples'
+  entrypoint: 'repo-tools'
   args: ['--version']
 
 images: ['gcr.io/$PROJECT_ID/nodejs']

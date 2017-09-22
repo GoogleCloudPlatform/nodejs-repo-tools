@@ -1,3 +1,8 @@
+##### 2.0.3 - 22 September 2017
+
+###### Bug fixes
+- Fixed --help and --version flags
+
 ##### 2.0.2 - 22 September 2017
 
 ###### Backwards compatible changes

@@ -15,9 +15,9 @@ steps:
   entrypoint: 'npm'
   args: ['--version']
 
-# Print samples version.
+# Print repo-tools version.
 - name: 'gcr.io/$PROJECT_ID/base'
-  entrypoint: 'samples'
+  entrypoint: 'repo-tools'
   args: ['--version']
 
 images: ['gcr.io/$PROJECT_ID/base']

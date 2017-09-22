@@ -116,7 +116,7 @@ const globalOpts = {
  * @class BuildPack
  * @returns {BuildPack} A new {@link BuildPack} instance.
  */
-exports.BuildPack = class BuildPack {
+module.exports = class BuildPack {
   constructor (config = {}, innerOpts = {}) {
     this.config = _.merge(globalOpts, config);
     delete innerOpts.config;

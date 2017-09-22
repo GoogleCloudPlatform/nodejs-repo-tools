@@ -10,4 +10,9 @@ steps:
   entrypoint: 'ruby'
   args: ['--version']
 
+# Print repo-tools version.
+- name: 'gcr.io/$PROJECT_ID/nodejs'
+  entrypoint: 'repo-tools'
+  args: ['--version']
+
 images: ['gcr.io/$PROJECT_ID/ruby']

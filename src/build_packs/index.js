@@ -46,6 +46,15 @@ let currentBuildPack;
  * @param {*} args
  */
 exports.getBuildPack = (args = process.argv) => {
+  let isHelpOrVersion = false;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--help' || arg === '-h' || arg === '--version' || arg === '-v') {
+      isHelpOrVersion = true;
+      break;
+    }
+  }
+
   if (currentBuildPack) {
     // Return the cached build pack
     return currentBuildPack;
@@ -87,7 +96,7 @@ exports.getBuildPack = (args = process.argv) => {
       _selected: true,
       _cwd: localPath
     });
-    return;
+    return currentBuildPack;
   }
   logger.debug('Inferring buildPack...');
 
@@ -114,8 +123,16 @@ exports.getBuildPack = (args = process.argv) => {
       _detected: true,
       _cwd: localPath
     });
-    return;
+    return currentBuildPack;
   }
 
-  logger.fatal('cli', 'Could not infer build pack!');
+  if (!isHelpOrVersion) {
+    logger.error('cli', `Could not infer build pack! Using the default build pack which does not support all commands.`.yellow);
+  }
+
+  currentBuildPack = new exports.BuildPack();
+  currentBuildPack._name = 'default';
+  currentBuildPack._selected = true;
+  currentBuildPack._cwd = localPath;
+  return currentBuildPack;
 };

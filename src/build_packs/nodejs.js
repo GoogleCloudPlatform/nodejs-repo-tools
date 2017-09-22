@@ -17,7 +17,7 @@ const _ = require('lodash');
 const fs = require('fs-extra');
 const path = require('path');
 
-const { BuildPack } = require('./build_pack');
+const BuildPack = require('./build_pack');
 
 const SETUP = `
 1.  Read [Prerequisites][prereq] and [How to run a sample][run] first.

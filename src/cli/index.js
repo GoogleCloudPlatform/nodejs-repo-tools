@@ -24,7 +24,7 @@ module.exports = require('yargs')
   .options({
     'build-pack': {
       alias: 'b',
-      description: `${'Choices:'.bold} ${buildPacks.packs.map((pack) => pack.name.yellow).join(', ')}. ${buildPack._selected ? 'Selected:'.bold : 'Detected:'.bold} ${`${buildPack._name}`.green}. The build pack to use. The tool will attempt to detect which build to use.`,
+      description: `${'Choices:'.bold} ${buildPacks.packs.map((pack) => pack.name.yellow).concat('default'.yellow).join(', ')}. ${buildPack._selected ? 'Selected:'.bold : 'Detected:'.bold} ${`${buildPack._name}`.green}. The build pack to use. The tool will attempt to detect which build to use.`,
       global: true,
       requiresArg: true,
       type: 'string'
