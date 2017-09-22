@@ -1,4 +1,4 @@
-# nodejs-repo-tools [![build status][travis_badge]][travis_link]
+# nodejs-repo-tools [![build status][travis_badge]][travis_link] [![coverage][coverage_badge]][coverage_link]
 
 A tool used to maintain and test repositories in the GoogleCloudPlatform
 organization.
@@ -17,19 +17,19 @@ organization.
 Via `npm`:
 
 1.  `npm install -g @google-cloud/nodejs-repo-tools`
-1.  `samples --help`
+1.  `repo-tools --help`
 
 Via download (Linux):
 
 1.  `curl -O https://storage.googleapis.com/cloud-docs-samples/releases/latest/nodejs-repo-tools-linux`
-1.  `mv ./nodejs-repo-tools-linux $HOME/bin/samples`
-1.  `chmod +x $HOME/bin/samples`
+1.  `mv ./nodejs-repo-tools-linux $HOME/bin/repo-tools`
+1.  `chmod +x $HOME/bin/repo-tools`
 
 Via download (Mac):
 
 1.  `curl -O https://storage.googleapis.com/cloud-docs-samples/releases/latest/nodejs-repo-tools-macos`
-1.  `mv ./nodejs-repo-tools-macos $HOME/bin/samples`
-1.  `chmod +x $HOME/bin/samples`
+1.  `mv ./nodejs-repo-tools-macos $HOME/bin/repo-tools`
+1.  `chmod +x $HOME/bin/repo-tools`
 
 Via download (Windows):
 
@@ -43,7 +43,7 @@ Usage: `repo-tools --help` or `tools --help`
 Commands:
   exec                  Run a given command in /Users/jdobry/projects/nodejs-repo-tools.
   generate <targets..>  Generate the given target(s) in /Users/jdobry/projects/nodejs-repo-tools.
-  lint [files..]        Lint files by running: semistandard in /Users/jdobry/projects/nodejs-repo-tools.
+  lint                  Lint files by running: semistandard in /Users/jdobry/projects/nodejs-repo-tools.
   list                  List samples.
   test                  Run a test sub-command.
   unify                 (Node.js only) Recursively add sub-directory dependencies to the top-level package.json file.
@@ -86,7 +86,7 @@ build pack with `--build-pack [BUILD_PACK]` or `-b [BUILD_PACK]`.
 * [python][] - Build pack for the Python programming language.
 * [ruby][] - Build pack for the Ruby programming language.
 
-[global]: https://github.com/GoogleCloudPlatform/nodejs-repo-tools/blob/master/src/build_packs/global.js
+[global]: https://github.com/GoogleCloudPlatform/nodejs-repo-tools/blob/master/src/build_packs/build_pack.js
 [nodejs]: https://github.com/GoogleCloudPlatform/nodejs-repo-tools/blob/master/src/build_packs/nodejs.js
 [python]: https://github.com/GoogleCloudPlatform/nodejs-repo-tools/blob/master/src/build_packs/python.js
 [ruby]: https://github.com/GoogleCloudPlatform/nodejs-repo-tools/blob/master/src/build_packs/ruby.js
@@ -111,3 +111,5 @@ See [LICENSE](https://github.com/GoogleCloudPlatform/nodejs-repo-tools/blob/mast
 
 [travis_badge]: https://img.shields.io/travis/GoogleCloudPlatform/nodejs-repo-tools.svg
 [travis_link]: https://travis-ci.org/GoogleCloudPlatform/nodejs-repo-tools
+[coverage_badge]: https://img.shields.io/codecov/c/github/GoogleCloudPlatform/nodejs-repo-tools/master.svg
+[coverage_link]: https://codecov.io/gh/GoogleCloudPlatform/nodejs-repo-tools

@@ -2,6 +2,9 @@
 
 Stable 2.0.0 release
 
+###### Bug fixes
+- #35 - Fix logger stutter
+
 ##### 2.0.0-beta.12 - 20 September 2017
 
 ###### Breaking changes
