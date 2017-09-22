@@ -44,9 +44,6 @@ accept your pull requests.
 ## Running the tests
 
 1.  [Prepare your environment for Node.js setup][setup].
-1.  Install [SemistandardJS](https://github.com/Flet/semistandard).
-
-        npm install -g semistandard
 
 1.  Install dependencies:
 
@@ -68,6 +65,10 @@ accept your pull requests.
 1.  Publish to `npm`:
 
         npm publish .
+
+1.  Install [pkg](https://www.npmjs.com/package/pkg).
+
+        npm install -g pkg
 
 1.  Run the release script:
 

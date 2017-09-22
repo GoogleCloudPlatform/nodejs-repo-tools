@@ -96,7 +96,7 @@ const nodejsConfig = {
     },
     gitignore: {
       description: '.gitignore',
-      filename: '.gitignore',
+      filename: '.gitignore'
     },
     jsdoc: {
       description: 'Generate JSDoc configuration.',

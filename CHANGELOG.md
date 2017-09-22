@@ -1,3 +1,14 @@
+##### 2.0.1 - 22 September 2017
+
+###### Backwards compatible changes
+- #36 - Automatically write a JavaScript appropriate .gitignore
+
+###### Bug fixes
+- Fixed release script
+
+###### Other
+- Updated contributing guide
+
 ##### 2.0.0 - 22 September 2017
 
 Stable 2.0.0 release

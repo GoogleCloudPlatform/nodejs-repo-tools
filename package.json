@@ -1,6 +1,6 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
   "author": "Google Inc.",
   "license": "Apache-2.0",
@@ -38,7 +38,7 @@
   },
   "pkg": {
     "scripts": [
-      "./cjs/build_packs/*.js",
+      "./cjs/src/build_packs/*.js",
       "./cjs/cli/commands/**/*.js"
     ]
   },
