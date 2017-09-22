@@ -18,7 +18,7 @@ require('colors');
 const { spawn } = require('child_process');
 
 const buildPack = require('../../build_packs').getBuildPack();
-const { logger } = require('../../utils');
+const utils = require('../../utils');
 
 const CLI_CMD = 'lint';
 // Currently, the base lint command/args are not configurable from the
@@ -50,7 +50,7 @@ exports.builder = (yargs) => {
 };
 exports.handler = (opts) => {
   if (opts.dryRun) {
-    logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
+    utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
 
   buildPack.expandConfig(opts);
@@ -58,11 +58,11 @@ exports.handler = (opts) => {
   opts.cmd || (opts.cmd = buildPack.config.lint.cmd);
   opts.args || (opts.args = buildPack.config.lint.args);
 
-  logger.log(CLI_CMD, 'Linting files in:', opts.localPath.yellow);
-  logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+  utils.logger.log(CLI_CMD, 'Linting files in:', opts.localPath.yellow);
+  utils.logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
 
   if (opts.dryRun) {
-    logger.log(CLI_CMD, 'Dry run complete.'.cyan);
+    utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
     return;
   }
 
@@ -72,13 +72,16 @@ exports.handler = (opts) => {
     shell: true
   };
 
+  const start = Date.now();
+
   spawn(opts.cmd, opts.args, options)
     .on('exit', (code, signal) => {
+      const timeTakenStr = utils.getTimeTaken(start);
       if (code !== 0 || signal) {
-        logger.error(CLI_CMD, 'Linting failed.'.red);
+        utils.logger.error(CLI_CMD, `Oh no! Linting failed after ${timeTakenStr}.`);
         process.exit(code || 1);
       } else {
-        logger.log(CLI_CMD, 'Looks good!'.green);
+        utils.logger.log(CLI_CMD, `Success! Linting finished in ${timeTakenStr}.`.green);
       }
     });
 };

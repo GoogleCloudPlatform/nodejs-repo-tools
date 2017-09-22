@@ -43,7 +43,7 @@ test.serial('should install with overrides', async (t) => {
 
   t.regex(output, new RegExp(`install: Installing dependencies in: ${samplePath}`));
   t.regex(output, new RegExp(`install: Running: ${cmd} ${args}`));
-  t.regex(output, new RegExp(`install: Installation complete.`));
+  t.regex(output, new RegExp(`install: Success!`));
 });
 
 test.serial('should install with defaults', async (t) => {
@@ -52,7 +52,7 @@ test.serial('should install with defaults', async (t) => {
 
   t.regex(output, new RegExp(`install: Installing dependencies in: ${samplePath}`));
   t.regex(output, new RegExp(`install: Running: ${buildPack.config.test.install.cmd} ${buildPack.config.test.install.args.join(' ')}`));
-  t.regex(output, new RegExp(`install: Installation complete.`));
+  t.regex(output, new RegExp(`install: Success!`));
 });
 
 test.serial('should do a dry run test', async (t) => {
@@ -69,7 +69,7 @@ test.serial('should run test with defaults', async (t) => {
 
   t.regex(output, new RegExp(`run: Executing tests in: ${samplePath}`));
   t.regex(output, new RegExp(`run: Running: ${buildPack.config.test.run.cmd} ${buildPack.config.test.run.args.join(' ')}`));
-  t.regex(output, new RegExp(`run: Test complete.`));
+  t.regex(output, new RegExp(`run: Success!`));
 });
 
 test.serial('should run test with overrides', async (t) => {
@@ -80,5 +80,5 @@ test.serial('should run test with overrides', async (t) => {
 
   t.regex(output, new RegExp(`run: Executing tests in: ${samplePath}`));
   t.regex(output, new RegExp(`run: Running: ${cmd} run test --foo=bar`));
-  t.regex(output, new RegExp(`run: Test complete.`));
+  t.regex(output, new RegExp(`run: Success!`));
 });

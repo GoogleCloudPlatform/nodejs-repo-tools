@@ -39,7 +39,7 @@ test.serial('should lint with files', async (t) => {
   } catch (err) {
     t.regex(err.stdout, new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`));
     t.regex(err.stdout, new RegExp(`lint: Running: ${buildPack.config.lint.cmd}`));
-    t.regex(err.stderr, new RegExp(`lint: Linting failed.`));
+    t.regex(err.stderr, new RegExp(`lint: Oh no!`));
     return;
   }
   t.fail('Should have entered catch');
@@ -51,7 +51,7 @@ test.serial('should lint with defaults', async (t) => {
   } catch (err) {
     t.regex(err.stdout, new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`));
     t.regex(err.stdout, new RegExp(`lint: Running: ${buildPack.config.lint.cmd}`));
-    t.regex(err.stderr, new RegExp(`lint: Linting failed.`));
+    t.regex(err.stderr, new RegExp(`lint: Oh no!`));
     return;
   }
   t.fail('Should have entered catch');
@@ -61,5 +61,5 @@ test.serial('should lint with overrides', async (t) => {
   const result = await tools.runAsyncWithIO(`${binPath} lint -b nodejs --cmd echo -- foo`, path.join(samplePath, '..'));
   t.regex(result.output, new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`));
   t.regex(result.output, new RegExp(`lint: Running: echo foo`));
-  t.regex(result.output, new RegExp(`lint: Looks good!`));
+  t.regex(result.output, new RegExp(`lint: Success!`));
 });

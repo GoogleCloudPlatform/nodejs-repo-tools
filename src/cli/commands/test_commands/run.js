@@ -79,18 +79,12 @@ exports.handler = (opts) => {
   childProcess
     .spawn(opts.cmd, opts.args, options)
     .on('exit', (code, signal) => {
-      let timeTaken = (Date.now() - start) / 1000;
-      if (timeTaken <= 100) {
-        timeTaken = timeTaken.toPrecision(3);
-      } else if (timeTaken >= 100) {
-        timeTaken = Math.floor(timeTaken);
-      }
-      const timeTakenStr = `${timeTaken}s`.cyan;
+      const timeTakenStr = utils.getTimeTaken(start);
       if (code !== 0 || signal) {
-        utils.logger.error(CLI_CMD, `Test failed in ${timeTakenStr}.`.red);
+        utils.logger.error(CLI_CMD, `Oh no! Test failed after ${timeTakenStr}.`);
         process.exit(code || 1);
       } else {
-        utils.logger.log(CLI_CMD, `Test complete in ${timeTakenStr}`.green);
+        utils.logger.log(CLI_CMD, `Success! Test finished in ${timeTakenStr}`.green);
       }
     });
 };

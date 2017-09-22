@@ -1,6 +1,4 @@
-# nodejs-repo-tools [![build status][travis_badge]][travis_link] [![coverage][coverage_badge]][coverage_link]
-
-[![Greenkeeper badge](https://badges.greenkeeper.io/GoogleCloudPlatform/nodejs-repo-tools.svg)](https://greenkeeper.io/)
+# nodejs-repo-tools [![build status][travis_badge]][travis_link] [![coverage][coverage_badge]][coverage_link] [![Greenkeeper badge][greenkeeper_badge]][greenkeeper_link]
 
 A tool used to maintain and test repositories in the GoogleCloudPlatform
 organization.
@@ -115,3 +113,5 @@ See [LICENSE](https://github.com/GoogleCloudPlatform/nodejs-repo-tools/blob/mast
 [travis_link]: https://travis-ci.org/GoogleCloudPlatform/nodejs-repo-tools
 [coverage_badge]: https://img.shields.io/codecov/c/github/GoogleCloudPlatform/nodejs-repo-tools/master.svg
 [coverage_link]: https://codecov.io/gh/GoogleCloudPlatform/nodejs-repo-tools
+[greenkeeper_badge]: https://badges.greenkeeper.io/GoogleCloudPlatform/nodejs-repo-tools.svg
+[greenkeeper_link]: https://greenkeeper.io/

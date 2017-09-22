@@ -74,14 +74,17 @@ exports.handler = (opts) => {
     shell: true
   };
 
+  const start = Date.now();
+
   childProcess
     .spawn(opts.cmd, opts.args, options)
     .on('exit', (code, signal) => {
+      const timeTakenStr = utils.getTimeTaken(start);
       if (code !== 0 || signal) {
-        utils.logger.error(CLI_CMD, 'Install failed.'.red);
+        utils.logger.error(CLI_CMD, `Oh no! Install failed after ${timeTakenStr}.`);
         process.exit(code || 1);
       } else {
-        utils.logger.log(CLI_CMD, 'Installation complete.'.green);
+        utils.logger.log(CLI_CMD, `Success! Installation finished in ${timeTakenStr}.`.green);
       }
     });
 };

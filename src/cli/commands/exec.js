@@ -64,14 +64,17 @@ exports.handler = (opts) => {
     shell: true
   };
 
+  const start = Date.now();
+
   childProcess
     .spawn(opts.args[0], opts.args.slice(1), options)
     .on('exit', (code, signal) => {
+      const timeTakenStr = utils.getTimeTaken(start);
       if (code !== 0 || signal) {
-        utils.logger.error(CLI_CMD, 'Execution failed.'.red);
+        utils.logger.error(CLI_CMD, `Oh no! Execution failed after ${timeTakenStr}.`);
         process.exit(code || 1);
       } else {
-        utils.logger.log(CLI_CMD, 'Execution complete.'.green);
+        utils.logger.log(CLI_CMD, `Success! Execution finished in ${timeTakenStr}.`.green);
       }
     });
 };

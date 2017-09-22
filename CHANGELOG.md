@@ -1,3 +1,8 @@
+##### 2.0.2 - 22 September 2017
+
+###### Backwards compatible changes
+- Made command logs more consistent
+
 ##### 2.0.1 - 22 September 2017
 
 ###### Backwards compatible changes

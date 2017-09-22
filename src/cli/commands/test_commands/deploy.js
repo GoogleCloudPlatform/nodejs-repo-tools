@@ -161,6 +161,8 @@ exports.handler = (opts) => {
       shell: true
     };
 
+    const start = Date.now();
+
     let triesRemaining = opts.tries;
 
     function attemptDeploy () {
@@ -170,10 +172,12 @@ exports.handler = (opts) => {
         childProcess
           .spawn(opts.cmd, opts.args, options)
           .on('exit', (code, signal) => {
+            let timeTakenStr = utils.getTimeTaken(start);
+
             if (code || signal) {
-              utils.logger.error(CLI_CMD, 'Deploy failed.');
+              utils.logger.error(CLI_CMD, `Oh no! Deployment failed after ${timeTakenStr}.`);
             } else {
-              utils.logger.log(CLI_CMD, 'Deployment complete.'.green);
+              utils.logger.log(CLI_CMD, `Success! Deployment finished in ${timeTakenStr}.`.green);
             }
 
             // Give app time to start
@@ -184,10 +188,11 @@ exports.handler = (opts) => {
               // Test that app is running successfully
               utils.testRequest(demoUrl, opts)
                 .then(() => {
-                  utils.logger.log(CLI_CMD, 'Test complete.'.green);
+                  timeTakenStr = utils.getTimeTaken(start);
+                  utils.logger.log(CLI_CMD, `Success! Test finished in ${timeTakenStr}.`.green);
                   resolve();
                 }, (err) => {
-                  utils.logger.error(CLI_CMD, 'Test failed.', err);
+                  utils.logger.error(CLI_CMD, `Oh no! Test failed after ${timeTakenStr}.`, err);
 
                   // Try the test again if any available tries remain
                   attemptDeploy();
@@ -195,7 +200,8 @@ exports.handler = (opts) => {
             }, 5000);
           });
       } else {
-        reject(new Error('Exhausted available deployment attempts.'));
+        const timeTakenStr = utils.getTimeTaken(start);
+        reject(new Error(`Exhausted available deployment attempts after ${timeTakenStr}.`));
       }
     }
 

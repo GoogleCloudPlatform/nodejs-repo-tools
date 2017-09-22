@@ -128,14 +128,17 @@ exports.handler = (opts) => {
 
     let requestErr = null;
 
+    const start = Date.now();
+
     // Start the app
     const child = childProcess
       .spawn(opts.cmd, opts.args, options)
       .on('exit', (code, signal) => {
+        const timeTakenStr = utils.getTimeTaken(start);
         if (code || signal !== 'SIGTERM' || requestErr) {
-          utils.logger.error(CLI_CMD, 'Test failed.', requestErr);
+          utils.logger.error(CLI_CMD, `Oh no! Test failed after ${timeTakenStr}.`, requestErr);
         } else {
-          utils.logger.log(CLI_CMD, 'Test complete.'.green);
+          utils.logger.log(CLI_CMD, `Success! Test finished in ${timeTakenStr}.`.green);
         }
       });
 

@@ -187,56 +187,75 @@ exports.handler = (opts) => {
     });
   }
 
+  const start = Date.now();
+  let errors = [];
+
   // Generate each specified target
   opts.targets.forEach((target) => {
     const targetConfig = TARGETS[target];
     const targetPath = path.join(opts.localPath, targetConfig.filename);
     utils.logger.log(CLI_CMD, 'Compiling:', targetPath.yellow);
 
-    if (target === 'lib_samples_readme' || target === 'samples_readme') {
-      // Prepare config for the samples, if any
-      expandOpts(opts, buildPack);
-    }
-
-    // Prepare the data for the template
-    const data = _.merge(opts, targetConfig.data || {}, buildPack.config);
-    data.lib_pkg_name = buildPack.config.generate.lib_readme.getLibPkgName(buildPack);
-    // Other data prep
-    if (target === 'lib_readme') {
-      if (buildPack.config.generate.lib_readme.quickstart_filename) {
-        data.quickstart = getQuickstart(path.join(opts.localPath, buildPack.config.generate.lib_readme.quickstart_filename), buildPack);
-      }
-      data.lib_install_cmd = buildPack.config.generate.lib_readme.lib_install_cmd.replace('{{name}}', data.lib_pkg_name);
-    }
-
-    // Load the target's template
-    let tpl;
     try {
-      tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${opts.buildPack}/${target}.tpl`), 'utf-8');
-    } catch (err) {
-      tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${target}.tpl`), 'utf-8');
-    }
-    // Validate the data for the given target is sufficient
-    if (targetConfig.validate) {
-      targetConfig.validate(data);
-    }
-
-    // Generate the content
-    const generated = handlebars.compile(tpl)(data);
-
-    if (opts.dryRun) {
-      utils.logger.log(CLI_CMD, `Printing: ${targetPath.yellow}\n${generated}`);
-      return;
-    }
-
-    // Write the content to the target's filename
-    fs.writeFile(targetPath, generated, (err) => {
-      if (err) {
-        utils.logger.error('generate', err.stack || err.message);
-        process.exit(1);
+      if (target === 'lib_samples_readme' || target === 'samples_readme') {
+        // Prepare config for the samples, if any
+        expandOpts(opts, buildPack);
       }
 
-      utils.logger.log(CLI_CMD, `Generated: ${targetPath}`.green);
-    });
+      // Prepare the data for the template
+      const data = _.merge(opts, targetConfig.data || {}, buildPack.config);
+      data.lib_pkg_name = buildPack.config.generate.lib_readme.getLibPkgName(buildPack);
+      // Other data prep
+      if (target === 'lib_readme') {
+        if (buildPack.config.generate.lib_readme.quickstart_filename) {
+          data.quickstart = getQuickstart(path.join(opts.localPath, buildPack.config.generate.lib_readme.quickstart_filename), buildPack);
+        }
+        data.lib_install_cmd = buildPack.config.generate.lib_readme.lib_install_cmd.replace('{{name}}', data.lib_pkg_name);
+      }
+
+      // Load the target's template
+      let tpl;
+      try {
+        tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${opts.buildPack}/${target}.tpl`), 'utf-8');
+      } catch (err) {
+        tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${target}.tpl`), 'utf-8');
+      }
+      // Validate the data for the given target is sufficient
+      if (targetConfig.validate) {
+        targetConfig.validate(data);
+      }
+
+      // Generate the content
+      const generated = handlebars.compile(tpl)(data);
+
+      if (opts.dryRun) {
+        utils.logger.log(CLI_CMD, `Printing: ${targetPath.yellow}\n${generated}`);
+        return;
+      }
+
+      // Write the content to the target's filename
+      fs.writeFile(targetPath, generated, (err) => {
+        if (err) {
+          utils.logger.error('generate', err.stack || err.message);
+          process.exit(1);
+        }
+
+        utils.logger.log(CLI_CMD, `Generated: ${targetPath}`.green);
+      });
+    } catch (err) {
+      errors.push(err);
+      utils.logger.error(CLI_CMD, `Failed to generate: ${targetPath}`.red);
+    }
   });
+
+  const timeTakenStr = utils.getTimeTaken(start);
+
+  if (errors.length) {
+    utils.logger.error(CLI_CMD, `Oh no! Generating failed after ${timeTakenStr}.`);
+    errors.forEach((error) => {
+      utils.logger.error(CLI_CMD, error);
+    });
+  } else {
+    utils.logger.log(CLI_CMD, `Success! Generating finished in ${timeTakenStr}.`.green);
+  }
 };

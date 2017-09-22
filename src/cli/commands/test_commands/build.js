@@ -249,6 +249,7 @@ exports.handler = (opts) => {
     }
     utils.logger.log(CLI_CMD, `Build command: ${buildCmd.yellow}`);
     if (!opts.dryRun) {
+      const start = Date.now();
       try {
         childProcess.execSync(buildCmd, {
           cwd: opts.localPath,
@@ -257,9 +258,13 @@ exports.handler = (opts) => {
         });
         // Remove temp files
         cleanup(opts);
+        const timeTakenStr = utils.getTimeTaken(start);
+        utils.logger.log(CLI_CMD, `Success! Build finished in ${timeTakenStr}.`.green);
       } catch (err) {
         // Remove temp files
         cleanup();
+        const timeTakenStr = utils.getTimeTaken(start);
+        utils.logger.error(CLI_CMD, `Oh no! Build failed after ${timeTakenStr}.`);
         process.exit(err.status);
       }
     }

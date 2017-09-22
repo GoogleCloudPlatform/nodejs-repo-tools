@@ -173,6 +173,16 @@ exports.getRepoPath = (repository, cwd) => {
   return result;
 };
 
+exports.getTimeTaken = (start) => {
+  let timeTaken = (Date.now() - start) / 1000;
+  if (timeTaken <= 100) {
+    timeTaken = timeTaken.toPrecision(3);
+  } else if (timeTaken >= 100) {
+    timeTaken = Math.floor(timeTaken);
+  }
+  return `${timeTaken}s`.cyan;
+};
+
 /**
  * Generates a markdown badge for displaying a "Release Quality'.
  *

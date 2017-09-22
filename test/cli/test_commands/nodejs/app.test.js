@@ -45,7 +45,7 @@ test.serial('should install with overrides', async (t) => {
 
   t.regex(output, new RegExp(`install: Installing dependencies in: ${samplePath}`));
   t.regex(output, new RegExp(`install: Running: ${cmd} ${args}`));
-  t.regex(output, new RegExp(`install: Installation complete.`));
+  t.regex(output, new RegExp(`install: Success!`));
 });
 
 test.serial('should install with defaults', async (t) => {
@@ -54,7 +54,7 @@ test.serial('should install with defaults', async (t) => {
 
   t.regex(output, new RegExp(`install: Installing dependencies in: ${samplePath}`));
   t.regex(output, new RegExp(`install: Running: ${buildPack.config.test.install.cmd} ${buildPack.config.test.install.args.join(' ')}`));
-  t.regex(output, new RegExp(`install: Installation complete.`));
+  t.regex(output, new RegExp(`install: Success!`));
 });
 
 // test run
@@ -73,7 +73,7 @@ test.serial('should run test with defaults', async (t) => {
 
   t.regex(results.output, new RegExp(`run: Executing tests in: ${samplePath}`));
   t.regex(results.output, new RegExp(`run: Running: ${buildPack.config.test.run.cmd} ${buildPack.config.test.run.args.join(' ')}`));
-  t.regex(results.output, new RegExp(`run: Test complete.`));
+  t.regex(results.output, new RegExp(`run: Success!`));
 });
 
 test.serial('should run test with overrides', async (t) => {
@@ -82,7 +82,7 @@ test.serial('should run test with overrides', async (t) => {
 
   t.regex(results.output, new RegExp(`run: Executing tests in: ${samplePath}`));
   t.regex(results.output, new RegExp(`run: Running: npm run test --foo=bar`));
-  t.regex(results.output, new RegExp(`run: Test complete.`));
+  t.regex(results.output, new RegExp(`run: Success!`));
 });
 
 // test app
@@ -104,7 +104,7 @@ test.serial('should test web app with defaults', async (t) => {
   t.regex(results.output, new RegExp(`app: Using port:`));
   t.regex(results.output, new RegExp(`app: Running: ${buildPack.config.test.app.cmd} ${buildPack.config.test.app.args.join(' ')}`));
   t.regex(results.output, new RegExp(`app: Verifying: http://localhost:`));
-  t.regex(results.output, new RegExp(`app: Test complete.`));
+  t.regex(results.output, new RegExp(`app: Success!`));
 });
 
 test.serial('should test web app with overrides', async (t) => {
@@ -115,7 +115,7 @@ test.serial('should test web app with overrides', async (t) => {
   t.regex(results.output, new RegExp(`app: Using port:`));
   t.regex(results.output, new RegExp(`app: Running: node app.js --foo bar`));
   t.regex(results.output, new RegExp(`app: Verifying: http://localhost:`));
-  t.regex(results.output, new RegExp(`app: Test complete.`));
+  t.regex(results.output, new RegExp(`app: Success!`));
 });
 
 // test build
