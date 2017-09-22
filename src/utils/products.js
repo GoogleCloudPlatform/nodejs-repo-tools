@@ -33,252 +33,272 @@ const products = [
     `Google App Engine`,
     `App Engine`,
     `${BASE}/appengine/docs`,
-    `[Google App Engine]({{docs_url}}) is a fully managed platform that completely abstracts away infrastructure so you focus only on code.`
+    `[Google App Engine]({{docs_url}}) is a fully managed platform that completely abstracts away infrastructure so you focus only on code.`,
+    `appengine.googleapis.com`
   ),
   new Product(
     'appengine_flexible',
     'Google App Engine flexible environment',
     'App Engine flexible environment',
     `${BASE}/appengine/docs/flexible`,
-    `Based on [Google Compute Engine](${BASE}/compute/docs/), the [App Engine flexible environment]({{docs_url}}) automatically scales your app up and down while balancing the load. Microservices, authorization, SQL and NoSQL databases, traffic splitting, logging, versioning, security scanning, and content delivery networks are all supported natively. In addition, the App Engine flexible environment allows you to customize your runtime and even the operating system of your virtual machine using Dockerfiles.`
+    `Based on [Google Compute Engine](${BASE}/compute/docs/), the [App Engine flexible environment]({{docs_url}}) automatically scales your app up and down while balancing the load. Microservices, authorization, SQL and NoSQL databases, traffic splitting, logging, versioning, security scanning, and content delivery networks are all supported natively. In addition, the App Engine flexible environment allows you to customize your runtime and even the operating system of your virtual machine using Dockerfiles.`,
+    `appengine.googleapis.com`
   ),
   new Product(
     'appengine_standard',
     'Google App Engine standard environment',
     'App Engine standard environment',
     `${BASE}/appengine/docs/standard`,
-    `The [App Engine standard environment]({{docs_url}}) is based on container instances running on Google's infrastructure. Containers are preconfigured with one of several available runtimes (Java 7, Python 2.7, Go and PHP). Each runtime also includes libraries that support App Engine Standard APIs. For many applications, the standard environment runtimes and libraries might be all you need.`
+    `The [App Engine standard environment]({{docs_url}}) is based on container instances running on Google's infrastructure. Containers are preconfigured with one of several available runtimes (Java 7, Python 2.7, Go and PHP). Each runtime also includes libraries that support App Engine Standard APIs. For many applications, the standard environment runtimes and libraries might be all you need.`,
+    `appengine.googleapis.com`
   ),
   new Product(
     `bigquery`,
     `Google BigQuery`,
     `BigQuery`,
     `${BASE}/bigquery/docs`,
-    `[BigQuery]({{docs_url}}) is Google's fully managed, petabyte scale, low cost analytics data warehouse. BigQuery is NoOps—there is no infrastructure to manage and you don't need a database administrator—so you can focus on analyzing data to find meaningful insights, use familiar SQL, and take advantage of our pay-as-you-go model.`
+    `[BigQuery]({{docs_url}}) is Google's fully managed, petabyte scale, low cost analytics data warehouse. BigQuery is NoOps—there is no infrastructure to manage and you don't need a database administrator—so you can focus on analyzing data to find meaningful insights, use familiar SQL, and take advantage of our pay-as-you-go model.`,
+    `bigquery-json.googleapis.com`
   ),
   new Product(
     `bigquery_transfer`,
     `Google BigQuery Data Transfer Service`,
     `BigQuery Data Transfer Service`,
-    `${BASE}`,
-    `TODO(jdobry): BigQuery Data Transfer Service`
+    `${BASE}/bigquery/docs/reference/datatransfer/rest/`,
+    `The [BigQuery Data Transfer Service]({{docs_url}}) transfers data from partner SaaS applications to Google BigQuery on a scheduled, managed basis.`,
+    `bigquerydatatransfer.googleapis.com`
   ),
   new Product(
     `bigtable`,
     `Cloud Bigtable`,
     `Cloud Bigtable`,
     `${BASE}/bigtable/docs/`,
-    `[Cloud Bigtable]({{docs_url}}) is Google's NoSQL Big Data database service. It's the same database that powers many core Google services, including Search, Analytics, Maps, and Gmail.`
-  ),
-  new Product(
-    `cdn`,
-    `Cloud Content Delivery Network`,
-    `Cloud CDN`,
-    `${BASE}`,
-    `TODO(jdobry): Cloud CDN description`
-  ),
-  new Product(
-    `cdn_keys`,
-    `Custom Cache Keys for Cloud Content Delivery Network`,
-    `Custom Cache Keys for Cloud CDN`,
-    `${BASE}`,
-    `TODO(jdobry): Custom Cache Keys for Cloud CDN description`
+    `[Cloud Bigtable]({{docs_url}}) is Google's NoSQL Big Data database service. It's the same database that powers many core Google services, including Search, Analytics, Maps, and Gmail.`,
+    `bigtable.googleapis.com,bigtableadmin.googleapis.com`
   ),
   new Product(
     `compute_engine`,
     `Google Compute Engine`,
     `Compute Engine`,
     `${BASE}/compute/docs/`,
-    `[Compute Engine]({{docs_url}}) lets you create and run virtual machines on Google infrastructure. Compute Engine offers scale, performance, and value that allows you to easily launch large compute clusters on Google's infrastructure. There are no upfront investments and you can run thousands of virtual CPUs on a system that has been designed to be fast, and to offer strong consistency of performance.`
+    `[Compute Engine]({{docs_url}}) lets you create and run virtual machines on Google infrastructure. Compute Engine offers scale, performance, and value that allows you to easily launch large compute clusters on Google's infrastructure. There are no upfront investments and you can run thousands of virtual CPUs on a system that has been designed to be fast, and to offer strong consistency of performance.`,
+    `compute.googleapis.com`
   ),
   new Product(
     `container_builder`,
     `Google Container Builder`,
     `Container Builder`,
-    `${BASE}`,
-    `TODO(jdobry): Container Builder description`
+    `${BASE}/container-builder/docs`,
+    `[Cloud Container Builder]({{docs_url}}) lets you create [Docker](http://docker.com/) container images from application source code located in [Google Cloud Storage](https://cloud.google.com/storage/docs, [Google Cloud Source Repositories](https://cloud.google.com/source-repositories/docs), GitHub or BitBucket.`,
+    `cloudbuild.googleapis.com`
   ),
   new Product(
     `container_engine`,
     `Google Container Engine`,
     `Container Engine`,
     `${BASE}/container-engine/docs/`,
-    `[Container Engine]({{docs_url}}) let's you run Docker containers on Google Cloud Platform, powered by Kubernetes.`
+    `[Container Engine]({{docs_url}}) let's you run Docker containers on Google Cloud Platform, powered by Kubernetes.`,
+    `container.googleapis.com`
   ),
   new Product(
     `container_registry`,
     `Google Container Registry`,
     `Container Registry`,
-    `${BASE}`,
-    `TODO(jdobry): Container Registry description`
+    `${BASE}/container-registry/docs`,
+    `[Container Registry]({{docs_url}}) provides secure, private Docker image storage on Google Cloud Platform.`,
+    `containerregistry.googleapis.com`
   ),
   new Product(
     `dataflow`,
     `Google Cloud Dataflow`,
     `Cloud Dataflow`,
-    `${BASE}`,
-    `TODO(jdobry): Cloud Dataflow description`
+    `${BASE}/dataflow/docs`,
+    `[Cloud Dataflow]({{docs_url}}) is a unified programming model and a managed service for developing and executing a wide variety of data processing patterns.`,
+    `dataflow.googleapis.com`
   ),
   new Product(
     `dataproc`,
     `Google Cloud Dataproc`,
     `Cloud Dataproc`,
-    `${BASE}`,
-    `TODO(jdobry): Cloud Dataproc description`
+    `${BASE}/dataproc/docs`,
+    `[Cloud Dataproc]({{docs_url}}) is a managed Apache Spark and Apache Hadoop service that lets you take advantage of open source data tools for batch processing, querying, streaming, and machine learning.`,
+    `dataproc.googleapis.com`
   ),
   new Product(
     `datastore`,
     `Google Cloud Datastore`,
     `Cloud Datastore`,
     `${BASE}/datastore/docs`,
-    `[Cloud Datastore]({{docs_url}}) is a NoSQL document database built for automatic scaling, high performance, and ease of application development. While the Cloud Datastore interface has many of the same features as traditional databases, as a NoSQL database it differs from them in the way it describes relationships between data objects.`
+    `[Cloud Datastore]({{docs_url}}) is a NoSQL document database built for automatic scaling, high performance, and ease of application development. While the Cloud Datastore interface has many of the same features as traditional databases, as a NoSQL database it differs from them in the way it describes relationships between data objects.`,
+    `datastore.googleapis.com`
   ),
   new Product(
     `debugger`,
     `Stackdriver Debugger`,
     `Stackdriver Debugger`,
     `${BASE}/debugger/docs/`,
-    `[Stackdriver Debugger]({{docs_url}}) is a feature of Google Cloud Platform that lets you inspect the state of a Java, Python, or Go application, at any code location, without stopping or slowing down the running app. Stackdriver Debugger makes it easier to view the application state without adding logging statements.`
+    `[Stackdriver Debugger]({{docs_url}}) is a feature of Google Cloud Platform that lets you inspect the state of a Java, Python, or Go application, at any code location, without stopping or slowing down the running app. Stackdriver Debugger makes it easier to view the application state without adding logging statements.`,
+    `clouddebugger.googleapis.com`
   ),
   new Product(
     `dlp`,
     `Google Cloud Data Loss Prevention (DLP) API`,
     `Data Loss Prevention (DLP) API`,
     `${BASE}/dlp/docs/`,
-    `The [Data Loss Prevention API]({{docs_url}}) provides programmatic access to a powerful detection engine for personally identifiable information and other privacy-sensitive data in unstructured data streams.`
+    `The [Data Loss Prevention API]({{docs_url}}) provides programmatic access to a powerful detection engine for personally identifiable information and other privacy-sensitive data in unstructured data streams.`,
+    `dlp.googleapis.com`
   ),
   new Product(
     `dns`,
     `Google Cloud DNS`,
     `Cloud DNS`,
     `${BASE}/dns/docs/`,
-    `[Cloud DNS]({{docs_url}}) allows you to publish your domain names using Google's infrastructure for production-quality, high-volume DNS services. Google's global network of anycast name servers provide reliable, low-latency authoritative name lookups for your domains from anywhere in the world.`
+    `[Cloud DNS]({{docs_url}}) allows you to publish your domain names using Google's infrastructure for production-quality, high-volume DNS services. Google's global network of anycast name servers provide reliable, low-latency authoritative name lookups for your domains from anywhere in the world.`,
+    `dns.googleapis.com`
   ),
   new Product(
     `endpoints`,
     `Google Cloud Endpoints`,
     `Cloud Endpoints`,
     `${BASE}/endpoints/docs/`,
-    `[Cloud Endpoints]({{docs_url}}) helps you create, deploy, protect, monitor, analyze, and serve your APIs using the same infrastructure Google uses for its own APIs. Use any language and framework to write an API, add an OpenAPI specification, and Cloud Endpoints will monitor and protect your API.`
+    `[Cloud Endpoints]({{docs_url}}) helps you create, deploy, protect, monitor, analyze, and serve your APIs using the same infrastructure Google uses for its own APIs. Use any language and framework to write an API, add an OpenAPI specification, and Cloud Endpoints will monitor and protect your API.`,
+    `endpoints.googleapis.com`
   ),
   new Product(
     `error_reporting`,
     `Stackdriver Error Reporting`,
     `Error Reporting`,
     `${BASE}/error-reporting/docs/`,
-    `[Stackdriver Error Reporting]({{docs_url}}) aggregates and displays errors produced in your running cloud services.`
+    `[Stackdriver Error Reporting]({{docs_url}}) aggregates and displays errors produced in your running cloud services.`,
+    `clouderrorreporting.googleapis.com`
   ),
   new Product(
     `genomics`,
     `Google Genomics`,
     `Genomics`,
-    `${BASE}`,
-    `TODO(jdobry): Genomics description`
+    `${BASE}/genomics`,
+    `[Google Genomics]({{docs_url}}) helps the life science community organize the world’s genomic information and make it accessible and useful.`,
+    `genomics.googleapis.com`
   ),
   new Product(
     `iam`,
     `Cloud Identity Access Management`,
     `Cloud IAM`,
-    `${BASE}`,
-    `TODO(jdobry): Cloud IAM description`
+    `${BASE}/iam/docs`,
+    `[Cloud Identity and Access Management (Cloud IAM)]({{docs_url}}) enables you to create and manage permissions for Google Cloud Platform resources. Cloud IAM unifies access control for Cloud Platform services into a single system and presents a consistent set of operations`,
+    `iam.googleapis.com`
   ),
   new Product(
     `functions`,
     `Google Cloud Functions`,
     `Cloud Functions`,
     `${BASE}/functions/docs/`,
-    `[Cloud Functions]({{docs_url}}) is a lightweight compute solution for developers to create single-purpose, stand-alone functions that respond to Cloud events without the need to manage a server or runtime environment.`
+    `[Cloud Functions]({{docs_url}}) is a lightweight compute solution for developers to create single-purpose, stand-alone functions that respond to Cloud events without the need to manage a server or runtime environment.`,
+    `cloudfunctions.googleapis.com`
   ),
   new Product(
     `kms`,
     `Cloud Key Management Service`,
     `Cloud KMS`,
     `${BASE}/kms/docs/`,
-    `[Cloud KMS]({{docs_url}}) allows you to keep encryption keys in one central cloud service, for direct use by other cloud resources and applications. With Cloud KMS you are the ultimate custodian of your data, you can manage encryption in the cloud the same way you do on-premises, and you have a provable and monitorable root of trust over your data.`
+    `[Cloud KMS]({{docs_url}}) allows you to keep encryption keys in one central cloud service, for direct use by other cloud resources and applications. With Cloud KMS you are the ultimate custodian of your data, you can manage encryption in the cloud the same way you do on-premises, and you have a provable and monitorable root of trust over your data.`,
+    `cloudkms.googleapis.com`
   ),
   new Product(
     `logging`,
     `Stackdriver Logging`,
     `Logging`,
     `${BASE}/logging/docs`,
-    `[Stackdriver Logging]({{docs_url}}) allows you to store, search, analyze, monitor, and alert on log data and events from Google Cloud Platform and Amazon Web Services.`
+    `[Stackdriver Logging]({{docs_url}}) allows you to store, search, analyze, monitor, and alert on log data and events from Google Cloud Platform and Amazon Web Services.`,
+    `logging.googleapis.com`
   ),
   new Product(
     `ml`,
     `Cloud Machine Learning Engine`,
     `Cloud ML Engine`,
-    `${BASE}`,
-    `TODO(jdobry): Cloud ML Engine description`
+    `${BASE}/ml/docs`,
+    `[Cloud Machine Learning Engine]({{docs_url}}) brings the power and flexibility of TensorFlow to the cloud. You can use its components to select and extract features from your data, train your machine learning models, and get predictions using the managed resources of Google Cloud Platform.`,
+    `ml.googleapis.com`
   ),
   new Product(
     `monitoring`,
     `Stackdriver Monitoring`,
     `Monitoring`,
     `${BASE}/monitoring/docs`,
-    `[Stackdriver Monitoring]({{docs_url}}) collects metrics, events, and metadata from Google Cloud Platform, Amazon Web Services (AWS), hosted uptime probes, application instrumentation, and a variety of common application components including Cassandra, Nginx, Apache Web Server, Elasticsearch and many others.`
+    `[Stackdriver Monitoring]({{docs_url}}) collects metrics, events, and metadata from Google Cloud Platform, Amazon Web Services (AWS), hosted uptime probes, application instrumentation, and a variety of common application components including Cassandra, Nginx, Apache Web Server, Elasticsearch and many others.`,
+    `monitoring.googleapis.com`
   ),
   new Product(
     `nl`,
     `Google Cloud Natural Language API`,
     `Natural Language API`,
     `${BASE}/natural-language/docs`,
-    `[Cloud Natural Language API]({{docs_url}}) provides natural language understanding technologies to developers, including sentiment analysis, entity analysis, and syntax analysis. This API is part of the larger Cloud Machine Learning API family.`
+    `[Cloud Natural Language API]({{docs_url}}) provides natural language understanding technologies to developers, including sentiment analysis, entity analysis, and syntax analysis. This API is part of the larger Cloud Machine Learning API family.`,
+    `language.googleapis.com`
   ),
   new Product(
     `prediction`,
     `Google Prediction API`,
     `Prediction API`,
     `${BASE}/prediction/docs`,
-    `The [Cloud Prediction API]({{docs_url}}) provides a RESTful API to build Machine Learning models.`
+    `The [Cloud Prediction API]({{docs_url}}) provides a RESTful API to build Machine Learning models.`,
+    `prediction.googleapis.com`
   ),
   new Product(
     `pubsub`,
     `Google Cloud Pub/Sub`,
     `Cloud Pub/Sub`,
     `${BASE}/pubsub/docs`,
-    `[Cloud Pub/Sub]({{docs_url}}) is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications.`
+    `[Cloud Pub/Sub]({{docs_url}}) is a fully-managed real-time messaging service that allows you to send and receive messages between independent applications.`,
+    `pubsub.googleapis.com`
   ),
   new Product(
     `resource`,
     `Google Cloud Resource Manager API`,
     `Cloud Resource Manager API`,
     `${BASE}/resource-manager/docs/`,
-    `Google Cloud Platform provides container resources such as Organizations and Projects, that allow you to group and hierarchically organize other Cloud Platform resources. This hierarchical organization lets you easily manage common aspects of your resources such as access control and configuration settings. The [Cloud Resource Manager API]({{docs_url}}) enables you to programmatically manage these container resources.`
+    `Google Cloud Platform provides container resources such as Organizations and Projects, that allow you to group and hierarchically organize other Cloud Platform resources. This hierarchical organization lets you easily manage common aspects of your resources such as access control and configuration settings. The [Cloud Resource Manager API]({{docs_url}}) enables you to programmatically manage these container resources.`,
+    `cloudresourcemanager.googleapis.com`
   ),
   new Product(
     `spanner`,
     `Cloud Spanner`,
     `Cloud Spanner`,
     `${BASE}/spanner/docs/`,
-    `[Cloud Spanner]({{docs_url}}) is a fully managed, mission-critical, relational database service that offers transactional consistency at global scale, schemas, SQL (ANSI 2011 with extensions), and automatic, synchronous replication for high availability.`
+    `[Cloud Spanner]({{docs_url}}) is a fully managed, mission-critical, relational database service that offers transactional consistency at global scale, schemas, SQL (ANSI 2011 with extensions), and automatic, synchronous replication for high availability.`,
+    `spanner.googleapis.com`
   ),
   new Product(
     `speech`,
     `Google Cloud Speech API`,
     `Speech API`,
     `${BASE}/speech/docs`,
-    `The [Cloud Speech API]({{docs_url}}) enables easy integration of Google speech recognition technologies into developer applications. Send audio and receive a text transcription from the Cloud Speech API service.`
+    `The [Cloud Speech API]({{docs_url}}) enables easy integration of Google speech recognition technologies into developer applications. Send audio and receive a text transcription from the Cloud Speech API service.`,
+    `speech.googleapis.com`
   ),
   new Product(
     `sql`,
     `Google Cloud SQL`,
     `Cloud SQL`,
     `${BASE}/sql/`,
-    `[Cloud SQL]({{docs_url}}) is a fully-managed database service that makes it easy to set up, maintain, manage, and administer your relational PostgreSQL BETA and MySQL databases in the cloud.`
+    `[Cloud SQL]({{docs_url}}) is a fully-managed database service that makes it easy to set up, maintain, manage, and administer your relational PostgreSQL BETA and MySQL databases in the cloud.`,
+    `sql-component.googleapis.com,sqladmin.googleapis.com`
   ),
   new Product(
     `sql_mysql`,
     `Google Cloud SQL for MySQL`,
     `Cloud SQL for MySQL`,
     `${BASE}/sql/docs/mysql/`,
-    `[Cloud SQL for MySQL]({{docs_url}}) is a fully-managed database service that makes it easy to set up, maintain, manage, and administer your MySQL relational databases on Google Cloud Platform.`
+    `[Cloud SQL for MySQL]({{docs_url}}) is a fully-managed database service that makes it easy to set up, maintain, manage, and administer your MySQL relational databases on Google Cloud Platform.`,
+    `sql-component.googleapis.com,sqladmin.googleapis.com`
   ),
   new Product(
     `sql_postgresql`,
     `Google Cloud SQL for PostgreSQL`,
     `Cloud SQL for PostgreSQL`,
     `${BASE}/sql/docs/postgres/`,
-    `[Cloud SQL for PostgreSQL]({{docs_url}}) is a fully-managed database service that makes it easy to set up, maintain, manage, and administer your PostgreSQL relational databases on Google Cloud Platform.`
+    `[Cloud SQL for PostgreSQL]({{docs_url}}) is a fully-managed database service that makes it easy to set up, maintain, manage, and administer your PostgreSQL relational databases on Google Cloud Platform.`,
+    `sql-component.googleapis.com,sqladmin.googleapis.com`
   ),
   new Product(
     `storage`,
@@ -292,43 +312,41 @@ const products = [
     `storage_transfer`,
     `Cloud Storage Transfer Service`,
     `Storage Transfer Service`,
-    `${BASE}`,
-    `TODO(jdobry): Storage Transfer Service description`
-  ),
-  new Product(
-    `tasks`,
-    `Google Cloud Tasks`,
-    `Cloud Tasks`,
-    `${BASE}`,
-    `TODO(jdobry): Cloud Tasks description`
+    `${BASE}/storage/transfer/`,
+    `The [Cloud Storage Transfer Service]({{docs_url}}) allows you to quickly import online data into Google Cloud Storage.`,
+    `storagetransfer.googleapis.com`
   ),
   new Product(
     `trace`,
     `Stackdriver Trace`,
     `Trace`,
     `${BASE}/trace/docs/`,
-    `[Stackdriver Trace]({{docs_url}}) is a distributed tracing system for Google Cloud Platform that collects latency data from App Engine applications and displays it in near real time in the Google Cloud Platform Console.`
+    `[Stackdriver Trace]({{docs_url}}) is a distributed tracing system for Google Cloud Platform that collects latency data from App Engine applications and displays it in near real time in the Google Cloud Platform Console.`,
+    `cloudtrace.googleapis.com`
   ),
   new Product(
     `translate`,
     `Google Cloud Translation API`,
     `Cloud Translation API`,
     `${BASE}/translate/docs`,
-    `The [Cloud Translation API]({{docs_url}}), can dynamically translate text between thousands of language pairs. The Cloud Translation API lets websites and programs integrate with the translation service programmatically. The Cloud Translation API is part of the larger Cloud Machine Learning API family.`
+    `The [Cloud Translation API]({{docs_url}}), can dynamically translate text between thousands of language pairs. The Cloud Translation API lets websites and programs integrate with the translation service programmatically. The Cloud Translation API is part of the larger Cloud Machine Learning API family.`,
+    `translate.googleapis.com`
   ),
   new Product(
     `vision`,
     `Google Cloud Vision API`,
     `Vision API`,
     `${BASE}/vision/docs`,
-    `The [Cloud Vision API]({{docs_url}}) allows developers to easily integrate vision detection features within applications, including image labeling, face and landmark detection, optical character recognition (OCR), and tagging of explicit content.`
+    `The [Cloud Vision API]({{docs_url}}) allows developers to easily integrate vision detection features within applications, including image labeling, face and landmark detection, optical character recognition (OCR), and tagging of explicit content.`,
+    `vision.googleapis.com`
   ),
   new Product(
     `video`,
     `Google Cloud Video Intelligence API`,
     `Video Intelligence API`,
     `${BASE}/video-intelligence`,
-    `The [Cloud Video Intelligence API]({{docs_url}}) allows developers to use Google video analysis technology as part of their applications.`
+    `The [Cloud Video Intelligence API]({{docs_url}}) allows developers to use Google video analysis technology as part of their applications.`,
+    `videointelligence.googleapis.com`
   )
 ];
 
