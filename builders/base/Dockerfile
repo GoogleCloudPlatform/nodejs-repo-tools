@@ -14,8 +14,8 @@ ENV PATH $PATH:/nodejs/bin
 # Install the Repo Tools binary
 RUN curl -O https://storage.googleapis.com/cloud-docs-samples/releases/latest/nodejs-repo-tools-linux \
     && mv ./nodejs-repo-tools-linux /usr/local/bin/repo-tools \
-    && chmod +x /usr/local/bin/repo-tools
-    && ln -s /usr/local/bin/repo-tools /usr/local/bin/samples
+    && chmod +x /usr/local/bin/repo-tools \
+    && ln -s /usr/local/bin/repo-tools /usr/local/bin/samples \
     && ln -s /usr/local/bin/repo-tools /usr/local/bin/tools
 ENV PATH $PATH:/usr/local/bin
 
