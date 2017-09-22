@@ -44,10 +44,12 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 
     [Enable billing][billing]
 
+{{#if api_id}}
 1.  Enable the {{name}} API.
 
     [Enable the API][enable_api]
 
+{{/if}}
 1.  [Set up authentication with a service account][auth] so you can access the
     API from your local workstation.
 
