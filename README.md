@@ -1,5 +1,7 @@
 # nodejs-repo-tools [![build status][travis_badge]][travis_link] [![coverage][coverage_badge]][coverage_link]
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/GoogleCloudPlatform/nodejs-repo-tools.svg)](https://greenkeeper.io/)
+
 A tool used to maintain and test repositories in the GoogleCloudPlatform
 organization.
 
