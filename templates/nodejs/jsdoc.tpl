@@ -39,7 +39,7 @@ module.exports = {
     copyright: 'Copyright 2017 Google, Inc.',
     includeDate: false,
     sourceFiles: false,
-    systemName: 'storage',
+    systemName: '{{lib_pkg_name}}',
     theme: 'lumen'
   }
 };
