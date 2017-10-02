@@ -1,3 +1,9 @@
+##### 2.0.5 - 02 October 2017
+
+###### Other
+- Tweaked library readme
+- Fix for JSDoc config
+
 ##### 2.0.4 - 22 September 2017
 
 ###### Backwards compatible changes

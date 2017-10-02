@@ -76,12 +76,15 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 Samples are in the [`samples/`](https://github.com{{../repoPath}}/blob/master/samples) directory. The samples' `README.md`
 has instructions for running the samples.
 
-| Sample                      | Documentation                      | Source Code                       |
-| --------------------------- | ---------------------------------- | --------------------------------- |
+| Sample                      | Source Code                       |
+| --------------------------- | --------------------------------- |
 {{#each samples}}
-| {{name}} | [documentation]({{docs_link}}) | [source code](https://github.com{{../repoPath}}/blob/master/samples/{{file}}) |
+| {{name}} | [source code](https://github.com{{../repoPath}}/blob/master/samples/{{file}}) |
 {{/each}}
 {{/if}}
+
+The [{{short_name}} {{display}} Client API Reference][client-docs] documentation
+also contains samples.
 
 ## Versioning
 

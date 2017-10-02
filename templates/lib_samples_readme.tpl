@@ -31,7 +31,7 @@ library's README.
 View the [README]({{ref}}).
 
 {{else}}
-View the [documentation][{{id}}_{{@index}}_docs] or the [source code][{{id}}_{{@index}}_code].{{#if description}}
+View the [source code][{{id}}_{{@index}}_code].{{#if description}}
 
 {{{description}}}{{/if}}{{#if usage}}
 
