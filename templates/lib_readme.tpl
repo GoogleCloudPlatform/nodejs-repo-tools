@@ -40,10 +40,12 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 
     [Go to the projects page][projects]
 
+{{#if suppress_billing}}
 1.  Enable billing for your project.
 
     [Enable billing][billing]
 
+{{/if}}
 {{#if api_id}}
 1.  Enable the {{name}} API.
 
