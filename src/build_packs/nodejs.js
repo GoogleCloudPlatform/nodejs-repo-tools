@@ -113,6 +113,10 @@ const nodejsConfig = {
       description: 'Generate nyc configuration.',
       filename: '.nycrc'
     },
+    prettierignore: {
+      description: 'Generate .prettierignore',
+      filename: '.prettierignore'
+    },
     prettierrc: {
       description: 'Generate .prettierrc',
       filename: '.prettierrc'
