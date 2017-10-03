@@ -173,6 +173,14 @@ const products = [
     `clouderrorreporting.googleapis.com`
   ),
   new Product(
+    `firestore`,
+    `Google Cloud Firestore`,
+    `Cloud Firestore`,
+    `${BASE}/firestore/docs/`,
+    `[Google Cloud Firestore]({{docs_url}}) is a NoSQL document database built for automatic scaling, high performance, and ease of application development.`,
+    `firestore.googleapis.com`
+  ),
+  new Product(
     `genomics`,
     `Google Genomics`,
     `Genomics`,
