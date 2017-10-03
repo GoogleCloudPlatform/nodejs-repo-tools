@@ -40,10 +40,12 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 
     [Go to the projects page][projects]
 
+{{#unless suppress_billing}}
 1.  Enable billing for your project.
 
     [Enable billing][billing]
 
+{{/unless}}
 {{#if api_id}}
 1.  Enable the {{name}} API.
 
@@ -54,7 +56,9 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
     API from your local workstation.
 
 [projects]: https://console.cloud.google.com/project
+{{#unless suppress_billing}}
 [billing]: https://support.google.com/cloud/answer/6293499#enable-billing
+{{/unless}}
 [enable_api]: https://console.cloud.google.com/flows/enableapi?apiid={{api_id}}
 [auth]: https://cloud.google.com/docs/authentication/getting-started
 
