@@ -1,3 +1,13 @@
+##### 2.0.6 - 03 October 2017
+
+###### Backwards compatible changes
+- #43 - Fix "quickstart" capitalization
+- #45 - Add `.prettierignore`
+- Use official Apache 2.0 license template.
+- Provide a mechanism to suppress the billing instruction.
+- Add Cloud Firestore product information.
+- #46 - Codecov badges should use master branch.
+
 ##### 2.0.5 - 02 October 2017
 
 ###### Other
