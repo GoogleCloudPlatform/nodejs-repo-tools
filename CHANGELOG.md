@@ -1,3 +1,8 @@
+##### 2.0.7 - 03 October 2017
+
+###### Bug fixes
+- Fix Firestore docs link
+
 ##### 2.0.6 - 03 October 2017
 
 ###### Backwards compatible changes
