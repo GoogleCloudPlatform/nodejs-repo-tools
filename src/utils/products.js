@@ -176,7 +176,7 @@ const products = [
     `firestore`,
     `Google Cloud Firestore`,
     `Cloud Firestore`,
-    `${BASE}/firestore/docs/`,
+    `https://firebase.google.com/docs/firestore/`,
     `[Google Cloud Firestore]({{docs_url}}) is a NoSQL document database built for automatic scaling, high performance, and ease of application development.`,
     `firestore.googleapis.com`
   ),
