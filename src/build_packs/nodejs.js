@@ -106,12 +106,59 @@ const nodejsConfig = {
       lib_install_cmd: 'npm install --save {{name}}',
       quickstart_filename: 'samples/quickstart.js',
       getLibPkgName (buildPack) {
-        return require(path.join(buildPack._cwd, 'package.json')).name;
+        return buildPack.config.pkgjson.name;
       }
     },
     nycrc: {
       description: 'Generate nyc configuration.',
       filename: '.nycrc'
+    },
+    pkgjson: {
+      description: 'Generate and/or update a package.json file.',
+      filename: 'package.json',
+      addData(data, opts) {
+        const json = {};
+        const origKeys = Object.keys(data.pkgjson);
+        json.name = data.libPkgName || data.pkgjson.name || 'TODO';
+        _.pull(origKeys, 'name');
+        json.description = data.pkgjson.description || 'TODO';
+        _.pull(origKeys, 'description');
+        json.version = data.pkgjson.version || '0.0.0';
+        _.pull(origKeys, 'version');
+        json.license = data.pkgjson.license || 'Apache-2.0';
+        _.pull(origKeys, 'license');
+        json.author = data.pkgjson.author || 'Google Inc.';
+        _.pull(origKeys, 'author');
+        json.engines = data.pkgjson.engines || {};
+        json.engines.node = data.pkgjson.engines ? data.pkgjson.engines.node : '>=4.0.0';
+        _.pull(origKeys, 'engines');
+        json.repository = data.pkgjson.repository || data.repository;
+        _.pull(origKeys, 'repository');
+        json.main = data.pkgjson.main || 'src/index.js';
+        _.pull(origKeys, 'main');
+
+        _.pull(origKeys, 'contributors');
+        _.pull(origKeys, 'scripts');
+        const depRe = /dependencies/i;
+        const depKeys = origKeys.filter((x) => depRe.test(x));
+        _.pull(origKeys, ...depKeys);
+
+        // Put extra keys that weren't used above here
+        for (const key of origKeys) {
+          json[key] = data.pkgjson[key];
+        }
+
+        // Put contributors, scripts, and (dev)dependencies at the bottom
+        data.generate.contributors.addData(data, opts);
+        json.contributors = data.contributors;
+        json.scripts = data.pkgjson.scripts || {};
+        depKeys.sort();
+        for (const key of depKeys) {
+          json[key] = data.pkgjson[key];
+        }
+
+        data.formattedPkgjson = JSON.stringify(json, null, 2);
+      }
     },
     prettierignore: {
       description: 'Generate .prettierignore',
@@ -135,6 +182,7 @@ const nodejsConfig = {
 module.exports = class NodejsBuildPack extends BuildPack {
   constructor (config = {}, innerOpts = {}) {
     super(_.merge(nodejsConfig, _.cloneDeep(config)), innerOpts);
+    this.config.pkgjson = this.config.pkgjson || {};
   }
 
   static detect (cwd) {
@@ -145,6 +193,7 @@ module.exports = class NodejsBuildPack extends BuildPack {
     super.expandConfig(opts);
     try {
       const pkg = require(path.join(opts.localPath, 'package.json'));
+      this.config.pkgjson = pkg;
       opts.repository || (opts.repository = pkg.repository);
     } catch (err) {
       // Ignore error
