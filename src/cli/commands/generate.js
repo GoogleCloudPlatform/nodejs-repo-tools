@@ -224,6 +224,9 @@ exports.handler = (opts) => {
       if (targetConfig.validate) {
         targetConfig.validate(data);
       }
+      if (targetConfig.addData) {
+        targetConfig.addData(data, opts);
+      }
 
       // Generate the content
       const generated = handlebars.compile(tpl)(data);
