@@ -93,7 +93,7 @@
     "string": "3.3.3",
     "supertest": "3.0.0",
     "yargs": "9.0.1",
-    "yargs-parser": "7.0.0"
+    "yargs-parser": "8.0.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
