@@ -116,7 +116,7 @@ const nodejsConfig = {
     pkgjson: {
       description: 'Generate and/or update a package.json file.',
       filename: 'package.json',
-      addData(data, opts) {
+      addData (data, opts) {
         const json = {};
         const origKeys = Object.keys(data.pkgjson);
         json.name = data.libPkgName || data.pkgjson.name || 'TODO';

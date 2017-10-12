@@ -19,7 +19,7 @@ const path = require('path');
 
 const utils = require('../utils');
 
-const TTY = process.platform === 'win32' ? 'CON' : '/dev/tty'
+const TTY = process.platform === 'win32' ? 'CON' : '/dev/tty';
 
 const globalOpts = {
   global: {
@@ -64,7 +64,7 @@ const globalOpts = {
     contributors: {
       description: 'Generate a CONTRIBUTORS file.',
       filename: 'CONTRIBUTORS',
-      addData(data, opts) {
+      addData (data, opts) {
         try {
           const output = execSync(`git shortlog -e -s < ${TTY}`, {
             shell: true,

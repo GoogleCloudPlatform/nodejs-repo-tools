@@ -1,3 +1,9 @@
+##### 2.0.8 - 12 October 2017
+
+###### Backwards compatible changes
+- Added support for generating and updating a package.json file.
+- Added support for generating a CONTRIBUTORS file.
+
 ##### 2.0.7 - 03 October 2017
 
 ###### Bug fixes
