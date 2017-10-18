@@ -197,7 +197,7 @@ exports.createReleaseQualityBadge = (releaseQuality) => {
   } else if (releaseQuality === 'BETA') {
     badge = 'beta-yellow';
   } else if (releaseQuality === 'ALPHA') {
-    badge = 'alpha-yellow';
+    badge = 'alpha-orange';
   } else if (releaseQuality === 'EAP') {
     badge = 'EAP-yellow';
   } else {
