@@ -100,10 +100,6 @@ is stable; the code surface will not change in backwards-incompatible ways
 unless absolutely necessary (e.g. because of critical security issues) or with
 an extensive deprecation period. Issues and requests against **GA** libraries
 are addressed with the highest priority.
-
-Please note that the auto-generated portions of the **GA** libraries (the ones
-in modules such as `v1` or `v2`) are considered to be of **Beta** quality, even
-if the libraries that wrap them are **GA**.
 {{/if_eq}}
 {{#if_eq release_quality 'beta'}}
 This library is considered to be in **beta**. This means it is expected to be
