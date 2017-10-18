@@ -1,3 +1,13 @@
+##### 2.0.10 - 17 October 2017
+
+###### Backwards compatible changes
+- Fixed wrong samples link in lib_readme.tpl
+- #52 - Make alpha release level badges orange.
+- #54 - Remove the autogen beta disclaimer.
+
+###### Other
+- Upgraded dependencies
+
 ##### 2.0.9 - 12 October 2017
 
 ###### Backwards compatible changes
