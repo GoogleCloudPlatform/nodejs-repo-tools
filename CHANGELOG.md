@@ -1,3 +1,8 @@
+##### 2.0.11 - 22 October 2017
+
+###### Bug fixes
+- Fix to `spawnAsyncWithIO`
+
 ##### 2.0.10 - 17 October 2017
 
 ###### Backwards compatible changes

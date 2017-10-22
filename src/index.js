@@ -76,6 +76,12 @@ exports.runAsyncWithIO = (cmd, cwd, cb) => {
 };
 
 exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
+  args || (args = []);
+  let opts = debug;
+  if (typeof opts === 'boolean') {
+    opts = { debug: true };
+  }
+  opts || (opts = {});
   return new Promise((resolve, reject) => {
     let done = false;
     let stdout = '';
@@ -98,15 +104,18 @@ exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
       }
     }
 
+    if (debug || (debug !== false && process.env.DEBUG)) {
+      utils.logger.log('CMD', cmd, ...args);
+    }
     const child = childProcess.spawn(cmd, args, { cwd: cwd, shell: true });
     child.stdout.on('data', (chunk) => {
       if (debug || (debug !== false && process.env.DEBUG)) {
-        utils.logger.log(chunk.toString());
+        utils.logger.log('stdout', chunk.toString());
       }
       stdout += chunk.toString();
     });
     child.stderr.on('data', (chunk) => {
-      utils.logger.error(chunk.toString());
+      utils.logger.error('stderr', chunk.toString());
       stderr += chunk.toString();
     });
     child
