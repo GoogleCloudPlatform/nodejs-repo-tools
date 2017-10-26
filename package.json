@@ -81,7 +81,7 @@
     "test": "node ./bin/tools test run --cmd npm -- run cover"
   },
   "dependencies": {
-    "ava": "0.22.0",
+    "ava": "0.23.0",
     "colors": "1.1.2",
     "fs-extra": "4.0.2",
     "got": "7.1.0",
@@ -89,10 +89,10 @@
     "lodash": "4.17.4",
     "nyc": "11.2.1",
     "proxyquire": "1.8.0",
-    "sinon": "4.0.1",
+    "sinon": "4.0.2",
     "string": "3.3.3",
     "supertest": "3.0.0",
-    "yargs": "9.0.1",
+    "yargs": "10.0.3",
     "yargs-parser": "8.0.0"
   },
   "devDependencies": {
