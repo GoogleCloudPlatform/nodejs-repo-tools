@@ -186,7 +186,7 @@ exports.getTimeTaken = (start) => {
 /**
  * Generates a markdown badge for displaying a "Release Quality'.
  *
- * @param {string} releaseQuality One of: (ga, beta, alpha, eap).
+ * @param {string} releaseQuality One of: (ga, beta, alpha, eap, deprecated).
  * @returns {string} The markdown badge.
  */
 exports.createReleaseQualityBadge = (releaseQuality) => {
@@ -200,8 +200,10 @@ exports.createReleaseQualityBadge = (releaseQuality) => {
     badge = 'alpha-orange';
   } else if (releaseQuality === 'EAP') {
     badge = 'EAP-yellow';
+  } else if (releaseQuality === 'DEPRECATED') {
+    badge = 'deprecated-red';
   } else {
-    logger.error('generate', `Expected "release_quality" to be one of: (ga, beta, alpha, eap)! Actual: "${releaseQuality}"`);
+    logger.error('generate', `Expected "release_quality" to be one of: (ga, beta, alpha, eap, deprecated)! Actual: "${releaseQuality}"`);
     process.exit(1);
   }
   return `[![release level](https://img.shields.io/badge/release%20level-${badge}.svg?style=flat)](https://cloud.google.com/terms/launch-stages)`;

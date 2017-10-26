@@ -11,6 +11,12 @@
 
 {{description}}
 
+{{#if deprecated}}
+| :warning: Deprecated Module |
+| --- |
+| This library is **deprecated**. {{deprecated}} |
+{{/if}}
+
 * [{{short_name}} {{display}} Client API Reference][client-docs]
 * [{{short_name}} Documentation][product-docs]
 
@@ -111,6 +117,11 @@ against beta libraries with a high priority.
 This library is considered to be in **alpha**. This means it is still a
 work-in-progress and under active development. Any release is subject to
 backwards-incompatible changes at any time.
+{{/if_eq}}
+{{#if_eq release_quality 'deprecated'}}
+This library is **deprecated**. This means that it is no longer being
+actively maintained and the only updates the library will receive will
+be for critical security issues. {{#if deprecated}}{{deprecated}}{{/if}}
 {{/if_eq}}
 
 More Information: [Google Cloud Platform Launch Stages][launch_stages]
