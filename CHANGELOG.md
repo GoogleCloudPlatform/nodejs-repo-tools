@@ -1,3 +1,21 @@
+##### 2.1.0 - 27 October 2017
+
+###### Bug fixes
+- #59 - Link to license and contributing files in lib_readme are wrong.
+- #60 - Add link to the library's repo in its readme
+- #61 - Compatible when sample directory does not exist
+- #67 - Samples link broken in the docs
+
+###### Backwards compatible changes
+- #56 - Successfully ignore the new package-lock.json-12345 files.
+- #63 - Add --except option to generate command to be used in combination with the "all" target
+- #65 - Support deprecated release level.
+- Add Open in Cloud Shell button to readmes.
+- Dogfood repo-tools on repo-tools. Switched to eslint + prettier.
+
+###### Other
+- Updated dependencies
+
 ##### 2.0.11 - 22 October 2017
 
 ###### Bug fixes
