@@ -288,15 +288,23 @@ exports.handler = opts => {
         return;
       }
 
-      // Write the content to the target's filename
-      fs.writeFile(targetPath, generated, err => {
+      fs.ensureDir(path.parse(targetPath).dir, err => {
         if (err) {
           utils.logger.error('generate', err.stack || err.message);
           // eslint-disable-next-line no-process-exit
           process.exit(1);
         }
 
-        utils.logger.log(CLI_CMD, `Generated: ${targetPath}`.green);
+        // Write the content to the target's filename
+        fs.writeFile(targetPath, generated, err => {
+          if (err) {
+            utils.logger.error('generate', err.stack || err.message);
+            // eslint-disable-next-line no-process-exit
+            process.exit(1);
+          }
+
+          utils.logger.log(CLI_CMD, `Generated: ${targetPath}`.green);
+        });
       });
     } catch (err) {
       errors.push(err);
