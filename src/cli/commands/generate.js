@@ -167,6 +167,11 @@ exports.builder = yargs => {
       requiresArg: true,
       type: 'string',
     },
+    except: {
+      description: `Exclude targets when using the ${'all'.bold} target.`,
+      requiresArg: true,
+      type: 'array',
+    },
   });
 };
 
@@ -181,6 +186,13 @@ exports.handler = opts => {
     opts.targets.splice(opts.targets.indexOf('all'), 1);
     opts.targets.splice(opts.targets.indexOf('lib_samples_readme'), 1);
     opts.targets.splice(opts.targets.indexOf('samples_readme'), 1);
+    if (Array.isArray(opts.except)) {
+      for (const exception of opts.except) {
+        if (opts.targets.indexOf(exception) !== -1) {
+          opts.targets.splice(opts.targets.indexOf(exception), 1);
+        }
+      }
+    }
   }
 
   buildPack.expandConfig(opts);
