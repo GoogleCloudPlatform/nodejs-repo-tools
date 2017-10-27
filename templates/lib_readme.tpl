@@ -130,13 +130,13 @@ More Information: [Google Cloud Platform Launch Stages][launch_stages]
 
 ## Contributing
 
-Contributions welcome! See the [Contributing Guide](.github/CONTRIBUTING.md).
+Contributions welcome! See the [Contributing Guide](https://github.com{{repoPath}}/blob/master/.github/CONTRIBUTING.md).
 
 ## License
 
 Apache Version 2.0
 
-See [LICENSE](LICENSE)
+See [LICENSE](https://github.com{{repoPath}}/blob/master/LICENSE)
 
 [client-docs]: {{client_reference_url}}
 [product-docs]: {{docs_url}}
