@@ -1,6 +1,6 @@
 <img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
-# {{name}}: {{display}} Client
+# [{{name}}: {{display}} Client](https://github.com{{repoPath}})
 
 {{release_quality release_quality}}
 [![CircleCI](https://img.shields.io/circleci/project/github{{repoPath}}.svg?style=flat)](https://circleci.com/gh{{repoPath}})
@@ -18,6 +18,7 @@
 {{/if}}
 
 * [{{short_name}} {{display}} Client API Reference][client-docs]
+* [github.com{{repoPath}}](https://github.com{{repoPath}})
 * [{{short_name}} Documentation][product-docs]
 
 Read more about the client libraries for Cloud APIs, including the older
