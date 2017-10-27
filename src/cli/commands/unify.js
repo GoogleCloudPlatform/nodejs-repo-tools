@@ -13,32 +13,34 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
 const fs = require('fs');
 const path = require('path');
 
 exports.command = 'unify';
-exports.description = '(Node.js only) Recursively add sub-directory dependencies to the top-level package.json file.';
+exports.description =
+  '(Node.js only) Recursively add sub-directory dependencies to the top-level package.json file.';
 
-exports.builder = (yargs) => {
-  yargs
-    .options({
-      localPath: {
-        alias: 'l',
-        default: process.cwd(),
-        requiresArg: true,
-        type: 'string'
-      }
-    });
+exports.builder = yargs => {
+  yargs.options({
+    localPath: {
+      alias: 'l',
+      default: process.cwd(),
+      requiresArg: true,
+      type: 'string',
+    },
+  });
 };
 
-exports.handler = (opts) => {
+exports.handler = opts => {
   // Dedupe package.json dependencies
   // WARNING: This will fail if two different versions of the same package are required.
   const pkgSet = {};
 
-  function getDeps (directory, depth) {
+  function getDeps(directory, depth) {
     // Limit recursion depth
     if (depth < 0) {
       return;
@@ -54,19 +56,21 @@ exports.handler = (opts) => {
 
     // Record subdirectories that contain a package.json file
     let pkgJson;
-    const pkgJsonDirs = dirs.filter((dir) =>
+    const pkgJsonDirs = dirs.filter(dir =>
       fs.existsSync(path.join(directory, dir, `package.json`))
     );
-    pkgJsonDirs.forEach((dir) => {
-      pkgJson = JSON.parse(fs.readFileSync(path.join(directory, dir, `package.json`)));
+    pkgJsonDirs.forEach(dir => {
+      pkgJson = JSON.parse(
+        fs.readFileSync(path.join(directory, dir, `package.json`))
+      );
       Object.assign(pkgSet, pkgJson.dependencies);
     });
 
     // Recurse
-    const recurseDirs = dirs.filter((dir) => {
+    const recurseDirs = dirs.filter(dir => {
       return fs.statSync(path.join(directory, dir)).isDirectory();
     });
-    recurseDirs.forEach((dir) => {
+    recurseDirs.forEach(dir => {
       getDeps(path.join(directory, dir), depth - 1);
     });
   }
@@ -75,10 +79,12 @@ exports.handler = (opts) => {
 
   // Update root-level package.json (by shelling to npm)
   const spawn = require('child_process').spawn;
-  const args = [`add`, `-D`].concat(Object.keys(pkgSet).map(pkg => `${pkg}@${pkgSet[pkg]}`));
+  const args = [`add`, `-D`].concat(
+    Object.keys(pkgSet).map(pkg => `${pkg}@${pkgSet[pkg]}`)
+  );
   spawn(`yarn`, args, {
     cwd: opts.localPath,
     shell: true,
-    stdio: ['ignore', process.stdout, process.stderr]
+    stdio: ['ignore', process.stdout, process.stderr],
   });
 };

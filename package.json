@@ -1,29 +1,19 @@
 {
   "name": "@google-cloud/nodejs-repo-tools",
-  "version": "2.0.11",
   "description": "Tools used to maintain and test Node.js repositories in the GoogleCloudPlaftorm organization.",
-  "author": "Google Inc.",
+  "version": "2.0.11",
   "license": "Apache-2.0",
-  "contributors": [
-    {
-      "name": "Jason Dobry",
-      "email": "jdobry@google.com"
-    },
-    {
-      "name": "Ace Nassri",
-      "email": "anassri@google.com"
-    }
-  ],
-  "repository": "GoogleCloudPlatform/nodejs-repo-tools",
+  "author": "Google Inc.",
   "engines": {
-    "node": ">=4"
+    "node": ">=4.0.0"
   },
+  "repository": "GoogleCloudPlatform/nodejs-repo-tools",
+  "main": "cjs/index.js",
   "bin": {
     "tools": "./bin/tools",
     "repo-tools": "./bin/tools"
   },
   "module": "src/index.js",
-  "main": "cjs/index.js",
   "files": [
     "bin/",
     "cjs/",
@@ -70,10 +60,19 @@
       ]
     ]
   },
+  "contributors": [
+    "Ace Nassri <anassri@google.com>",
+    "Jason Dobry <jason.dobry@gmail.com>",
+    "Jason Dobry <jmdobry@users.noreply.github.com>",
+    "Luke Sneeringer <luke@sneeringer.com>",
+    "greenkeeper[bot] <greenkeeper[bot]@users.noreply.github.com>"
+  ],
   "scripts": {
     "clean": "node ./scripts/clean",
     "build": "npm run clean && babel src --out-dir cjs",
-    "lint": "npm run build && node ./bin/tools lint",
+    "generate-scaffolding": "node ./bin/tools generate coc contributors license pkgjson",
+    "lint": "npm run build && node ./bin/tools lint --cmd eslint -- src/ test/",
+    "prettier": "npm run build && node ./bin/tools exec -- prettier --write 'src/{,**/,**/**/,**/**/**/}*.js' 'test/{,**/,**/**/,**/**/**/,**/**/**/**/,**/**/**/**/**/}*.js'",
     "prepublishOnly": "npm run lint",
     "release": "npm run prepublishOnly && node ./scripts/release",
     "pretest": "npm run prepublishOnly",
@@ -98,6 +97,11 @@
   "devDependencies": {
     "babel-cli": "6.26.0",
     "babel-preset-env": "1.6.1",
+    "eslint": "4.7.1",
+    "eslint-config-prettier": "2.5.0",
+    "eslint-plugin-node": "5.1.1",
+    "eslint-plugin-prettier": "2.3.1",
+    "prettier": "1.7.0",
     "semistandard": "11.0.0"
   }
 }

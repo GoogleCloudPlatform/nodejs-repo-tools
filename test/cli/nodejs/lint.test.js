@@ -24,7 +24,7 @@ const samplePath = path.join(toolsPath, 'test/samples/nodejs/snippet');
 const NodejsBuildPack = require(toolsPath).buildPacks.NodejsBuildPack;
 const buildPack = new NodejsBuildPack();
 
-test.serial('should do a dry run lint', async (t) => {
+test.serial('should do a dry run lint', async t => {
   const output = await tools.runAsync(`${binPath} lint --dry-run`, samplePath);
 
   t.regex(output, new RegExp(`lint: Beginning dry run.`));
@@ -33,33 +33,57 @@ test.serial('should do a dry run lint', async (t) => {
   t.regex(output, new RegExp(`lint: Dry run complete.`));
 });
 
-test.serial('should lint with files', async (t) => {
+test.serial('should lint with files', async t => {
   try {
-    await tools.runAsyncWithIO(`${binPath} lint -b nodejs -- ${samplePath}/lint_error.js`, path.join(samplePath, '..'));
+    await tools.runAsyncWithIO(
+      `${binPath} lint -b nodejs --cmd semistandard -- ${samplePath}/lint_error.js`,
+      path.join(samplePath, '..')
+    );
   } catch (err) {
-    t.regex(err.stdout, new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`));
-    t.regex(err.stdout, new RegExp(`lint: Running: ${buildPack.config.lint.cmd}`));
+    t.regex(
+      err.stdout,
+      new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`)
+    );
+    t.regex(
+      err.stdout,
+      new RegExp(`lint: Running: ${buildPack.config.lint.cmd}`)
+    );
     t.regex(err.stderr, new RegExp(`lint: Oh no!`));
     return;
   }
   t.fail('Should have entered catch');
 });
 
-test.serial('should lint with defaults', async (t) => {
+test.serial('should lint with defaults', async t => {
   try {
-    await tools.runAsyncWithIO(`${binPath} lint -b nodejs`, path.join(samplePath, '..'));
+    await tools.runAsyncWithIO(
+      `${binPath} lint -b nodejs`,
+      path.join(samplePath, '..')
+    );
   } catch (err) {
-    t.regex(err.stdout, new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`));
-    t.regex(err.stdout, new RegExp(`lint: Running: ${buildPack.config.lint.cmd}`));
+    t.regex(
+      err.stdout,
+      new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`)
+    );
+    t.regex(
+      err.stdout,
+      new RegExp(`lint: Running: ${buildPack.config.lint.cmd}`)
+    );
     t.regex(err.stderr, new RegExp(`lint: Oh no!`));
     return;
   }
   t.fail('Should have entered catch');
 });
 
-test.serial('should lint with overrides', async (t) => {
-  const result = await tools.runAsyncWithIO(`${binPath} lint -b nodejs --cmd echo -- foo`, path.join(samplePath, '..'));
-  t.regex(result.output, new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`));
+test.serial('should lint with overrides', async t => {
+  const result = await tools.runAsyncWithIO(
+    `${binPath} lint -b nodejs --cmd echo -- foo`,
+    path.join(samplePath, '..')
+  );
+  t.regex(
+    result.output,
+    new RegExp(`lint: Linting files in: ${path.join(samplePath, '..')}`)
+  );
   t.regex(result.output, new RegExp(`lint: Running: echo foo`));
   t.regex(result.output, new RegExp(`lint: Success!`));
 });

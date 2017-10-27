@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 const _ = require('lodash');
 const fs = require('fs-extra');
 const path = require('path');
@@ -51,72 +53,72 @@ const nodejsConfig = {
   display: 'Node.js',
   lint: {
     cmd: 'semistandard',
-    args: []
+    args: [],
   },
   test: {
     app: {
       cmd: 'node',
-      args: ['app.js']
+      args: ['app.js'],
     },
     build: {},
     deploy: {},
     install: {
       cmd: 'npm',
-      args: ['install']
+      args: ['install'],
     },
     run: {
       cmd: 'npm',
-      args: ['test']
-    }
+      args: ['test'],
+    },
   },
   generate: {
     eslintignore: {
       description: 'Generate .eslintignore',
-      filename: '.eslintignore'
+      filename: '.eslintignore',
     },
     eslintrc: {
       description: 'Generate main ESLint configuration.',
-      filename: '.eslintrc.yml'
+      filename: '.eslintrc.yml',
     },
     eslintrc_test: {
       description: 'Generate ESLint configuration for unit tests.',
-      filename: 'test/.eslintrc.yml'
+      filename: 'test/.eslintrc.yml',
     },
     eslintrc_samples: {
       description: 'Generate ESLint configuration for samples.',
-      filename: 'samples/.eslintrc.yml'
+      filename: 'samples/.eslintrc.yml',
     },
     eslintrc_samples_test: {
       description: 'Generate ESLint configuration for samples tests.',
-      filename: 'samples/system-test/.eslintrc.yml'
+      filename: 'samples/system-test/.eslintrc.yml',
     },
     eslintrc_systemtest: {
       description: 'Generate ESLint configuration for system tests.',
-      filename: 'system-test/.eslintrc.yml'
+      filename: 'system-test/.eslintrc.yml',
     },
     gitignore: {
       description: '.gitignore',
-      filename: '.gitignore'
+      filename: '.gitignore',
     },
     jsdoc: {
       description: 'Generate JSDoc configuration.',
-      filename: '.jsdoc.js'
+      filename: '.jsdoc.js',
     },
     lib_readme: {
       lib_install_cmd: 'npm install --save {{name}}',
       quickstart_filename: 'samples/quickstart.js',
-      getLibPkgName (buildPack) {
+      getLibPkgName(buildPack) {
         return buildPack.config.pkgjson.name;
-      }
+      },
     },
     nycrc: {
       description: 'Generate nyc configuration.',
-      filename: '.nycrc'
+      filename: '.nycrc',
     },
     pkgjson: {
       description: 'Generate and/or update a package.json file.',
       filename: 'package.json',
-      addData (data, opts) {
+      addData(data, opts) {
         const json = {};
         const origKeys = Object.keys(data.pkgjson);
         json.name = data.libPkgName || data.pkgjson.name || 'TODO';
@@ -130,7 +132,9 @@ const nodejsConfig = {
         json.author = data.pkgjson.author || 'Google Inc.';
         _.pull(origKeys, 'author');
         json.engines = data.pkgjson.engines || {};
-        json.engines.node = data.pkgjson.engines ? data.pkgjson.engines.node : '>=4.0.0';
+        json.engines.node = data.pkgjson.engines
+          ? data.pkgjson.engines.node
+          : '>=4.0.0';
         _.pull(origKeys, 'engines');
         json.repository = data.pkgjson.repository || data.repository;
         _.pull(origKeys, 'repository');
@@ -140,7 +144,7 @@ const nodejsConfig = {
         _.pull(origKeys, 'contributors');
         _.pull(origKeys, 'scripts');
         const depRe = /dependencies/i;
-        const depKeys = origKeys.filter((x) => depRe.test(x));
+        const depKeys = origKeys.filter(x => depRe.test(x));
         _.pull(origKeys, ...depKeys);
 
         // Put extra keys that weren't used above here
@@ -158,21 +162,21 @@ const nodejsConfig = {
         }
 
         data.formattedPkgjson = JSON.stringify(json, null, 2);
-      }
+      },
     },
     prettierignore: {
       description: 'Generate .prettierignore',
-      filename: '.prettierignore'
+      filename: '.prettierignore',
     },
     prettierrc: {
       description: 'Generate .prettierrc',
-      filename: '.prettierrc'
+      filename: '.prettierrc',
     },
     samples_readme: {
       setup: SETUP,
-      tests: TESTS
-    }
-  }
+      tests: TESTS,
+    },
+  },
 };
 
 /**
@@ -180,16 +184,16 @@ const nodejsConfig = {
  * @returns {NodejsBuildPack} A new {@link NodejsBuildPack} instance.
  */
 module.exports = class NodejsBuildPack extends BuildPack {
-  constructor (config = {}, innerOpts = {}) {
+  constructor(config = {}, innerOpts = {}) {
     super(_.merge(nodejsConfig, _.cloneDeep(config)), innerOpts);
     this.config.pkgjson = this.config.pkgjson || {};
   }
 
-  static detect (cwd) {
+  static detect(cwd) {
     return fs.statSync(path.join(cwd, 'package.json')).isFile();
   }
 
-  expandConfig (opts) {
+  expandConfig(opts) {
     super.expandConfig(opts);
     try {
       const pkg = require(path.join(opts.localPath, 'package.json'));
@@ -200,7 +204,7 @@ module.exports = class NodejsBuildPack extends BuildPack {
     }
   }
 
-  getLibInstallCmd (opts) {
+  getLibInstallCmd(opts) {
     return `npm install --save ${opts.libPkgName}`;
   }
 };

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -34,29 +36,29 @@ const TESTS = `
 
 module.exports = {
   display: 'Python',
-  detect: (cwd) => fs.statSync(path.join(cwd, 'requirements.txt')).isFile(),
-  load: (filename) => require(filename),
+  detect: cwd => fs.statSync(path.join(cwd, 'requirements.txt')).isFile(),
+  load: filename => require(filename),
   lint: {
     cmd: 'nox',
-    args: ['lint']
+    args: ['lint'],
   },
   test: {
     app: {
       cmd: 'python',
-      args: ['main.py']
+      args: ['main.py'],
     },
     build: {},
     install: {
       cmd: 'pip',
-      args: ['install', '-r', 'requirements.txt']
+      args: ['install', '-r', 'requirements.txt'],
     },
     run: {
       cmd: 'nox',
-      args: []
-    }
+      args: [],
+    },
   },
   readme: {
     setup: SETUP,
-    tests: TESTS
-  }
+    tests: TESTS,
+  },
 };

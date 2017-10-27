@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -34,30 +36,30 @@ const TESTS = `
 
 module.exports = {
   display: 'Ruby',
-  detect: (cwd) => fs.statSync(path.join(cwd, 'Gemfile')).isFile(),
-  load: (filename) => require(filename),
+  detect: cwd => fs.statSync(path.join(cwd, 'Gemfile')).isFile(),
+  load: filename => require(filename),
   lint: {
     cmd: 'semistandard',
-    args: []
+    args: [],
   },
   test: {
     app: {
       cmd: 'bundle',
-      args: ['exec', 'ruby', 'app.rb']
+      args: ['exec', 'ruby', 'app.rb'],
     },
     build: {},
     deploy: {},
     install: {
       cmd: 'bundle',
-      args: ['install']
+      args: ['install'],
     },
     run: {
       cmd: 'bundle',
-      args: ['exec', 'rspec', '--format', 'documentation']
-    }
+      args: ['exec', 'rspec', '--format', 'documentation'],
+    },
   },
   readme: {
     setup: SETUP,
-    tests: TESTS
-  }
+    tests: TESTS,
+  },
 };

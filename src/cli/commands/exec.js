@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
 const childProcess = require('child_process');
@@ -30,14 +32,14 @@ Description:
 
 exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
-exports.builder = (yargs) => {
+exports.builder = yargs => {
   yargs
     .usage(USAGE)
     .example('Run the given command in the specified directory:')
     .example(`- ${'tools exec -l=~/projects/some/dir -- echo "hi"'.cyan}`);
 };
 
-exports.handler = (opts) => {
+exports.handler = opts => {
   if (opts.dryRun) {
     utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
@@ -47,7 +49,10 @@ exports.handler = (opts) => {
   opts.args || (opts.args = []);
 
   if (opts.args.length === 0) {
-    utils.logger.fatal(CLI_CMD, 'You must provide at least 1 command argument!');
+    utils.logger.fatal(
+      CLI_CMD,
+      'You must provide at least 1 command argument!'
+    );
   }
 
   utils.logger.log(CLI_CMD, `Executing in: ${opts.localPath.yellow}`);
@@ -61,7 +66,7 @@ exports.handler = (opts) => {
   const options = {
     cwd: opts.localPath,
     stdio: opts.silent ? 'ignore' : 'inherit',
-    shell: true
+    shell: true,
   };
 
   const start = Date.now();
@@ -71,10 +76,17 @@ exports.handler = (opts) => {
     .on('exit', (code, signal) => {
       const timeTakenStr = utils.getTimeTaken(start);
       if (code !== 0 || signal) {
-        utils.logger.error(CLI_CMD, `Oh no! Execution failed after ${timeTakenStr}.`);
+        utils.logger.error(
+          CLI_CMD,
+          `Oh no! Execution failed after ${timeTakenStr}.`
+        );
+        // eslint-disable-next-line no-process-exit
         process.exit(code || 1);
       } else {
-        utils.logger.log(CLI_CMD, `Success! Execution finished in ${timeTakenStr}.`.green);
+        utils.logger.log(
+          CLI_CMD,
+          `Success! Execution finished in ${timeTakenStr}.`.green
+        );
       }
     });
 };

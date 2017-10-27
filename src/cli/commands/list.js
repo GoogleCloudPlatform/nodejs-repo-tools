@@ -13,13 +13,18 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
 exports.command = 'list';
 exports.description = 'List samples.';
 
-exports.builder = (yargs) => {};
+exports.builder = () => {
+  // Not yet implemented
+};
 
-exports.handler = (opts) => {
+exports.handler = () => {
+  // eslint-disable-next-line no-console
   console.log('Not yet implemented.'.red);
 };

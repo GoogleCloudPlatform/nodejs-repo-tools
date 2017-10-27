@@ -1,0 +1,8 @@
+node_modules/*
+samples/node_modules/*
+src/**/doc/*
+test/samples/nodejs/app/node_modules/*
+test/samples/nodejs/app/app.js
+test/samples/nodejs/snippet/node_modules/*
+test/samples/nodejs/snippet/index.js
+test/samples/nodejs/snippet/lint_error.js

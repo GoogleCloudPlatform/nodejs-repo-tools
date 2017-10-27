@@ -13,7 +13,6 @@
   },
   "scripts": {
     "lint": "../../../../bin/tools lint",
-    "pretest": "npm run lint",
     "mocha": "mocha --timeout 20000 test/*.test.js",
     "test": "../../../../bin/tools test run --cmd npm -- run mocha"
   },

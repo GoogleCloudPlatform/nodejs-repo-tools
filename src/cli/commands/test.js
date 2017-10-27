@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
 const COMMAND = `tools test <command> ${'[options]'.yellow}`;
@@ -25,7 +27,7 @@ Description:
 exports.command = 'test';
 exports.description = DESCRIPTION;
 
-exports.builder = (yargs) => {
+exports.builder = yargs => {
   yargs
     .demand(1)
     .usage(USAGE)

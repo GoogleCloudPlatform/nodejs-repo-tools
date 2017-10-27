@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 
 const buildPack = require('../../build_packs').getBuildPack();
 const utils = require('../../utils');
@@ -27,7 +29,8 @@ const LINT_CMD = buildPack.config.lint.cmd;
 const LINT_ARGS = buildPack.config.lint.args;
 const LINT_CMD_STR = `${LINT_CMD} ${LINT_ARGS.join(' ')}`.trim();
 const COMMAND = `tools ${CLI_CMD} -- ${'[files...]'.yellow}`;
-const DESCRIPTION = `Lint files by running: ${LINT_CMD_STR.bold} in ${buildPack._cwd.yellow}.`;
+const DESCRIPTION = `Lint files by running: ${LINT_CMD_STR.bold} in ${buildPack
+  ._cwd.yellow}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
@@ -38,17 +41,16 @@ Positional arguments:
 
 exports.command = `${CLI_CMD}`;
 exports.description = DESCRIPTION;
-exports.builder = (yargs) => {
-  yargs
-    .usage(USAGE)
-    .options({
-      cmd: {
-        description: `${'Default:'.bold} ${`${LINT_CMD}`.yellow}. The lint command to use.`,
-        type: 'string'
-      }
-    });
+exports.builder = yargs => {
+  yargs.usage(USAGE).options({
+    cmd: {
+      description: `${'Default:'.bold} ${`${LINT_CMD}`
+        .yellow}. The lint command to use.`,
+      type: 'string',
+    },
+  });
 };
-exports.handler = (opts) => {
+exports.handler = opts => {
   if (opts.dryRun) {
     utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
@@ -59,7 +61,12 @@ exports.handler = (opts) => {
   opts.args || (opts.args = buildPack.config.lint.args);
 
   utils.logger.log(CLI_CMD, 'Linting files in:', opts.localPath.yellow);
-  utils.logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+  utils.logger.log(
+    CLI_CMD,
+    'Running:',
+    opts.cmd.yellow,
+    opts.args.join(' ').yellow
+  );
 
   if (opts.dryRun) {
     utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
@@ -69,19 +76,25 @@ exports.handler = (opts) => {
   const options = {
     cwd: opts.localPath,
     stdio: 'inherit',
-    shell: true
+    shell: true,
   };
 
   const start = Date.now();
 
-  spawn(opts.cmd, opts.args, options)
-    .on('exit', (code, signal) => {
-      const timeTakenStr = utils.getTimeTaken(start);
-      if (code !== 0 || signal) {
-        utils.logger.error(CLI_CMD, `Oh no! Linting failed after ${timeTakenStr}.`);
-        process.exit(code || 1);
-      } else {
-        utils.logger.log(CLI_CMD, `Success! Linting finished in ${timeTakenStr}.`.green);
-      }
-    });
+  spawn(opts.cmd, opts.args, options).on('exit', (code, signal) => {
+    const timeTakenStr = utils.getTimeTaken(start);
+    if (code !== 0 || signal) {
+      utils.logger.error(
+        CLI_CMD,
+        `Oh no! Linting failed after ${timeTakenStr}.`
+      );
+      // eslint-disable-next-line no-process-exit
+      process.exit(code || 1);
+    } else {
+      utils.logger.log(
+        CLI_CMD,
+        `Success! Linting finished in ${timeTakenStr}.`.green
+      );
+    }
+  });
 };

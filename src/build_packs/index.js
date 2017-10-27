@@ -13,23 +13,25 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
 const fs = require('fs-extra');
 const parser = require('yargs-parser');
 const path = require('path');
 
-const { logger } = require('../utils');
+const {logger} = require('../utils');
 
-const packs = exports.packs = fs
+const packs = (exports.packs = fs
   .readdirSync(__dirname)
-  .filter((name) => name !== 'index.js' && name !== 'build_pack.js')
-  .map((name) => {
+  .filter(name => name !== 'index.js' && name !== 'build_pack.js')
+  .map(name => {
     return {
       name: name.replace('.js', ''),
-      BuildPack: require(`./${name}`)
+      BuildPack: require(`./${name}`),
     };
-  });
+  }));
 
 exports.BuildPack = require('./build_pack');
 exports.NodejsBuildPack = require('./nodejs');
@@ -49,7 +51,12 @@ exports.getBuildPack = (args = process.argv) => {
   let isHelpOrVersion = false;
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    if (arg === '--help' || arg === '-h' || arg === '--version' || arg === '-v') {
+    if (
+      arg === '--help' ||
+      arg === '-h' ||
+      arg === '--version' ||
+      arg === '-v'
+    ) {
       isHelpOrVersion = true;
       break;
     }
@@ -86,22 +93,25 @@ exports.getBuildPack = (args = process.argv) => {
   // Try to load the build pack selected by the user
   if (buildPackName) {
     // Otherwise try to infer the build pack
-    const pack = packs.find((pack) => pack.name === buildPackName);
+    const pack = packs.find(pack => pack.name === buildPackName);
     if (!pack) {
       logger.fatal('cli', `Invalid buildPack: ${buildPackName}`);
     }
     logger.debug(`Using specified buildPack: ${buildPackName.yellow}`);
-    currentBuildPack = new pack.BuildPack({}, {
-      _name: buildPackName,
-      _selected: true,
-      _cwd: localPath
-    });
+    currentBuildPack = new pack.BuildPack(
+      {},
+      {
+        _name: buildPackName,
+        _selected: true,
+        _cwd: localPath,
+      }
+    );
     return currentBuildPack;
   }
   logger.debug('Inferring buildPack...');
 
   // Otherwise try to infer the build pack
-  const pack = packs.find((pack) => {
+  const pack = packs.find(pack => {
     try {
       return pack.BuildPack.detect(localPath);
     } catch (err) {
@@ -118,16 +128,23 @@ exports.getBuildPack = (args = process.argv) => {
       process.argv.push(buildPackArg);
     }
     logger.debug(`Inferred buildPack: ${pack.name.yellow}`);
-    currentBuildPack = new pack.BuildPack({}, {
-      _name: pack.name,
-      _detected: true,
-      _cwd: localPath
-    });
+    currentBuildPack = new pack.BuildPack(
+      {},
+      {
+        _name: pack.name,
+        _detected: true,
+        _cwd: localPath,
+      }
+    );
     return currentBuildPack;
   }
 
   if (!isHelpOrVersion) {
-    logger.error('cli', `Could not infer build pack! Using the default build pack which does not support all commands.`.yellow);
+    logger.error(
+      'cli',
+      `Could not infer build pack! Using the default build pack which does not support all commands.`
+        .yellow
+    );
   }
 
   currentBuildPack = new exports.BuildPack();

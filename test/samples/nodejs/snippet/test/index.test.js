@@ -15,8 +15,11 @@
 
 'use strict';
 
+/* global before, describe, it */
+
 var assert = require('assert');
 var path = require('path');
+// eslint-disable-next-line
 var tools = require('../../../../../');
 var translate = require('@google-cloud/translate')();
 
@@ -27,17 +30,16 @@ var text = 'Hello, world!';
 
 before(tools.checkCredentials);
 
-describe('snippet', function () {
-  it('should work', function () {
+describe('snippet', function() {
+  it('should work', function() {
     return Promise.all([
       tools.runAsync(cmd, cwd),
-      translate.translate(text, lang)
-    ])
-      .then(function (results) {
-        var output = results[0];
-        var translation = results[1][0];
-        assert(output.includes('Text: ' + text));
-        assert(output.includes('Translation: ' + translation));
-      });
+      translate.translate(text, lang),
+    ]).then(function(results) {
+      var output = results[0];
+      var translation = results[1][0];
+      assert(output.includes('Text: ' + text));
+      assert(output.includes('Translation: ' + translation));
+    });
   });
 });

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
 const _ = require('lodash');
@@ -27,8 +29,8 @@ const options = require('../options');
 const products = require('../../utils/products');
 const utils = require('../../utils');
 
-handlebars.registerHelper('slugify', (str) => string(str).slugify().s);
-handlebars.registerHelper('trim', (str) => string(str).trim().s);
+handlebars.registerHelper('slugify', str => string(str).slugify().s);
+handlebars.registerHelper('trim', str => string(str).trim().s);
 handlebars.registerHelper('release_quality', utils.createReleaseQualityBadge);
 handlebars.registerHelper('if_eq', (left, right, opts) => {
   if (left === right) {
@@ -36,8 +38,11 @@ handlebars.registerHelper('if_eq', (left, right, opts) => {
   }
   return opts.inverse(this);
 });
-handlebars.registerHelper('syntax_highlighting_ext', (opts) => {
-  const repoPath = path.parse(opts.data.root.repoPath).name.replace('google', '').replace('cloud', '');
+handlebars.registerHelper('syntax_highlighting_ext', opts => {
+  const repoPath = path
+    .parse(opts.data.root.repoPath)
+    .name.replace('google', '')
+    .replace('cloud', '');
   if (repoPath.includes('csharp') || repoPath.includes('dotnet')) {
     return 'cs';
   } else if (repoPath.includes('go')) {
@@ -56,28 +61,31 @@ handlebars.registerHelper('syntax_highlighting_ext', (opts) => {
   return '';
 });
 
-function gatherHelpText (opts, buildPack) {
-  (buildPack.config.samples || []).forEach((sample) => {
+function gatherHelpText(opts, buildPack) {
+  (buildPack.config.samples || []).forEach(sample => {
     if (typeof sample.usage === 'string') {
       sample.usage = {
         cmd: sample.usage,
-        text: sample.usage
+        text: sample.usage,
       };
     }
     if (!sample.help && sample.usage && typeof sample.usage.cmd === 'string') {
       try {
         sample.help = execSync(sample.usage.cmd, {
-          cwd: opts.localPath
-        }).toString().trim();
+          cwd: opts.localPath,
+        })
+          .toString()
+          .trim();
       } catch (err) {
         utils.logger.error('generate', err.message);
+        // eslint-disable-next-line no-process-exit
         process.exit(err.status);
       }
     }
   });
 }
 
-function expandOpts (opts, buildPack) {
+function expandOpts(opts, buildPack) {
   opts.samples || (opts.samples = []);
   gatherHelpText(opts, buildPack);
 }
@@ -85,15 +93,17 @@ function expandOpts (opts, buildPack) {
 const RE_REGION_TAG_START = /\[START ([\w_-]+)\]/g;
 const RE_REGION_TAG_END = /\[END ([\w_-]+)\]/g;
 
-function getQuickstart (filename, opts) {
+function getQuickstart(filename) {
   if (!path.isAbsolute(filename)) {
     filename = path.join(buildPack._cwd, filename);
   }
   let regionTag = 'quickstart';
   try {
-    regionTag = buildPack.config.generate.lib_readme.quickstart_region_tag || 'quickstart';
+    regionTag =
+      buildPack.config.generate.lib_readme.quickstart_region_tag ||
+      'quickstart';
   } catch (err) {
-
+    // Ignore error
   }
   const content = fs.readFileSync(filename, 'utf-8');
   const lines = content.split('\n');
@@ -126,8 +136,9 @@ function getQuickstart (filename, opts) {
 
 const TARGETS = buildPack.config.generate;
 let availableTargetsStr = '';
-Object.keys(TARGETS).forEach((target) => {
-  availableTargetsStr += `  ${target.yellow}:  ${TARGETS[target].description}\n`;
+Object.keys(TARGETS).forEach(target => {
+  availableTargetsStr += `  ${target.yellow}:  ${TARGETS[target]
+    .description}\n`;
 });
 
 const CLI_CMD = 'generate';
@@ -146,21 +157,20 @@ ${availableTargetsStr}`;
 exports.command = `${CLI_CMD} <targets..>`;
 exports.description = DESCRIPTION;
 
-exports.builder = (yargs) => {
-  yargs
-    .usage(USAGE)
-    .options({
-      config: options.config,
-      'config-key': options.configKey,
-      data: {
-        description: `${'Default:'.bold} ${`{}`.yellow}. JSON string, to be passed to the template.`,
-        requiresArg: true,
-        type: 'string'
-      }
-    });
+exports.builder = yargs => {
+  yargs.usage(USAGE).options({
+    config: options.config,
+    'config-key': options.configKey,
+    data: {
+      description: `${'Default:'.bold} ${`{}`
+        .yellow}. JSON string, to be passed to the template.`,
+      requiresArg: true,
+      type: 'string',
+    },
+  });
 };
 
-exports.handler = (opts) => {
+exports.handler = opts => {
   if (opts.dryRun) {
     utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
@@ -174,15 +184,22 @@ exports.handler = (opts) => {
   }
 
   buildPack.expandConfig(opts);
-  utils.logger.log(CLI_CMD, `Generating ${opts.targets.join(', ')} in: ${opts.localPath.yellow}`);
+  utils.logger.log(
+    CLI_CMD,
+    `Generating ${opts.targets.join(', ')} in: ${opts.localPath.yellow}`
+  );
 
   // The badgeUri is used for test status badges
   opts.repoPath = utils.getRepoPath(opts.repository, opts.localPath) || null;
-  buildPack.config.cloudBuildBadgeUri = path.join('cloud-docs-samples-badges', opts.repoPath, opts.name);
+  buildPack.config.cloudBuildBadgeUri = path.join(
+    'cloud-docs-samples-badges',
+    opts.repoPath,
+    opts.name
+  );
 
   // Load associated product information, if any
   if (buildPack.config.product) {
-    Object.keys(products[buildPack.config.product]).forEach((field) => {
+    Object.keys(products[buildPack.config.product]).forEach(field => {
       buildPack.config[field] = products[buildPack.config.product][field];
     });
   }
@@ -191,7 +208,7 @@ exports.handler = (opts) => {
   let errors = [];
 
   // Generate each specified target
-  opts.targets.forEach((target) => {
+  opts.targets.forEach(target => {
     const targetConfig = TARGETS[target];
     const targetPath = path.join(opts.localPath, targetConfig.filename);
     utils.logger.log(CLI_CMD, 'Compiling:', targetPath.yellow);
@@ -204,21 +221,41 @@ exports.handler = (opts) => {
 
       // Prepare the data for the template
       const data = _.merge(opts, targetConfig.data || {}, buildPack.config);
-      data.lib_pkg_name = buildPack.config.generate.lib_readme.getLibPkgName(buildPack);
+      data.lib_pkg_name = buildPack.config.generate.lib_readme.getLibPkgName(
+        buildPack
+      );
       // Other data prep
       if (target === 'lib_readme') {
         if (buildPack.config.generate.lib_readme.quickstart_filename) {
-          data.quickstart = getQuickstart(path.join(opts.localPath, buildPack.config.generate.lib_readme.quickstart_filename), buildPack);
+          data.quickstart = getQuickstart(
+            path.join(
+              opts.localPath,
+              buildPack.config.generate.lib_readme.quickstart_filename
+            ),
+            buildPack
+          );
         }
-        data.lib_install_cmd = buildPack.config.generate.lib_readme.lib_install_cmd.replace('{{name}}', data.lib_pkg_name);
+        data.lib_install_cmd = buildPack.config.generate.lib_readme.lib_install_cmd.replace(
+          '{{name}}',
+          data.lib_pkg_name
+        );
       }
 
       // Load the target's template
       let tpl;
       try {
-        tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${opts.buildPack}/${target}.tpl`), 'utf-8');
+        tpl = fs.readFileSync(
+          path.join(
+            __dirname,
+            `../../../templates/${opts.buildPack}/${target}.tpl`
+          ),
+          'utf-8'
+        );
       } catch (err) {
-        tpl = fs.readFileSync(path.join(__dirname, `../../../templates/${target}.tpl`), 'utf-8');
+        tpl = fs.readFileSync(
+          path.join(__dirname, `../../../templates/${target}.tpl`),
+          'utf-8'
+        );
       }
       // Validate the data for the given target is sufficient
       if (targetConfig.validate) {
@@ -232,14 +269,18 @@ exports.handler = (opts) => {
       const generated = handlebars.compile(tpl)(data);
 
       if (opts.dryRun) {
-        utils.logger.log(CLI_CMD, `Printing: ${targetPath.yellow}\n${generated}`);
+        utils.logger.log(
+          CLI_CMD,
+          `Printing: ${targetPath.yellow}\n${generated}`
+        );
         return;
       }
 
       // Write the content to the target's filename
-      fs.writeFile(targetPath, generated, (err) => {
+      fs.writeFile(targetPath, generated, err => {
         if (err) {
           utils.logger.error('generate', err.stack || err.message);
+          // eslint-disable-next-line no-process-exit
           process.exit(1);
         }
 
@@ -254,11 +295,17 @@ exports.handler = (opts) => {
   const timeTakenStr = utils.getTimeTaken(start);
 
   if (errors.length) {
-    utils.logger.error(CLI_CMD, `Oh no! Generating failed after ${timeTakenStr}.`);
-    errors.forEach((error) => {
+    utils.logger.error(
+      CLI_CMD,
+      `Oh no! Generating failed after ${timeTakenStr}.`
+    );
+    errors.forEach(error => {
       utils.logger.error(CLI_CMD, error);
     });
   } else {
-    utils.logger.log(CLI_CMD, `Success! Generating finished in ${timeTakenStr}.`.green);
+    utils.logger.log(
+      CLI_CMD,
+      `Success! Generating finished in ${timeTakenStr}.`.green
+    );
   }
 };

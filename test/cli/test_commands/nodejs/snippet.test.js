@@ -25,58 +25,103 @@ const samplePath = path.join(toolsPath, 'test/samples/nodejs/snippet');
 const NodejsBuildPack = require(toolsPath).buildPacks.NodejsBuildPack;
 const buildPack = new NodejsBuildPack();
 
-test.serial('should do a dry run install', async (t) => {
-  const output = await tools.runAsync(`${binPath} test install --dry-run`, samplePath);
+test.serial('should do a dry run install', async t => {
+  const output = await tools.runAsync(
+    `${binPath} test install --dry-run`,
+    samplePath
+  );
 
   t.regex(output, new RegExp(`install: Beginning dry run.`));
-  t.regex(output, new RegExp(`install: Installing dependencies in: ${samplePath}`));
-  t.regex(output, new RegExp(`install: Running: ${buildPack.config.test.install.cmd} ${buildPack.config.test.install.args.join(' ')}`));
+  t.regex(
+    output,
+    new RegExp(`install: Installing dependencies in: ${samplePath}`)
+  );
+  t.regex(
+    output,
+    new RegExp(
+      `install: Running: ${buildPack.config.test.install
+        .cmd} ${buildPack.config.test.install.args.join(' ')}`
+    )
+  );
   t.regex(output, new RegExp(`install: Dry run complete.`));
 });
 
-test.serial('should install with overrides', async (t) => {
+test.serial('should install with overrides', async t => {
   const cmd = 'npm';
   const args = 'install --no-optional --dry-run';
 
   await fs.remove(path.join(samplePath, 'node_modules'));
-  const output = await tools.runAsync(`${binPath} test install --cmd=${cmd} -- ${args}`, samplePath);
+  const output = await tools.runAsync(
+    `${binPath} test install --cmd=${cmd} -- ${args}`,
+    samplePath
+  );
 
-  t.regex(output, new RegExp(`install: Installing dependencies in: ${samplePath}`));
+  t.regex(
+    output,
+    new RegExp(`install: Installing dependencies in: ${samplePath}`)
+  );
   t.regex(output, new RegExp(`install: Running: ${cmd} ${args}`));
   t.regex(output, new RegExp(`install: Success!`));
 });
 
-test.serial('should install with defaults', async (t) => {
+test.serial('should install with defaults', async t => {
   await fs.remove(path.join(samplePath, 'node_modules'));
   const output = await tools.runAsync(`${binPath} test install`, samplePath);
 
-  t.regex(output, new RegExp(`install: Installing dependencies in: ${samplePath}`));
-  t.regex(output, new RegExp(`install: Running: ${buildPack.config.test.install.cmd} ${buildPack.config.test.install.args.join(' ')}`));
+  t.regex(
+    output,
+    new RegExp(`install: Installing dependencies in: ${samplePath}`)
+  );
+  t.regex(
+    output,
+    new RegExp(
+      `install: Running: ${buildPack.config.test.install
+        .cmd} ${buildPack.config.test.install.args.join(' ')}`
+    )
+  );
   t.regex(output, new RegExp(`install: Success!`));
 });
 
-test.serial('should do a dry run test', async (t) => {
-  const output = await tools.runAsync(`${binPath} test run --dry-run`, samplePath);
+test.serial('should do a dry run test', async t => {
+  const output = await tools.runAsync(
+    `${binPath} test run --dry-run`,
+    samplePath
+  );
 
   t.regex(output, new RegExp(`run: Beginning dry run.`));
   t.regex(output, new RegExp(`run: Executing tests in: ${samplePath}`));
-  t.regex(output, new RegExp(`run: Running: ${buildPack.config.test.run.cmd} ${buildPack.config.test.run.args.join(' ')}`));
+  t.regex(
+    output,
+    new RegExp(
+      `run: Running: ${buildPack.config.test.run
+        .cmd} ${buildPack.config.test.run.args.join(' ')}`
+    )
+  );
   t.regex(output, new RegExp(`run: Dry run complete.`));
 });
 
-test.serial('should run test with defaults', async (t) => {
+test.serial('should run test with defaults', async t => {
   const output = await tools.runAsync(`${binPath} test run`, samplePath);
 
   t.regex(output, new RegExp(`run: Executing tests in: ${samplePath}`));
-  t.regex(output, new RegExp(`run: Running: ${buildPack.config.test.run.cmd} ${buildPack.config.test.run.args.join(' ')}`));
+  t.regex(
+    output,
+    new RegExp(
+      `run: Running: ${buildPack.config.test.run
+        .cmd} ${buildPack.config.test.run.args.join(' ')}`
+    )
+  );
   t.regex(output, new RegExp(`run: Success!`));
 });
 
-test.serial('should run test with overrides', async (t) => {
+test.serial('should run test with overrides', async t => {
   const cmd = 'npm';
   const args = 'run test --foo="bar"';
 
-  const output = await tools.runAsync(`${binPath} test run --cmd=${cmd} -- ${args}`, samplePath);
+  const output = await tools.runAsync(
+    `${binPath} test run --cmd=${cmd} -- ${args}`,
+    samplePath
+  );
 
   t.regex(output, new RegExp(`run: Executing tests in: ${samplePath}`));
   t.regex(output, new RegExp(`run: Running: ${cmd} run test --foo=bar`));

@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
+'use strict';
+
 const BASE = `https://cloud.google.com`;
 const RE_DOCS_URL = /{{docs_url}}/gi;
 
 class Product {
-  constructor (id, name, shortName, docsUrl, description, apiId) {
+  constructor(id, name, shortName, docsUrl, description, apiId) {
     this.id = id;
     this.name = name;
     this.short_name = shortName;
@@ -355,12 +357,12 @@ const products = [
     `${BASE}/video-intelligence`,
     `The [Cloud Video Intelligence API]({{docs_url}}) allows developers to use Google video analysis technology as part of their applications.`,
     `videointelligence.googleapis.com`
-  )
+  ),
 ];
 
 const productsObject = {};
 
-products.forEach((product) => {
+products.forEach(product => {
   productsObject[product.id] = product;
 });
 

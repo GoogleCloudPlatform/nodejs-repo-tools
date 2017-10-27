@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
+'use strict';
+
 const _ = require('lodash');
-const { execSync } = require('child_process');
+const {execSync} = require('child_process');
 const path = require('path');
 
 const utils = require('../utils');
@@ -27,11 +29,11 @@ const globalOpts = {
     localPath: process.cwd(),
     project: process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT,
     config: '.cloud-repo-tools.json',
-    configKey: null
+    configKey: null,
   },
   lint: {
     cmd: 'lint',
-    args: []
+    args: [],
   },
   test: {
     app: {},
@@ -39,94 +41,107 @@ const globalOpts = {
       builderProject: 'cloud-docs-samples',
       ci: process.env.CI,
       keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-      timeout: '20m'
+      timeout: '20m',
     },
     deploy: {
       cmd: 'gcloud',
       yaml: 'app.yaml',
-      tries: 1
+      tries: 1,
     },
     install: {},
-    run: {}
+    run: {},
   },
   generate: {
     all: {
-      description: 'Generate all available targets.'
+      description: 'Generate all available targets.',
     },
     coc: {
       description: 'Generate a CODE_OF_CONDUCT.md file.',
-      filename: 'CODE_OF_CONDUCT.md'
+      filename: 'CODE_OF_CONDUCT.md',
     },
     contributing: {
       description: 'Generate a .github/CONTRIBUTING.md file.',
-      filename: '.github/CONTRIBUTING.md'
+      filename: '.github/CONTRIBUTING.md',
     },
     contributors: {
       description: 'Generate a CONTRIBUTORS file.',
       filename: 'CONTRIBUTORS',
-      addData (data, opts) {
+      addData(data, opts) {
         try {
           const output = execSync(`git shortlog -e -s < ${TTY}`, {
             shell: true,
             cwd: opts.localPath,
-            encoding: 'utf8'
+            encoding: 'utf8',
           });
           data.contributors = output
             .split('\n')
-            .filter((x) => x)
-            .map((line) => line.substring(line.indexOf('\t') + 1));
+            .filter(x => x)
+            .map(line => line.substring(line.indexOf('\t') + 1));
         } catch (err) {
           utils.logger.error('generate', 'Failed to load contibutors!');
           throw err;
         }
-      }
+      },
     },
     issue_template: {
       description: 'Generate a .github/ISSUE_TEMPLATE.md file.',
-      filename: '.github/ISSUE_TEMPLATE.md'
+      filename: '.github/ISSUE_TEMPLATE.md',
     },
     license: {
       description: 'Generate a LICENSE file.',
       filename: 'LICENSE',
       data: {
-        year: (new Date()).getFullYear()
-      }
+        year: new Date().getFullYear(),
+      },
     },
     lib_readme: {
       description: 'Generate a README.md file for a client library.',
       filename: 'README.md',
-      getLibPkgName (buildPack) {
-        utils.logger.fatal('generate', 'getLibPkgName() must be implemented by a subclass!');
+      getLibPkgName() {
+        utils.logger.fatal(
+          'generate',
+          'getLibPkgName() must be implemented by a subclass!'
+        );
       },
-      validate (data) {
+      validate(data) {
         if (!data.lib_install_cmd) {
-          utils.logger.fatal('generate', `In order to generate lib_readme, "lib_install_cmd" must be set!`);
+          utils.logger.fatal(
+            'generate',
+            `In order to generate lib_readme, "lib_install_cmd" must be set!`
+          );
         }
-      }
+      },
     },
     lib_samples_readme: {
-      description: 'Generate a README.md file for the samples/ folder of a client library.',
+      description:
+        'Generate a README.md file for the samples/ folder of a client library.',
       filename: 'README.md',
-      validate (data) {
+      validate(data) {
         if (!data.samples || !data.samples.length) {
-          utils.logger.fatal('generate', `In order to generate lib_samples_readme, config must contain a non-empty "samples" array!`);
+          utils.logger.fatal(
+            'generate',
+            `In order to generate lib_samples_readme, config must contain a non-empty "samples" array!`
+          );
         }
-      }
+      },
     },
     pr_template: {
       description: 'Generate a .github/PULL_REQUEST_TEMPLATE.md file.',
-      filename: '.github/PULL_REQUEST_TEMPLATE.md'
+      filename: '.github/PULL_REQUEST_TEMPLATE.md',
     },
     samples_readme: {
       description: 'Generate a generate samples README.md file.',
       filename: 'README.md',
-      validate (data) {
+      validate(data) {
         if (!data.samples || !data.samples.length) {
-          utils.logger.fatal('generate', `In order to generate samples_readme, config must contain a non-empty "samples" array!`);
+          utils.logger.fatal(
+            'generate',
+            `In order to generate samples_readme, config must contain a non-empty "samples" array!`
+          );
         }
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 /**
@@ -140,17 +155,17 @@ const globalOpts = {
  * @returns {BuildPack} A new {@link BuildPack} instance.
  */
 module.exports = class BuildPack {
-  constructor (config = {}, innerOpts = {}) {
+  constructor(config = {}, innerOpts = {}) {
     this.config = _.merge(globalOpts, config);
     delete innerOpts.config;
     _.merge(this, innerOpts);
   }
 
-  detect () {
+  detect() {
     throw new Error('detect() must be implemented by a subclass!');
   }
 
-  expandConfig (opts) {
+  expandConfig(opts) {
     opts.localPath = path.resolve(opts.localPath);
     opts.cwd = opts.localPath;
     const base = path.parse(opts.localPath).base;
@@ -172,13 +187,14 @@ module.exports = class BuildPack {
         // Values in the config file take precedence
         _.merge(this.config, config);
       } catch (err) {
-        // TODO: Print something here?
+        // Ignore error
       }
     }
 
     opts.name = opts.name || config.name || name || base;
     opts.project = opts.project || this.config.global.project;
-    opts.builderProject = opts.builderProject || this.config.test.build.builderProject;
+    opts.builderProject =
+      opts.builderProject || this.config.test.build.builderProject;
     opts.repository = config.repository || repository;
 
     const args = process.argv.slice(2);
@@ -191,7 +207,7 @@ module.exports = class BuildPack {
     });
   }
 
-  getLibInstallCmd () {
+  getLibInstallCmd() {
     throw new Error('getLibInstallCmd() must be implemented by a subclass!');
   }
 
@@ -203,7 +219,7 @@ module.exports = class BuildPack {
    *
    * @param {*} filename
    */
-  load (filename) {
+  load(filename) {
     const file = require(filename);
     if (typeof file === 'function') {
       return file(this.config);

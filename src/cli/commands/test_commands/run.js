@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+'use strict';
+
 require('colors');
 
 const childProcess = require('child_process');
@@ -31,26 +33,30 @@ const USAGE = `Usage:
 Description:
   ${DESCRIPTION}
 
-  Override the args passed to the configured test command by appending ${'-- "your" "args" "here"'.bold} when you run the ${'test run'.bold} command.`;
+  Override the args passed to the configured test command by appending ${'-- "your" "args" "here"'
+    .bold} when you run the ${'test run'.bold} command.`;
 
 exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
-exports.builder = (yargs) => {
+exports.builder = yargs => {
   yargs
     .usage(USAGE)
     .options({
       cmd: {
-        description: `${'Default:'.bold} ${`${TEST_CMD}`.yellow}. The test command to use.`,
-        type: 'string'
-      }
+        description: `${'Default:'.bold} ${`${TEST_CMD}`
+          .yellow}. The test command to use.`,
+        type: 'string',
+      },
     })
     .example('Run the test command in the specified directory:')
     .example(`- ${'tools test run -l=~/projects/some/dir'.cyan}`)
-    .example(`Runs ${'npm run system-test'.bold} instead of the default command:`)
+    .example(
+      `Runs ${'npm run system-test'.bold} instead of the default command:`
+    )
     .example(`- ${'tools test install --cmd=npm -- run system-test'.cyan}`);
 };
 
-exports.handler = (opts) => {
+exports.handler = opts => {
   if (opts.dryRun) {
     utils.logger.log(CLI_CMD, 'Beginning dry run.'.cyan);
   }
@@ -61,7 +67,12 @@ exports.handler = (opts) => {
   opts.args || (opts.args = buildPack.config.test.run.args);
 
   utils.logger.log(CLI_CMD, `Executing tests in: ${opts.localPath.yellow}`);
-  utils.logger.log(CLI_CMD, 'Running:', opts.cmd.yellow, opts.args.join(' ').yellow);
+  utils.logger.log(
+    CLI_CMD,
+    'Running:',
+    opts.cmd.yellow,
+    opts.args.join(' ').yellow
+  );
 
   if (opts.dryRun) {
     utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
@@ -71,7 +82,7 @@ exports.handler = (opts) => {
   const options = {
     cwd: opts.localPath,
     stdio: opts.silent ? 'ignore' : 'inherit',
-    shell: true
+    shell: true,
   };
 
   const start = Date.now();
@@ -81,10 +92,17 @@ exports.handler = (opts) => {
     .on('exit', (code, signal) => {
       const timeTakenStr = utils.getTimeTaken(start);
       if (code !== 0 || signal) {
-        utils.logger.error(CLI_CMD, `Oh no! Test failed after ${timeTakenStr}.`);
+        utils.logger.error(
+          CLI_CMD,
+          `Oh no! Test failed after ${timeTakenStr}.`
+        );
+        // eslint-disable-next-line no-process-exit
         process.exit(code || 1);
       } else {
-        utils.logger.log(CLI_CMD, `Success! Test finished in ${timeTakenStr}`.green);
+        utils.logger.log(
+          CLI_CMD,
+          `Success! Test finished in ${timeTakenStr}`.green
+        );
       }
     });
 };

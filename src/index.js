@@ -22,28 +22,33 @@ const proxyquire = require('proxyquire').noPreserveCache();
 const sinon = require('sinon');
 const supertest = require('supertest');
 
-const utils = exports.utils = require('./utils');
+const utils = (exports.utils = require('./utils'));
 
 exports.buildPacks = require('./build_packs');
 
-exports.getRequest = (config) => {
+exports.getRequest = config => {
   if (process.env.E2E_TESTS) {
     return supertest(utils.getUrl(config));
   }
-  return supertest(proxyquire(path.join(config.cwd, config.cmd || 'app'), {
-    process: {
-      env: config.env || process.env
-    }
-  }));
+  return supertest(
+    proxyquire(path.join(config.cwd, config.cmd || 'app'), {
+      process: {
+        env: config.env || process.env,
+      },
+    })
+  );
 };
 
 exports.run = (cmd, cwd) => {
-  return childProcess.execSync(cmd, { cwd: cwd, shell: true }).toString().trim();
+  return childProcess
+    .execSync(cmd, {cwd: cwd, shell: true})
+    .toString()
+    .trim();
 };
 
-exports.runAsync = (cmd, cwd, cb) => {
+exports.runAsync = (cmd, cwd) => {
   return new Promise((resolve, reject) => {
-    childProcess.exec(cmd, { cwd: cwd, shell: true }, (err, stdout, stderr) => {
+    childProcess.exec(cmd, {cwd: cwd, shell: true}, (err, stdout) => {
       if (err) {
         reject(err);
         return;
@@ -57,13 +62,13 @@ exports.runAsync = (cmd, cwd, cb) => {
   });
 };
 
-exports.runAsyncWithIO = (cmd, cwd, cb) => {
+exports.runAsyncWithIO = (cmd, cwd) => {
   return new Promise((resolve, reject) => {
-    childProcess.exec(cmd, { cwd: cwd, shell: true }, (err, stdout, stderr) => {
+    childProcess.exec(cmd, {cwd: cwd, shell: true}, (err, stdout, stderr) => {
       const result = {
         err: err,
         stdout: stdout ? stdout.toString().trim() : null,
-        stderr: stderr ? stderr.toString().trim() : null
+        stderr: stderr ? stderr.toString().trim() : null,
       };
       result.output = (result.stdout || '') + (result.stderr || '');
       if (err) {
@@ -79,7 +84,7 @@ exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
   args || (args = []);
   let opts = debug;
   if (typeof opts === 'boolean') {
-    opts = { debug: true };
+    opts = {debug: true};
   }
   opts || (opts = {});
   return new Promise((resolve, reject) => {
@@ -87,14 +92,14 @@ exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
     let stdout = '';
     let stderr = '';
 
-    function finish (err) {
+    function finish(err) {
       if (!done) {
         done = true;
         const results = {
           stdout: stdout.trim(),
           stderr: stderr.trim(),
           output: stdout.trim() + stderr.trim(),
-          err: err
+          err: err,
         };
         if (err) {
           reject(results);
@@ -107,14 +112,14 @@ exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
     if (debug || (debug !== false && process.env.DEBUG)) {
       utils.logger.log('CMD', cmd, ...args);
     }
-    const child = childProcess.spawn(cmd, args, { cwd: cwd, shell: true });
-    child.stdout.on('data', (chunk) => {
+    const child = childProcess.spawn(cmd, args, {cwd: cwd, shell: true});
+    child.stdout.on('data', chunk => {
       if (debug || (debug !== false && process.env.DEBUG)) {
         utils.logger.log('stdout', chunk.toString());
       }
       stdout += chunk.toString();
     });
-    child.stderr.on('data', (chunk) => {
+    child.stderr.on('data', chunk => {
       utils.logger.error('stderr', chunk.toString());
       stderr += chunk.toString();
     });
@@ -130,7 +135,7 @@ exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
 };
 
 class Try {
-  constructor (test) {
+  constructor(test) {
     this._maxTries = 10;
     this._maxDelay = 20000;
     this._timeout = 60000;
@@ -140,17 +145,19 @@ class Try {
     this._test = test;
   }
 
-  execute () {
+  execute() {
     if (this._iteration >= this._maxTries) {
-      return this.reject(this._error || new Error('Reached maximum number of tries'));
-    } else if ((Date.now() - this._start) >= this._timeout) {
+      return this.reject(
+        this._error || new Error('Reached maximum number of tries')
+      );
+    } else if (Date.now() - this._start >= this._timeout) {
       return this.reject(this._error || new Error('Test timed out'));
     }
 
     return Promise.resolve()
       .then(() => this._test(assert))
       .then(() => this.resolve())
-      .catch((err) => {
+      .catch(err => {
         this._error = err;
         this._iteration++;
         this._delay = Math.min(this._delay * this._multiplier, this._maxDelay);
@@ -164,15 +171,15 @@ class Try {
       });
   }
 
-  timeout (timeout) {
+  timeout(timeout) {
     this._timeout = timeout;
   }
 
-  tries (maxTries) {
+  tries(maxTries) {
     this._maxTries = maxTries;
   }
 
-  start () {
+  start() {
     this._start = Date.now();
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -183,42 +190,65 @@ class Try {
   }
 }
 
-exports.tryTest = (test) => {
+exports.tryTest = test => {
   return new Try(test);
 };
 
 exports.stubConsole = () => {
-  if (typeof console.log.restore !== `function` && typeof console.error.restore !== `function`) {
+  /* eslint-disable no-console */
+  if (
+    typeof console.log.restore !== `function` &&
+    typeof console.error.restore !== `function`
+  ) {
     if (process.env.DEBUG) {
       sinon.spy(console, `error`);
       sinon.spy(console, `log`);
     } else {
       sinon.stub(console, `error`);
-      sinon.stub(console, `log`).callsFake((a, b, c) => {
-        if (typeof a === `string` && a.indexOf(`\u001b`) !== -1 && typeof b === `string`) {
+      sinon.stub(console, `log`).callsFake((a, b) => {
+        if (
+          typeof a === `string` &&
+          a.indexOf(`\u001b`) !== -1 &&
+          typeof b === `string`
+        ) {
           console.log.apply(console, arguments);
         }
       });
     }
   }
+  /* eslint-enable no-console */
 };
 
 exports.restoreConsole = () => {
+  /* eslint-disable no-console */
   if (typeof console.log.restore === `function`) {
     console.log.restore();
   }
   if (typeof console.error.restore === `function`) {
     console.error.restore();
   }
+  /* eslint-enable no-console */
 };
 
-exports.checkCredentials = (t) => {
+exports.checkCredentials = t => {
   if (t && typeof t.truthy === 'function') {
-    t.truthy(process.env.GCLOUD_PROJECT, `Must set GCLOUD_PROJECT environment variable!`);
-    t.truthy(process.env.GOOGLE_APPLICATION_CREDENTIALS, `Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!`);
+    t.truthy(
+      process.env.GCLOUD_PROJECT,
+      `Must set GCLOUD_PROJECT environment variable!`
+    );
+    t.truthy(
+      process.env.GOOGLE_APPLICATION_CREDENTIALS,
+      `Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!`
+    );
   } else {
-    assert(process.env.GCLOUD_PROJECT, `Must set GCLOUD_PROJECT environment variable!`);
-    assert(process.env.GOOGLE_APPLICATION_CREDENTIALS, `Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!`);
+    assert(
+      process.env.GCLOUD_PROJECT,
+      `Must set GCLOUD_PROJECT environment variable!`
+    );
+    assert(
+      process.env.GOOGLE_APPLICATION_CREDENTIALS,
+      `Must set GOOGLE_APPLICATION_CREDENTIALS environment variable!`
+    );
     if (typeof t === 'function') {
       t();
     }
