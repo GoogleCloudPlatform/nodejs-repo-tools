@@ -2,7 +2,7 @@
 
 # {{name}}: {{display}} Samples
 
-[![Build](https://storage.googleapis.com/{{badgeUri}}.svg)]()
+[![Open in Cloud Shell][shell_img]][shell_link]
 
 {{description}}
 
@@ -31,7 +31,9 @@ library's README.
 View the [README]({{ref}}).
 
 {{else}}
-View the [source code][{{id}}_{{@index}}_code].{{#if description}}
+View the [source code][{{id}}_{{@index}}_code].
+
+[![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com{{../repoPath}}&page=editor&open_in_editor=samples/{{file}},samples/README.md){{#if description}}
 
 {{{description}}}{{/if}}{{#if usage}}
 
@@ -47,3 +49,6 @@ __Usage:__ `{{{usage.text}}}`
 [{{id}}_{{@index}}_docs]: {{docs_link}}
 [{{id}}_{{@index}}_code]: {{file}}{{/if}}{{/if}}
 {{/each}}
+
+[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
+[shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com{{repoPath}}&page=editor&open_in_editor=samples/README.md

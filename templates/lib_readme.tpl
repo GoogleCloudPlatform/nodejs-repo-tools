@@ -86,10 +86,10 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 Samples are in the [`samples/`](https://github.com{{repoPath}}/blob/master/samples) directory. The samples' `README.md`
 has instructions for running the samples.
 
-| Sample                      | Source Code                       |
-| --------------------------- | --------------------------------- |
+| Sample                      | Source Code                       | Try it |
+| --------------------------- | --------------------------------- | ------ |
 {{#each samples}}
-| {{name}} | [source code](https://github.com{{../repoPath}}/blob/master/samples/{{file}}) |
+| {{name}} | [source code](https://github.com{{../repoPath}}/blob/master/samples/{{file}}) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com{{../repoPath}}&page=editor&open_in_editor=samples/{{file}},samples/README.md) |
 {{/each}}
 {{/if}}
 
@@ -140,3 +140,4 @@ See [LICENSE](LICENSE)
 
 [client-docs]: {{client_reference_url}}
 [product-docs]: {{docs_url}}
+[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
