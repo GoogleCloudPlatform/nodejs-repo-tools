@@ -1,3 +1,8 @@
+##### 2.1.1 - 01 November 2017
+
+###### Bug fixes
+- Fix issue with `getUrl`
+
 ##### 2.1.0 - 27 October 2017
 
 ###### Bug fixes
