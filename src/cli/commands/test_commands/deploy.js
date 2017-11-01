@@ -208,7 +208,7 @@ exports.handler = opts => {
             // Give app time to start
             setTimeout(() => {
               // Test versioned url of "default" module
-              let demoUrl = utils.getUrl(opts.version, opts.project);
+              let demoUrl = utils.getUrl(opts);
 
               // Test that app is running successfully
               utils.testRequest(demoUrl, opts).then(

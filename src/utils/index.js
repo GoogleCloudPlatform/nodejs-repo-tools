@@ -106,8 +106,8 @@ exports.parseArgs = (args = '') => {
   return parsed;
 };
 
-exports.getUrl = (version, project) => {
-  return `https://${version}-dot-${project}.appspot-preview.com`;
+exports.getUrl = opts => {
+  return `https://${opts.version}-dot-${opts.project}.appspot.com`;
 };
 
 exports.finalize = (err, resolve, reject) => {
