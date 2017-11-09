@@ -1,3 +1,8 @@
+##### 2.1.2 - 08 November 2017
+
+###### Backwards compatible changes
+- Added `yaml` flag to the `test deploy` command.
+
 ##### 2.1.1 - 01 November 2017
 
 ###### Bug fixes
