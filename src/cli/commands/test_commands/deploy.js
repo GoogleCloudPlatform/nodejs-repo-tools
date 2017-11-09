@@ -83,6 +83,12 @@ exports.builder = yargs => {
       requiresArg: true,
       type: 'number',
     },
+    yaml: {
+      description: `${'Default:'.bold} ${'app.yaml'
+        .yellow}. Specify the base yaml file to use when deploying.`,
+      requiresArg: true,
+      type: 'string',
+    },
   });
 };
 
