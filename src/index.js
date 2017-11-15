@@ -27,10 +27,9 @@ const utils = (exports.utils = require('./utils'));
 exports.buildPacks = require('./build_packs');
 
 exports.getRequest = config => {
-  if (process.env.TEST_URL) {
-    return supertest(process.env.TEST_URL);
-  }
-  if (process.env.E2E_TESTS) {
+  if (process.env.TEST_URL || config.testUrl) {
+    return supertest(process.env.TEST_URL || config.testUrl);
+  } else if (process.env.E2E_TESTS) {
     return supertest(utils.getUrl(config));
   }
   return supertest(
