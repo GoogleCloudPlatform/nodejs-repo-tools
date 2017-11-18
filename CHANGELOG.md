@@ -1,3 +1,8 @@
+##### 2.1.3 - 17 November 2017
+
+###### Backwards compatible changes
+- #81 - Add ability to specify test url in config file
+
 ##### 2.1.2 - 08 November 2017
 
 ###### Backwards compatible changes
