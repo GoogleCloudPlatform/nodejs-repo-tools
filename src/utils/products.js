@@ -63,7 +63,7 @@ const products = [
     `bigquery-json.googleapis.com`
   ),
   new Product(
-    `bigquery_transfer`,
+    `bigquerydatatransfer`,
     `Google BigQuery Data Transfer Service`,
     `BigQuery Data Transfer Service`,
     `${BASE}/bigquery/docs/reference/datatransfer/rest/`,
