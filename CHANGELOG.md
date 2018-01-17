@@ -1,3 +1,7 @@
+##### 2.1.4 - 17 January 2018
+
+- Updated a product name
+
 ##### 2.1.3 - 17 November 2017
 
 ###### Backwards compatible changes
