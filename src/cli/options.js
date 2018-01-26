@@ -19,14 +19,16 @@ const buildPack = require('../build_packs').getBuildPack();
 
 module.exports = {
   config: {
-    description: `${'Default:'.bold} ${`${buildPack.config.global.config}`
-      .yellow}. Specify a .json or .js config file to load. Options set in the config file supercede options set at the command line. A .js file must export a function which returns a config object.`,
+    description: `${'Default:'.bold} ${
+      `${buildPack.config.global.config}`.yellow
+    }. Specify a .json or .js config file to load. Options set in the config file supercede options set at the command line. A .js file must export a function which returns a config object.`,
     requiresArg: true,
     type: 'string',
   },
   'config-key': {
-    description: `${'Default:'.bold} ${`${buildPack.config.global.configKey}`
-      .yellow}. Specify the key under which options are nested in the config file.`,
+    description: `${'Default:'.bold} ${
+      `${buildPack.config.global.configKey}`.yellow
+    }. Specify the key under which options are nested in the config file.`,
     requiresArg: true,
     type: 'string',
   },

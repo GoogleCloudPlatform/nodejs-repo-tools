@@ -279,11 +279,15 @@ exports.testRequest = (url, config, numTry) => {
           );
         } else if (config.msg && !body.includes(config.msg)) {
           throw new Error(
-            `failed verification!\nExpected body: ${config.msg}\nActual: ${body}`
+            `failed verification!\nExpected body: ${
+              config.msg
+            }\nActual: ${body}`
           );
         } else if (config.testStr && !config.testStr.test(body)) {
           throw new Error(
-            `failed verification!\nExpected body: ${config.testStr}\nActual: ${body}`
+            `failed verification!\nExpected body: ${
+              config.testStr
+            }\nActual: ${body}`
           );
         }
       },
@@ -301,11 +305,15 @@ exports.testRequest = (url, config, numTry) => {
             );
           } else if (config.msg && !body.includes(config.msg)) {
             throw new Error(
-              `failed verification!\nExpected body: ${config.msg}\nActual: ${body}`
+              `failed verification!\nExpected body: ${
+                config.msg
+              }\nActual: ${body}`
             );
           } else if (config.testStr && !config.testStr.test(body)) {
             throw new Error(
-              `failed verification!\nExpected body: ${config.testStr}\nActual: ${body}`
+              `failed verification!\nExpected body: ${
+                config.testStr
+              }\nActual: ${body}`
             );
           }
         } else {

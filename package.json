@@ -62,6 +62,7 @@
   },
   "contributors": [
     "Ace Nassri <anassri@google.com>",
+    "Alexander Fenster <github@fenster.name>",
     "Jason Dobry <jason.dobry@gmail.com>",
     "Jason Dobry <jmdobry@users.noreply.github.com>",
     "Luke Sneeringer <luke@sneeringer.com>",
@@ -80,28 +81,28 @@
     "test": "node ./bin/tools test run --cmd npm -- run cover"
   },
   "dependencies": {
-    "ava": "0.23.0",
+    "ava": "0.25.0",
     "colors": "1.1.2",
-    "fs-extra": "4.0.2",
-    "got": "7.1.0",
+    "fs-extra": "5.0.0",
+    "got": "8.0.3",
     "handlebars": "4.0.11",
     "lodash": "4.17.4",
-    "nyc": "11.3.0",
+    "nyc": "11.4.1",
     "proxyquire": "1.8.0",
-    "sinon": "4.1.0",
+    "sinon": "4.2.1",
     "string": "3.3.3",
     "supertest": "3.0.0",
-    "yargs": "10.1.1",
-    "yargs-parser": "8.0.0"
+    "yargs": "11.0.0",
+    "yargs-parser": "9.0.2"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
     "babel-preset-env": "1.6.1",
-    "eslint": "4.11.0",
-    "eslint-config-prettier": "2.7.0",
-    "eslint-plugin-node": "5.1.1",
-    "eslint-plugin-prettier": "2.3.1",
-    "prettier": "1.7.4",
-    "semistandard": "11.0.0"
+    "eslint": "4.16.0",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-plugin-node": "5.2.1",
+    "eslint-plugin-prettier": "2.5.0",
+    "prettier": "1.10.2",
+    "semistandard": "12.0.0"
   }
 }

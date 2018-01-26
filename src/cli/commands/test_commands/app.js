@@ -32,16 +32,18 @@ const USAGE = `Usage:
 Description:
   ${DESCRIPTION}
 
-  Override the args passed to the configured start command by appending ${'-- "your" "args" "here"'
-    .bold} when you run the ${'test app'.bold} command.`;
+  Override the args passed to the configured start command by appending ${
+    '-- "your" "args" "here"'.bold
+  } when you run the ${'test app'.bold} command.`;
 
 exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
 exports.builder = yargs => {
   yargs.usage(USAGE).options({
     cmd: {
-      description: `${'Default:'.bold} ${buildPack.config.test.app.cmd
-        .yellow}. The command used to start the app.`,
+      description: `${'Default:'.bold} ${
+        buildPack.config.test.app.cmd.yellow
+      }. The command used to start the app.`,
       type: 'string',
     },
     port: {
@@ -50,8 +52,9 @@ exports.builder = yargs => {
     },
     start: {
       default: true,
-      description: `${'Default:'.bold} ${'true'
-        .yellow}. Whether to start the app in addition to sending it a request.`,
+      description: `${'Default:'.bold} ${
+        'true'.yellow
+      }. Whether to start the app in addition to sending it a request.`,
       type: 'boolean',
     },
     config: options.config,
@@ -152,8 +155,9 @@ exports.handler = opts => {
       if (opts.dryRun) {
         utils.logger.log(
           CLI_CMD,
-          `Verifying: ${`${opts.url || `http://localhost:${options.env.PORT}`}`
-            .yellow}.`
+          `Verifying: ${
+            `${opts.url || `http://localhost:${options.env.PORT}`}`.yellow
+          }.`
         );
         utils.logger.log(CLI_CMD, 'Dry run complete.'.cyan);
         return;

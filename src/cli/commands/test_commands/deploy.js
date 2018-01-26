@@ -40,21 +40,24 @@ exports.description = DESCRIPTION;
 exports.builder = yargs => {
   yargs.usage(USAGE).options({
     cmd: {
-      description: `${'Default:'
-        .bold} ${DEPLOY_CMD.yellow}. Override the command used to deploy the app.`,
+      description: `${'Default:'.bold} ${
+        DEPLOY_CMD.yellow
+      }. Override the command used to deploy the app.`,
       type: 'string',
     },
     project: {
       alias: 'p',
-      description: `${'Default:'.bold} ${`${buildPack.config.global.project}`
-        .yellow}. The project ID to use ${'inside'.italic} the build.`,
+      description: `${'Default:'.bold} ${
+        `${buildPack.config.global.project}`.yellow
+      }. The project ID to use ${'inside'.italic} the build.`,
       requiresArg: true,
       type: 'string',
     },
     delete: {
       default: true,
-      description: `${'Default:'.bold} ${'true'
-        .yellow}. Whether to delete the deployed app after the test finishes.`,
+      description: `${'Default:'.bold} ${
+        'true'.yellow
+      }. Whether to delete the deployed app after the test finishes.`,
       type: 'boolean',
     },
     config: options.config,
@@ -78,14 +81,16 @@ exports.builder = yargs => {
       type: 'string',
     },
     tries: {
-      description: `${'Default:'.bold} ${'1'
-        .yellow}. Number of times to attempt deployment. Deployment will only be attempted again if the previous deployment fails. Must be greater than zero.`,
+      description: `${'Default:'.bold} ${
+        '1'.yellow
+      }. Number of times to attempt deployment. Deployment will only be attempted again if the previous deployment fails. Must be greater than zero.`,
       requiresArg: true,
       type: 'number',
     },
     yaml: {
-      description: `${'Default:'.bold} ${'app.yaml'
-        .yellow}. Specify the base yaml file to use when deploying.`,
+      description: `${'Default:'.bold} ${
+        'app.yaml'.yellow
+      }. Specify the base yaml file to use when deploying.`,
       requiresArg: true,
       type: 'string',
     },

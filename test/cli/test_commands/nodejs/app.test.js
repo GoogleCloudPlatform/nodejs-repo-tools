@@ -41,8 +41,9 @@ test.serial('should do a dry run install', async t => {
   t.regex(
     output,
     new RegExp(
-      `install: Running: ${buildPack.config.test.install
-        .cmd} ${buildPack.config.test.install.args.join(' ')}`
+      `install: Running: ${
+        buildPack.config.test.install.cmd
+      } ${buildPack.config.test.install.args.join(' ')}`
     )
   );
   t.regex(output, new RegExp(`install: Dry run complete.`));
@@ -77,8 +78,9 @@ test.serial('should install with defaults', async t => {
   t.regex(
     output,
     new RegExp(
-      `install: Running: ${buildPack.config.test.install
-        .cmd} ${buildPack.config.test.install.args.join(' ')}`
+      `install: Running: ${
+        buildPack.config.test.install.cmd
+      } ${buildPack.config.test.install.args.join(' ')}`
     )
   );
   t.regex(output, new RegExp(`install: Success!`));
@@ -97,8 +99,9 @@ test.serial('should do a dry run test', async t => {
   t.regex(
     output,
     new RegExp(
-      `run: Running: ${buildPack.config.test.run
-        .cmd} ${buildPack.config.test.run.args.join(' ')}`
+      `run: Running: ${
+        buildPack.config.test.run.cmd
+      } ${buildPack.config.test.run.args.join(' ')}`
     )
   );
   t.regex(output, new RegExp(`run: Dry run complete.`));
@@ -115,8 +118,9 @@ test.serial('should run test with defaults', async t => {
   t.regex(
     results.output,
     new RegExp(
-      `run: Running: ${buildPack.config.test.run
-        .cmd} ${buildPack.config.test.run.args.join(' ')}`
+      `run: Running: ${
+        buildPack.config.test.run.cmd
+      } ${buildPack.config.test.run.args.join(' ')}`
     )
   );
   t.regex(results.output, new RegExp(`run: Success!`));
@@ -149,8 +153,9 @@ test.serial('should do a dry run web app test', async t => {
   t.regex(
     results.output,
     new RegExp(
-      `app: Running: ${buildPack.config.test.app
-        .cmd} ${buildPack.config.test.app.args.join(' ')}`
+      `app: Running: ${
+        buildPack.config.test.app.cmd
+      } ${buildPack.config.test.app.args.join(' ')}`
     )
   );
   t.regex(results.output, new RegExp(`app: Verifying: http://localhost:`));
@@ -169,8 +174,9 @@ test.serial('should test web app with defaults', async t => {
   t.regex(
     results.output,
     new RegExp(
-      `app: Running: ${buildPack.config.test.app
-        .cmd} ${buildPack.config.test.app.args.join(' ')}`
+      `app: Running: ${
+        buildPack.config.test.app.cmd
+      } ${buildPack.config.test.app.args.join(' ')}`
     )
   );
   t.regex(results.output, new RegExp(`app: Verifying: http://localhost:`));

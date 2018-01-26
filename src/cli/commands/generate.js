@@ -137,8 +137,9 @@ function getQuickstart(filename) {
 const TARGETS = buildPack.config.generate;
 let availableTargetsStr = '';
 Object.keys(TARGETS).forEach(target => {
-  availableTargetsStr += `  ${target.yellow}:  ${TARGETS[target]
-    .description}\n`;
+  availableTargetsStr += `  ${target.yellow}:  ${
+    TARGETS[target].description
+  }\n`;
 });
 
 const CLI_CMD = 'generate';
@@ -162,8 +163,9 @@ exports.builder = yargs => {
     config: options.config,
     'config-key': options.configKey,
     data: {
-      description: `${'Default:'.bold} ${`{}`
-        .yellow}. JSON string, to be passed to the template.`,
+      description: `${'Default:'.bold} ${
+        `{}`.yellow
+      }. JSON string, to be passed to the template.`,
       requiresArg: true,
       type: 'string',
     },

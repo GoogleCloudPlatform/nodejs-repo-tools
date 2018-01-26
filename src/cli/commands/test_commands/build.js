@@ -45,8 +45,9 @@ Description:
   Passing ${'--deploy'.bold} will cause the build to also run the web app
   deployment test.
 
-  Pass ${'--dry-run'
-    .bold} to see what the cloudbuild.yaml file will look like.`;
+  Pass ${
+    '--dry-run'.bold
+  } to see what the cloudbuild.yaml file will look like.`;
 
 exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
@@ -56,39 +57,44 @@ exports.builder = yargs => {
     .options({
       run: {
         default: true,
-        description: `${'Default:'.bold} ${`true`
-          .yellow}. Whether to run the system/unit test command.`,
+        description: `${'Default:'.bold} ${
+          `true`.yellow
+        }. Whether to run the system/unit test command.`,
         type: 'boolean',
       },
       app: {
-        description: `${'Default:'.bold} ${`false`
-          .yellow}. Whether to run the web app test command.`,
+        description: `${'Default:'.bold} ${
+          `false`.yellow
+        }. Whether to run the web app test command.`,
         type: 'boolean',
       },
       deploy: {
-        description: `${'Default:'.bold} ${`false`
-          .yellow}. Whether to run the deploy command.`,
+        description: `${'Default:'.bold} ${
+          `false`.yellow
+        }. Whether to run the deploy command.`,
         type: 'boolean',
       },
       'builder-project': {
         alias: 'bp',
-        description: `${'Default:'.bold} ${`${buildPack.config.test.build
-          .builderProject}`
-          .yellow}. The project in which the Cloud Container Build should execute.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.build.builderProject}`.yellow
+        }. The project in which the Cloud Container Build should execute.`,
         requiresArg: true,
         type: 'string',
       },
       project: {
         alias: 'p',
-        description: `${'Default:'.bold} ${`${buildPack.config.global.project}`
-          .yellow}. The project ID to use ${'inside'.italic} the build.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.global.project}`.yellow
+        }. The project ID to use ${'inside'.italic} the build.`,
         requiresArg: true,
         type: 'string',
       },
       'key-file': {
         alias: 'k',
-        description: `${'Default:'.bold} ${`${buildPack.config.test.build
-          .keyFile}`.yellow}. The path to the key to copy into the build.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.build.keyFile}`.yellow
+        }. The path to the key to copy into the build.`,
         requiresArg: true,
         type: 'string',
       },
@@ -96,32 +102,35 @@ exports.builder = yargs => {
       'config-key': options.configKey,
       async: {
         alias: 'a',
-        description: `${'Default:'.bold} ${`${buildPack.config.test.build
-          .async}`
-          .yellow}. Start the build, but don't wait for it to complete.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.build.async}`.yellow
+        }. Start the build, but don't wait for it to complete.`,
         type: 'boolean',
       },
       ci: {
-        description: `${'Default:'.bold} ${`${buildPack.config.test.build.ci ||
-          false}`.yellow}. Whether this is a CI environment.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.build.ci || false}`.yellow
+        }. Whether this is a CI environment.`,
         type: 'boolean',
       },
       timeout: {
-        description: `${'Default:'.bold} ${`${buildPack.config.test.build
-          .timeout}`.yellow}. The maximum time allowed for the build.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.build.timeout}`.yellow
+        }. The maximum time allowed for the build.`,
         requiresArg: true,
         type: 'string',
       },
       'install-cmd': {
-        description: `${'Default:'.bold} ${`${buildPack.config.test.install
-          .cmd}`.yellow}. The install command to use.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.install.cmd}`.yellow
+        }. The install command to use.`,
         requiresArg: true,
         type: 'string',
       },
       'install-args': {
-        description: `${'Default:'
-          .bold} ${`${buildPack.config.test.install.args.join(' ')}`
-          .yellow}. The arguments to pass to the install command.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.install.args.join(' ')}`.yellow
+        }. The arguments to pass to the install command.`,
         requiresArg: true,
         type: 'string',
       },
@@ -137,28 +146,30 @@ exports.builder = yargs => {
         type: 'string',
       },
       'start-cmd': {
-        description: `${'Default:'.bold} ${`${buildPack.config.test.app.cmd}`
-          .yellow}. The command the web app test will use to start the app.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.app.cmd}`.yellow
+        }. The command the web app test will use to start the app.`,
         requiresArg: true,
         type: 'string',
       },
       'start-args': {
-        description: `${'Default:'
-          .bold} ${`${buildPack.config.test.app.args.join(' ')}`
-          .yellow}. The arguments to pass to the command used by the web app test.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.app.args.join(' ')}`.yellow
+        }. The arguments to pass to the command used by the web app test.`,
         requiresArg: true,
         type: 'string',
       },
       'test-cmd': {
-        description: `${'Default:'.bold} ${`${buildPack.config.test.run.cmd}`
-          .yellow}. The system/unit test command to use.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.run.cmd}`.yellow
+        }. The system/unit test command to use.`,
         requiresArg: true,
         type: 'string',
       },
       'test-args': {
-        description: `${'Default:'
-          .bold} ${`${buildPack.config.test.run.args.join(' ')}`
-          .yellow}. The arguments to pass to the system/unit test command.`,
+        description: `${'Default:'.bold} ${
+          `${buildPack.config.test.run.args.join(' ')}`.yellow
+        }. The arguments to pass to the system/unit test command.`,
         requiresArg: true,
         type: 'string',
       },
@@ -167,8 +178,10 @@ exports.builder = yargs => {
     .example(`- ${'$ tools test build'.cyan}`)
     .example('Start a build that tests and deploys an App Engine app:')
     .example(
-      `- ${'$ tools test build -l=~/nodejs-docs-samples/appengine/cloudsql --app --deploy'
-        .cyan}`
+      `- ${
+        '$ tools test build -l=~/nodejs-docs-samples/appengine/cloudsql --app --deploy'
+          .cyan
+      }`
     );
 };
 
@@ -294,7 +307,9 @@ exports.handler = opts => {
     }
 
     // Start the build
-    let buildCmd = `gcloud container builds submit . --config 'repo-tools-cloudbuild.yaml' --project '${opts.builderProject}'`;
+    let buildCmd = `gcloud container builds submit . --config 'repo-tools-cloudbuild.yaml' --project '${
+      opts.builderProject
+    }'`;
     if (opts.async) {
       buildCmd += ' --async';
     } else {

@@ -29,32 +29,37 @@ module.exports = require('yargs')
       description: `${'Choices:'.bold} ${buildPacks.packs
         .map(pack => pack.name.yellow)
         .concat('default'.yellow)
-        .join(', ')}. ${buildPack._selected
-        ? 'Selected:'.bold
-        : 'Detected:'.bold} ${`${buildPack._name}`
-        .green}. The build pack to use. The tool will attempt to detect which build to use.`,
+        .join(', ')}. ${
+        buildPack._selected ? 'Selected:'.bold : 'Detected:'.bold
+      } ${
+        `${buildPack._name}`.green
+      }. The build pack to use. The tool will attempt to detect which build to use.`,
       global: true,
       requiresArg: true,
       type: 'string',
     },
     'local-path': {
       alias: 'l',
-      description: `${'Current:'.bold} ${`${buildPack.config.global.localPath}`
-        .yellow}. Use this option to set the current working directory of the command.`,
+      description: `${'Current:'.bold} ${
+        `${buildPack.config.global.localPath}`.yellow
+      }. Use this option to set the current working directory of the command.`,
       global: true,
       requiresArg: true,
       type: 'string',
     },
     'dry-run': {
-      description: `${'Default:'.bold} ${`${buildPack.config.global.dryRun}`
-        .yellow}. Print the actions that ${'would'
-        .italic} be taken, but don't actually do anything.`,
+      description: `${'Default:'.bold} ${
+        `${buildPack.config.global.dryRun}`.yellow
+      }. Print the actions that ${
+        'would'.italic
+      } be taken, but don't actually do anything.`,
       global: true,
       type: 'boolean',
     },
     silent: {
-      description: `${'Default:'.bold} ${'false'
-        .yellow}. If true, hide the output of shell commands.`,
+      description: `${'Default:'.bold} ${
+        'false'.yellow
+      }. If true, hide the output of shell commands.`,
       global: true,
       type: 'boolean',
     },

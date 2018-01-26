@@ -29,8 +29,9 @@ const LINT_CMD = buildPack.config.lint.cmd;
 const LINT_ARGS = buildPack.config.lint.args;
 const LINT_CMD_STR = `${LINT_CMD} ${LINT_ARGS.join(' ')}`.trim();
 const COMMAND = `tools ${CLI_CMD} -- ${'[files...]'.yellow}`;
-const DESCRIPTION = `Lint files by running: ${LINT_CMD_STR.bold} in ${buildPack
-  ._cwd.yellow}.`;
+const DESCRIPTION = `Lint files by running: ${LINT_CMD_STR.bold} in ${
+  buildPack._cwd.yellow
+}.`;
 const USAGE = `Usage:
   ${COMMAND.bold}
 Description:
@@ -44,8 +45,9 @@ exports.description = DESCRIPTION;
 exports.builder = yargs => {
   yargs.usage(USAGE).options({
     cmd: {
-      description: `${'Default:'.bold} ${`${LINT_CMD}`
-        .yellow}. The lint command to use.`,
+      description: `${'Default:'.bold} ${
+        `${LINT_CMD}`.yellow
+      }. The lint command to use.`,
       type: 'string',
     },
   });

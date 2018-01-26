@@ -33,8 +33,9 @@ const USAGE = `Usage:
 Description:
   ${DESCRIPTION}
 
-  Override the args passed to the configured test command by appending ${'-- "your" "args" "here"'
-    .bold} when you run the ${'test run'.bold} command.`;
+  Override the args passed to the configured test command by appending ${
+    '-- "your" "args" "here"'.bold
+  } when you run the ${'test run'.bold} command.`;
 
 exports.command = CLI_CMD;
 exports.description = DESCRIPTION;
@@ -43,8 +44,9 @@ exports.builder = yargs => {
     .usage(USAGE)
     .options({
       cmd: {
-        description: `${'Default:'.bold} ${`${TEST_CMD}`
-          .yellow}. The test command to use.`,
+        description: `${'Default:'.bold} ${
+          `${TEST_CMD}`.yellow
+        }. The test command to use.`,
         type: 'string',
       },
     })
