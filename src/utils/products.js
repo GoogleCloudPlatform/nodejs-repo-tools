@@ -143,6 +143,14 @@ const products = [
     `clouddebugger.googleapis.com`
   ),
   new Product(
+    `dialogflow`,
+    `Dialogflow`,
+    `Dialogflow`,
+    `https://dialogflow.com/docs/`,
+    `[Dialogflow]({{docs_url}}) is a natural language understanding platform that makes it easy for you to design and integrate a conversational user interface into your mobile app, web application, device, bot, and so on.`,
+    `dialogflow.googleapis.com`
+  ),
+  new Product(
     `dlp`,
     `Google Cloud Data Loss Prevention (DLP) API`,
     `Data Loss Prevention (DLP) API`,
