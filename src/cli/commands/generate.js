@@ -29,6 +29,8 @@ const options = require('../options');
 const products = require('../../utils/products');
 const utils = require('../../utils');
 
+const CLI_CMD = 'generate';
+
 handlebars.registerHelper('slugify', str => string(str).slugify().s);
 handlebars.registerHelper('trim', str => string(str).trim().s);
 handlebars.registerHelper('release_quality', utils.createReleaseQualityBadge);
@@ -77,7 +79,7 @@ function gatherHelpText(opts, buildPack) {
           .toString()
           .trim();
       } catch (err) {
-        utils.logger.error('generate', err.message);
+        utils.logger.error(CLI_CMD, err.message);
         // eslint-disable-next-line no-process-exit
         process.exit(err.status);
       }
@@ -142,7 +144,6 @@ Object.keys(TARGETS).forEach(target => {
   }\n`;
 });
 
-const CLI_CMD = 'generate';
 const COMMAND = `tools ${CLI_CMD} <targets..> ${'[options]'.yellow}`;
 const DESCRIPTION = `Generate the given target(s) in ${buildPack._cwd.yellow}.`;
 
@@ -213,9 +214,14 @@ exports.handler = opts => {
 
   // Load associated product information, if any
   if (buildPack.config.product) {
-    Object.keys(products[buildPack.config.product]).forEach(field => {
-      buildPack.config[field] = products[buildPack.config.product][field];
-    });
+    try {
+      Object.keys(products[buildPack.config.product]).forEach(field => {
+        buildPack.config[field] = products[buildPack.config.product][field];
+      });
+    } catch (err) {
+      utils.logger.error(CLI_CMD, `Unrecognized product: ${buildPack.config.product}`);
+      return;
+    }
   }
 
   const start = Date.now();
@@ -292,7 +298,7 @@ exports.handler = opts => {
 
       fs.ensureDir(path.parse(targetPath).dir, err => {
         if (err) {
-          utils.logger.error('generate', err.stack || err.message);
+          utils.logger.error(CLI_CMD, err.stack || err.message);
           // eslint-disable-next-line no-process-exit
           process.exit(1);
         }
@@ -300,7 +306,7 @@ exports.handler = opts => {
         // Write the content to the target's filename
         fs.writeFile(targetPath, generated, err => {
           if (err) {
-            utils.logger.error('generate', err.stack || err.message);
+            utils.logger.error(CLI_CMD, err.stack || err.message);
             // eslint-disable-next-line no-process-exit
             process.exit(1);
           }

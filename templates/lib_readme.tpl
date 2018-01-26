@@ -7,7 +7,7 @@
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/github{{repoPath}}?branch=master&svg=true)](https://ci.appveyor.com/project{{repoPath}})
 [![codecov](https://img.shields.io/codecov/c/github{{repoPath}}/master.svg?style=flat)](https://codecov.io/gh{{repoPath}})
 
-> Node.js idiomatic client for [{{short_name}}][product-docs].
+> {{display}} idiomatic client for [{{short_name}}][product-docs].
 
 {{description}}
 

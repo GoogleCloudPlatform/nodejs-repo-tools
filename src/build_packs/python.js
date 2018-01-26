@@ -15,8 +15,11 @@
 
 'use strict';
 
+const _ = require('lodash');
 const fs = require('fs-extra');
 const path = require('path');
+
+const BuildPack = require('./build_pack');
 
 const SETUP = `
 1.  Read [Prerequisites][prereq] and [How to run a sample][run] first.
@@ -34,10 +37,8 @@ const TESTS = `
 
         nox`;
 
-module.exports = {
+const pythonConfig = {
   display: 'Python',
-  detect: cwd => fs.statSync(path.join(cwd, 'requirements.txt')).isFile(),
-  load: filename => require(filename),
   lint: {
     cmd: 'nox',
     args: ['lint'],
@@ -48,6 +49,7 @@ module.exports = {
       args: ['main.py'],
     },
     build: {},
+    deploy: {},
     install: {
       cmd: 'pip',
       args: ['install', '-r', 'requirements.txt'],
@@ -57,8 +59,59 @@ module.exports = {
       args: [],
     },
   },
-  readme: {
-    setup: SETUP,
-    tests: TESTS,
+  generate: {
+    gitignore: {
+      description: '.gitignore',
+      filename: '.gitignore',
+    },
+    lib_readme: {
+      description: 'README.rst',
+      filename: 'README.rst',
+      lib_install_cmd: 'pip install {{name}}',
+      quickstart_filename: 'samples/quickstart.py',
+      getLibPkgName(buildPack) {
+        return buildPack.config.client_name;
+      },
+    },
+    lib_samples_readme: {
+      description:
+        'Generate a README.rst file for the samples/ folder of a client library.',
+      filename: 'README.rst',
+      validate(data) {
+        if (!data.samples || !data.samples.length) {
+          utils.logger.fatal(
+            'generate',
+            `In order to generate lib_samples_readme, config must contain a non-empty "samples" array!`
+          );
+        }
+      },
+    },
+    samples_readme: {
+      setup: SETUP,
+      tests: TESTS,
+    },
   },
 };
+
+/**
+ * @class PythonBuildPack
+ * @returns {PythonBuildPack} A new {@link PythonBuildPack} instance.
+ */
+module.exports = class PythonBuildPack extends BuildPack {
+  constructor(config = {}, innerOpts = {}) {
+    super(_.merge(pythonConfig, _.cloneDeep(config)), innerOpts);
+  }
+
+  static detect(cwd) {
+    try {
+      if (fs.statSync(path.join(cwd, 'requirements.txt')).isFile()) {
+        return true;
+      }
+    } catch (err) {}
+    try {
+      if (fs.statSync(path.join(cwd, 'setup.py')).isFile()) {
+        return true;
+      }
+    } catch (err) {}
+  }
+}
