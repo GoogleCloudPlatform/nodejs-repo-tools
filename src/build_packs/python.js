@@ -20,6 +20,7 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const BuildPack = require('./build_pack');
+const utils = require('../utils');
 
 const SETUP = `
 1.  Read [Prerequisites][prereq] and [How to run a sample][run] first.
@@ -107,11 +108,15 @@ module.exports = class PythonBuildPack extends BuildPack {
       if (fs.statSync(path.join(cwd, 'requirements.txt')).isFile()) {
         return true;
       }
-    } catch (err) {}
+    } catch (err) {
+      // Ignore error
+    }
     try {
       if (fs.statSync(path.join(cwd, 'setup.py')).isFile()) {
         return true;
       }
-    } catch (err) {}
+    } catch (err) {
+      // Ignore error
+    }
   }
-}
+};

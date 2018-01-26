@@ -219,7 +219,10 @@ exports.handler = opts => {
         buildPack.config[field] = products[buildPack.config.product][field];
       });
     } catch (err) {
-      utils.logger.error(CLI_CMD, `Unrecognized product: ${buildPack.config.product}`);
+      utils.logger.error(
+        CLI_CMD,
+        `Unrecognized product: ${buildPack.config.product}`
+      );
       return;
     }
   }
