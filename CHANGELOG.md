@@ -1,3 +1,9 @@
+##### 2.2.0 - 26 January 2018
+
+###### Backwards compatible changes
+- Improved Python support
+- Upgraded dependencies
+
 ##### 2.1.4 - 17 January 2018
 
 - Updated a product name
