@@ -89,7 +89,7 @@
     "lodash": "4.17.4",
     "nyc": "11.4.1",
     "proxyquire": "1.8.0",
-    "sinon": "4.2.1",
+    "sinon": "4.2.2",
     "string": "3.3.3",
     "supertest": "3.0.0",
     "yargs": "11.0.0",
