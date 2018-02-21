@@ -1,3 +1,8 @@
+##### 2.2.1 - 21 February 2018
+
+###### Bug fixes
+- Removed broken links from Node.js issue template
+
 ##### 2.2.0 - 26 January 2018
 
 ###### Backwards compatible changes
