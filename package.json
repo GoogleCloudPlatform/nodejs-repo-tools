@@ -86,7 +86,7 @@
     "fs-extra": "5.0.0",
     "got": "8.0.3",
     "handlebars": "4.0.11",
-    "lodash": "4.17.4",
+    "lodash": "4.17.5",
     "nyc": "11.4.1",
     "proxyquire": "1.8.0",
     "sinon": "4.2.2",
