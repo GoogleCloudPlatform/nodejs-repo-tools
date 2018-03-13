@@ -1,3 +1,8 @@
+##### 2.2.2 - 13 March 2018
+
+###### Bug fixes
+- Un-ignore package-lock.json files in Node.js .gitignore template
+
 ##### 2.2.1 - 21 February 2018
 
 ###### Bug fixes
