@@ -1,3 +1,8 @@
+##### 2.2.3 - 14 March 2018
+
+###### Bug fixes
+- Fix link to "Open in Cloud Shell" button image
+
 ##### 2.2.2 - 13 March 2018
 
 ###### Bug fixes
