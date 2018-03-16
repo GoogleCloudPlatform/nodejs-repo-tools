@@ -1,3 +1,9 @@
+##### 2.2.4 - 16 March 2018
+
+###### Bug fixes
+- Add missing lines to `.gitignore` Node.js template
+- Add missing configuration for two products
+
 ##### 2.2.3 - 14 March 2018
 
 ###### Bug fixes

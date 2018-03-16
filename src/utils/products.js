@@ -87,6 +87,14 @@ const products = [
     `compute.googleapis.com`
   ),
   new Product(
+    `container`,
+    `Google Kubernetes Engine`,
+    `Kubernetes Engine`,
+    `${BASE}/kubernetes-engine/docs/`,
+    `[Kubernetes Engine]({{docs_url}}) is used for building and managing container based applications, powered by the open source Kubernetes technology.`,
+    `container.googleapis.com`
+  ),
+  new Product(
     `container_builder`,
     `Google Container Builder`,
     `Container Builder`,
@@ -253,6 +261,14 @@ const products = [
     `${BASE}/natural-language/docs`,
     `[Cloud Natural Language API]({{docs_url}}) provides natural language understanding technologies to developers, including sentiment analysis, entity analysis, and syntax analysis. This API is part of the larger Cloud Machine Learning API family.`,
     `language.googleapis.com`
+  ),
+  new Product(
+    `oslogin`,
+    `Google Cloud OS Login API`,
+    `Cloud OS Login API`,
+    `${BASE}/compute/docs/oslogin/rest`,
+    `The [Google Cloud OS Login API]({{docs_url}}) manages OS login configuration for Google account users.`,
+    `oslogin.googleapis.com`
   ),
   new Product(
     `prediction`,
