@@ -66,5 +66,5 @@ View the `source code <{{file}}>`__.
 {{/if}}
 {{/each}}
 
-.. |Open in Cloud Shell| image:: //gstatic.com/cloudssh/images/open-btn.png
+.. |Open in Cloud Shell| image:: https://gstatic.com/cloudssh/images/open-btn.png
    :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com{{repoPath}}&page=editor&open_in_editor=samples/README.md

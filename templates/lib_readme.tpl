@@ -143,4 +143,4 @@ See [LICENSE](https://github.com{{repoPath}}/blob/master/LICENSE)
 
 [client-docs]: {{client_reference_url}}
 [product-docs]: {{docs_url}}
-[shell_img]: //gstatic.com/cloudssh/images/open-btn.png
+[shell_img]: https://gstatic.com/cloudssh/images/open-btn.png

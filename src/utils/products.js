@@ -351,6 +351,14 @@ const products = [
     `storagetransfer.googleapis.com`
   ),
   new Product(
+    `tts`,
+    `Google Cloud Text-to-Speech API`,
+    `Cloud Text-to-Speech API`,
+    `${BASE}/text-to-speech/docs`,
+    `The [Cloud Text-to-Speech API]({{docs_url}}) converts text or Speech Synthesis Markup Language (SSML) input into audio data of natural human speech.`,
+    `texttospeech.googleapis.com`
+  ),
+  new Product(
     `trace`,
     `Stackdriver Trace`,
     `Trace`,
