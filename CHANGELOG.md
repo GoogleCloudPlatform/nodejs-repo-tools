@@ -1,3 +1,8 @@
+##### 2.3.0 - 06 April 2018
+
+###### Backwards compatible changes
+- Added a Node.js-only "bump" command (thanks @alexander-fenster)
+
 ##### 2.2.6 - 28 March 2018
 
 - Add Text-to-Speech product info
