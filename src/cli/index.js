@@ -18,11 +18,22 @@
 require('colors');
 
 const buildPacks = require('../build_packs');
+const NodejsBuildPack = require('../build_packs/nodejs');
 const buildPack = buildPacks.getBuildPack();
 
 module.exports = require('yargs')
   .demand(1)
-  .commandDir('commands')
+  .commandDir('commands', {
+    visit(command) {
+      if (
+        command.command.startsWith('bump') &&
+        !(buildPack instanceof NodejsBuildPack)
+      ) {
+        return false;
+      }
+      return command;
+    },
+  })
   .options({
     'build-pack': {
       alias: 'b',
