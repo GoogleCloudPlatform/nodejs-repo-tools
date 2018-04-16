@@ -147,7 +147,7 @@ exports.handler = opts => {
       ${'git add samples/package.json samples/package-lock.json'.yellow}`;
     }
     message += `
-      ${'git commit -m "bump version to'.yellow} ${newVersion.yellow}${
+      ${'git commit -m "chore: bump version to'.yellow} ${newVersion.yellow}${
       '"'.yellow
     }`;
     utils.logger.log('bump', message);
