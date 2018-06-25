@@ -351,6 +351,14 @@ const products = [
     `storagetransfer.googleapis.com`
   ),
   new Product(
+    `tasks`,
+    `Google Cloud Tasks`,
+    `Cloud Tasks`,
+    `${BASE}/tasks/docs`,
+    `[Cloud Tasks]({{docs_url}}) manages the execution of large numbers of distributed requests.`,
+    `tasks.googleapis.com`
+  ),
+  new Product(
     `tts`,
     `Google Cloud Text-to-Speech API`,
     `Cloud Text-to-Speech API`,
