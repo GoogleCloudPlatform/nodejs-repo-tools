@@ -87,6 +87,14 @@ const products = [
     `compute.googleapis.com`
   ),
   new Product(
+    `container`,
+    `Google Kubernetes Engine`,
+    `Kubernetes Engine`,
+    `${BASE}/kubernetes-engine/docs/`,
+    `[Kubernetes Engine]({{docs_url}}) is used for building and managing container based applications, powered by the open source Kubernetes technology.`,
+    `container.googleapis.com`
+  ),
+  new Product(
     `container_builder`,
     `Google Container Builder`,
     `Container Builder`,
@@ -255,6 +263,14 @@ const products = [
     `language.googleapis.com`
   ),
   new Product(
+    `oslogin`,
+    `Google Cloud OS Login API`,
+    `Cloud OS Login API`,
+    `${BASE}/compute/docs/oslogin/rest`,
+    `The [Google Cloud OS Login API]({{docs_url}}) manages OS login configuration for Google account users.`,
+    `oslogin.googleapis.com`
+  ),
+  new Product(
     `prediction`,
     `Google Prediction API`,
     `Prediction API`,
@@ -333,6 +349,22 @@ const products = [
     `${BASE}/storage/transfer/`,
     `The [Cloud Storage Transfer Service]({{docs_url}}) allows you to quickly import online data into Google Cloud Storage.`,
     `storagetransfer.googleapis.com`
+  ),
+  new Product(
+    `tasks`,
+    `Google Cloud Tasks`,
+    `Cloud Tasks`,
+    `${BASE}/tasks/docs`,
+    `[Cloud Tasks]({{docs_url}}) manages the execution of large numbers of distributed requests.`,
+    `tasks.googleapis.com`
+  ),
+  new Product(
+    `tts`,
+    `Google Cloud Text-to-Speech API`,
+    `Cloud Text-to-Speech API`,
+    `${BASE}/text-to-speech/docs`,
+    `The [Cloud Text-to-Speech API]({{docs_url}}) converts text or Speech Synthesis Markup Language (SSML) input into audio data of natural human speech.`,
+    `texttospeech.googleapis.com`
   ),
   new Product(
     `trace`,

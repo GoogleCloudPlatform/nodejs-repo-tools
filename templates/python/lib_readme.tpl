@@ -111,7 +111,7 @@ samples.
 {{#each samples}}
 \| {{name}} \| `source code <https://github.com{{../repoPath}}/blob/master/samples/{{file}}>`__ \| |Open in Cloud Shell {{name}}| \|
 
-.. |Open in Cloud Shell {{name}}| image:: http://gstatic.com/cloudssh/images/open-btn.png
+.. |Open in Cloud Shell {{name}}| image:: https://gstatic.com/cloudssh/images/open-btn.png
    :target: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com{{../repoPath}}&page=editor&open_in_editor=samples/{{file}},samples/README.md
 
 {{/each}}

@@ -1,0 +1,17 @@
+{
+  "name": "test-samples-nodejs-app-samples",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Google Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/nodejs-repo-tools.git"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "dependencies": {
+    "test-samples-nodejs-app": "0.0.1"
+  }
+}

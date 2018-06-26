@@ -1,3 +1,5 @@
+[//]: # "This README.md file is auto-generated, all changes to this file will be lost."
+[//]: # "To regenerate it, use `npm run generate-scaffolding`."
 <img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
 # [{{name}}: {{display}} Client](https://github.com{{repoPath}})
@@ -141,4 +143,4 @@ See [LICENSE](https://github.com{{repoPath}}/blob/master/LICENSE)
 
 [client-docs]: {{client_reference_url}}
 [product-docs]: {{docs_url}}
-[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
+[shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
