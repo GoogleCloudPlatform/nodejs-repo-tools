@@ -1,3 +1,8 @@
+##### 2.3.1 - 11 July 2018
+
+###### Backwards compatible changes
+- Added Cloud Tasks product
+
 ##### 2.3.0 - 06 April 2018
 
 ###### Backwards compatible changes
