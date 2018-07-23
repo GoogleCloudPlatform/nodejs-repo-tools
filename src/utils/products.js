@@ -55,6 +55,14 @@ const products = [
     `appengine.googleapis.com`
   ),
   new Product(
+    `automl`,
+    `Google Cloud AutoML`,
+    `Cloud AutoML`,
+    `${BASE}/automl/docs`,
+    `[Google Cloud AutoML]({{docs_url}}) includes several options you can use to create your own custom machine learning models that you can integrate into your applications and web sites.`,
+    `automl.googleapis.com`
+  ),
+  new Product(
     `bigquery`,
     `Google BigQuery`,
     `BigQuery`,
@@ -77,6 +85,14 @@ const products = [
     `${BASE}/bigtable/docs/`,
     `[Cloud Bigtable]({{docs_url}}) is Google's NoSQL Big Data database service. It's the same database that powers many core Google services, including Search, Analytics, Maps, and Gmail.`,
     `bigtable.googleapis.com,bigtableadmin.googleapis.com`
+  ),
+  new Product(
+    `cloudiot`,
+    `Google Cloud IoT Core`,
+    `Cloud IoT Core`,
+    `${BASE}/iot/docs`,
+    `[Google Cloud Internet of Things (IoT) Core]({{docs_url}}) is a fully managed service for securely connecting and managing IoT devices, from a few to millions. Ingest data from connected devices and build rich applications that integrate with the other big data services of Google Cloud Platform.`,
+    `cloudiot.googleapis.com`
   ),
   new Product(
     `compute_engine`,
@@ -211,7 +227,7 @@ const products = [
     `Cloud Identity Access Management`,
     `Cloud IAM`,
     `${BASE}/iam/docs`,
-    `[Cloud Identity and Access Management (Cloud IAM)]({{docs_url}}) enables you to create and manage permissions for Google Cloud Platform resources. Cloud IAM unifies access control for Cloud Platform services into a single system and presents a consistent set of operations`,
+    `[Cloud Identity and Access Management (Cloud IAM)]({{docs_url}}) enables you to create and manage permissions for Google Cloud Platform resources. Cloud IAM unifies access control for Cloud Platform services into a single system and presents a consistent set of operations.`,
     `iam.googleapis.com`
   ),
   new Product(
