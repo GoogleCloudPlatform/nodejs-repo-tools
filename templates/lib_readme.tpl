@@ -9,8 +9,6 @@
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/github{{repoPath}}?branch=master&svg=true)](https://ci.appveyor.com/project{{repoPath}})
 [![codecov](https://img.shields.io/codecov/c/github{{repoPath}}/master.svg?style=flat)](https://codecov.io/gh{{repoPath}})
 
-> {{display}} idiomatic client for [{{short_name}}][product-docs].
-
 {{description}}
 
 {{#if deprecated}}
@@ -19,21 +17,7 @@
 | This library is **deprecated**. {{deprecated}} |
 {{/if}}
 
-* [{{short_name}} {{display}} Client API Reference][client-docs]
-* [github.com{{repoPath}}](https://github.com{{repoPath}})
-* [{{short_name}} Documentation][product-docs]
-
-Read more about the client libraries for Cloud APIs, including the older
-Google APIs Client Libraries, in [Client Libraries Explained][explained].
-
-[explained]: https://cloud.google.com/apis/docs/client-libraries-explained
-
-**Table of contents:**
-
-* [Quickstart](#quickstart)
-  * [Before you begin](#before-you-begin)
-  * [Installing the client library](#installing-the-client-library)
-  * [Using the client library](#using-the-client-library)
+* [Using the client library](#using-the-client-library)
 {{#if samples.length}}
 * [Samples](#samples)
 {{/if}}
@@ -41,42 +25,27 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 * [Contributing](#contributing)
 * [License](#license)
 
-## Quickstart
+## Using the client library
 
-### Before you begin
-
-1.  Select or create a Cloud Platform project.
-
-    [Go to the projects page][projects]
+1.  [Select or create a Cloud Platform project][projects].
 
 {{#unless suppress_billing}}
-1.  Enable billing for your project.
-
-    [Enable billing][billing]
+1.  [Enable billing for your project][billing].
 
 {{/unless}}
 {{#if api_id}}
-1.  Enable the {{name}} API.
-
-    [Enable the API][enable_api]
+1.  [Enable the {{name}} API][enable_api].
 
 {{/if}}
 1.  [Set up authentication with a service account][auth] so you can access the
     API from your local workstation.
 
-[projects]: https://console.cloud.google.com/project
-{{#unless suppress_billing}}
-[billing]: https://support.google.com/cloud/answer/6293499#enable-billing
-{{/unless}}
-[enable_api]: https://console.cloud.google.com/flows/enableapi?apiid={{api_id}}
-[auth]: https://cloud.google.com/docs/authentication/getting-started
+1. Install the client library:
 
-### Installing the client library
-
-    {{lib_install_cmd}}
+        {{lib_install_cmd}}
 
 {{#if quickstart}}
-### Using the client library
+1. Try an example:
 
 ```{{syntax_highlighting_ext}}
 {{{quickstart}}}
@@ -141,6 +110,21 @@ Apache Version 2.0
 
 See [LICENSE](https://github.com{{repoPath}}/blob/master/LICENSE)
 
+## What's Next
+
+* [{{short_name}} Documentation][product-docs]
+* [{{short_name}} {{display}} Client API Reference][client-docs]
+* [github.com{{repoPath}}](https://github.com{{repoPath}})
+
+Read more about the client libraries for Cloud APIs, including the older
+Google APIs Client Libraries, in [Client Libraries Explained][explained].
+
+[explained]: https://cloud.google.com/apis/docs/client-libraries-explained
+
 [client-docs]: {{client_reference_url}}
 [product-docs]: {{docs_url}}
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
+[projects]: https://console.cloud.google.com/project
+[billing]: https://support.google.com/cloud/answer/6293499#enable-billing
+[enable_api]: https://console.cloud.google.com/flows/enableapi?apiid={{api_id}}
+[auth]: https://cloud.google.com/docs/authentication/getting-started
