@@ -105,6 +105,6 @@
     "eslint-plugin-node": "6.0.1",
     "eslint-plugin-prettier": "2.6.2",
     "prettier": "1.10.2",
-    "semistandard": "12.0.0"
+    "semistandard": "12.0.1"
   }
 }
