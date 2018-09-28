@@ -1,3 +1,8 @@
+##### 2.3.5 - 27 September 2018
+
+###### Backwards compatible changes
+- Updated dependencies
+
 ##### 2.3.3 - 27 July 2018
 
 ###### Backwards compatible changes
