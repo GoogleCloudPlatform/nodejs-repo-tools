@@ -36,7 +36,7 @@ module.exports = {
     includePattern: '\\.js$'
   },
   templates: {
-    copyright: 'Copyright 2017 Google, Inc.',
+    copyright: 'Copyright 2018 Google LLC.',
     includeDate: false,
     sourceFiles: false,
     systemName: '{{lib_pkg_name}}',
