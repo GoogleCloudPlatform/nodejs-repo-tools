@@ -15,19 +15,10 @@
 sudo: false
 language: node_js
 node_js:
-- "6"
-- "7"
 - "8"
-
-cache:
-  # We need yarn installed for the tests to work
-  yarn: true
-  directories:
-  - $HOME/node_modules/
+- "10"
 
 before_install:
-  - npm install -g npm
-  - npm install -g nyc codecov semistandard
   - openssl aes-256-cbc -K $AES_256_KEY -iv $AES_256_IV -in key.json.enc -out key.json -d
 install:
   - npm install
