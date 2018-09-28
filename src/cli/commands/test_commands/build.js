@@ -21,14 +21,14 @@ const childProcess = require('child_process');
 const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
-const string = require('string');
+const slugify = require('@sindresorhus/slugify');
 
 const buildPack = require('../../../build_packs').getBuildPack();
 const options = require('../../options');
 const utils = require('../../../utils');
 
-handlebars.registerHelper('slugify', str => string(str).slugify().s);
-handlebars.registerHelper('trim', str => string(str).trim().s);
+handlebars.registerHelper('slugify', str => slugify(str));
+handlebars.registerHelper('trim', str => str.trim());
 
 const tpl = path.join(__dirname, '../../../../templates/cloudbuild.yaml.tpl');
 

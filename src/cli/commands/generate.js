@@ -22,7 +22,7 @@ const execSync = require('child_process').execSync;
 const fs = require('fs-extra');
 const handlebars = require('handlebars');
 const path = require('path');
-const string = require('string');
+const slugify = require('@sindresorhus/slugify');
 
 const buildPack = require('../../build_packs').getBuildPack();
 const options = require('../options');
@@ -31,8 +31,8 @@ const utils = require('../../utils');
 
 const CLI_CMD = 'generate';
 
-handlebars.registerHelper('slugify', str => string(str).slugify().s);
-handlebars.registerHelper('trim', str => string(str).trim().s);
+handlebars.registerHelper('slugify', str => slugify(str));
+handlebars.registerHelper('trim', str => str.trim());
 handlebars.registerHelper('release_quality', utils.createReleaseQualityBadge);
 handlebars.registerHelper('if_eq', (left, right, opts) => {
   if (left === right) {

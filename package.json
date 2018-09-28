@@ -82,19 +82,19 @@
     "test": "node ./bin/tools test run --cmd npm -- run cover"
   },
   "dependencies": {
+    "@sindresorhus/slugify": "^0.3.0",
     "ava": "0.25.0",
     "colors": "1.1.2",
     "fs-extra": "^6.0.0",
     "got": "^8.3.2",
     "handlebars": "4.0.11",
-    "proxyquire": "^2.0.0",
     "lodash": "^4.17.11",
     "nyc": "11.7.2",
-    "sinon": "6.0.1",
+    "proxyquire": "^2.0.0",
     "semver": "^5.5.0",
-    "string": "3.3.3",
-    "yargs": "^12.0.1",
+    "sinon": "6.0.1",
     "supertest": "^3.2.0",
+    "yargs": "^12.0.1",
     "yargs-parser": "10.1.0"
   },
   "devDependencies": {
