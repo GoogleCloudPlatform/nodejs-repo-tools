@@ -96,6 +96,7 @@ exports.handler = opts => {
   opts.port || (opts.port = buildPack.config.test.app.port);
   opts.msg || (opts.msg = buildPack.config.test.app.msg);
   opts.code || (opts.code = buildPack.config.test.app.code);
+  opts.url || (opts.code = buildPack.config.test.app.url);
 
   // Verify that required env vars are set, if any
   opts.requiredEnvVars =
