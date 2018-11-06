@@ -2,10 +2,10 @@
 
 This Container Builder build step runs the `node` tool.
 
-It also install Yarn, nyc, codecov, and semistandard.
+It also installs Yarn, nyc, codecov, and semistandard.
 
 ## Building this builder
 
 To build this builder, run the following command in this directory.
 
-    $ gcloud container builds submit . --config=cloudbuild.yaml
+    $ gcloud builds submit . --config=cloudbuild.yaml
