@@ -1,3 +1,11 @@
+##### 2.3.6 - 07 November 2018
+
+###### Backwards compatible changes
+- Updated dependencies
+- Use new `gcloud builds` command
+- Switch `semistandard` to being a non-dev dependency
+- Respect URLs specified in build packs
+
 ##### 2.3.5 - 27 September 2018
 
 ###### Backwards compatible changes
