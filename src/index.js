@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-require('colors');
+const colors = require('colors');
 
 const assert = require('assert');
 const childProcess = require('child_process');
@@ -42,10 +42,15 @@ exports.getRequest = config => {
 };
 
 exports.run = (cmd, cwd) => {
-  return childProcess
+  const output = childProcess
     .execSync(cmd, {cwd: cwd, shell: true})
     .toString()
     .trim();
+  try {
+    return colors.strip(output);
+  } catch (err) {
+    return output;
+  }
 };
 
 exports.runAsync = (cmd, cwd) => {
@@ -56,7 +61,12 @@ exports.runAsync = (cmd, cwd) => {
         return;
       }
       if (stdout) {
-        resolve(stdout.toString().trim());
+        const output = stdout.toString().trim();
+        try {
+          resolve(colors.strip(output));
+        } catch (err) {
+          resolve(output);
+        }
       } else {
         resolve(stdout);
       }
@@ -77,7 +87,20 @@ exports.runAsyncWithIO = (cmd, cwd) => {
         reject(result);
         return;
       }
-      resolve(result);
+      try {
+        if (result.stderr) {
+          result.stderr = colors.strip(result.stderr);
+        }
+        if (result.stdout) {
+          result.stdout = colors.strip(result.stdout);
+        }
+        if (result.output) {
+          result.output = colors.strip(result.output);
+        }
+        resolve(result);
+      } catch (err) {
+        resolve(result);
+      }
     });
   });
 };
@@ -103,6 +126,19 @@ exports.spawnAsyncWithIO = (cmd, args, cwd, debug) => {
           output: stdout.trim() + stderr.trim(),
           err: err,
         };
+        try {
+          if (results.stderr) {
+            results.stderr = colors.strip(results.stderr);
+          }
+          if (results.stdout) {
+            results.stdout = colors.strip(results.stdout);
+          }
+          if (results.output) {
+            results.output = colors.strip(results.output);
+          }
+        } catch (err) {
+          // Do nothing
+        }
         if (err) {
           reject(results);
         } else {

@@ -1,3 +1,8 @@
+##### 3.0.0 - 09 November 2018
+
+###### Breaking changes
+- Removed the `lint` command and dependency on `semistandard`
+
 ##### 2.3.6 - 07 November 2018
 
 ###### Backwards compatible changes

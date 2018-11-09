@@ -181,7 +181,7 @@ exports.getRepoPath = (repository, cwd) => {
     }
   }
 
-  const result = url.parse(repository.url).path.replace('.git', '');
+  const result = url.parse(repository.url).path.replace('.git', ''); // eslint-disable-line node/no-deprecated-api
   if (!result.startsWith('/')) {
     return `/${result}`;
   }
