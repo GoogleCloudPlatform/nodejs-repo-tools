@@ -8,8 +8,9 @@ plugins:
   - prettier
 rules:
   prettier/prettier: error
-  block-scoped-var: error
+  block-scoped-var: warn
   eqeqeq: error
   no-warning-comments: warn
-  node/no-unsupported-features: off
-  node/no-missing-require: off
+  no-unsafe-finally: warn
+  node/no-deprecated-api: warn
+
