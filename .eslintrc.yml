@@ -13,4 +13,4 @@ rules:
   no-warning-comments: warn
   no-unsafe-finally: warn
   node/no-deprecated-api: warn
-
+  node/no-missing-require: warn
