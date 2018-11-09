@@ -12,8 +12,6 @@
     "node": ">=4"
   },
   "scripts": {
-    "lint": "../../../../bin/tools lint",
-    "pretest": "npm run lint",
     "test": "../../../../bin/tools test app"
   },
   "dependencies": {

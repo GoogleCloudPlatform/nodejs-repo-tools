@@ -19,6 +19,6 @@ RUN set -ex \
   && mv yarn.js /usr/local/bin/yarn \
   && chmod +x /usr/local/bin/yarn
 
-RUN yarn global add nyc codecov semistandard node-gyp
+RUN yarn global add nyc codecov node-gyp
 
 ENTRYPOINT ["node"]

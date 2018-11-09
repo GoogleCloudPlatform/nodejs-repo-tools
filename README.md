@@ -43,8 +43,6 @@ Usage: `repo-tools --help` or `tools --help`
 Commands:
   exec                  Run a given command in /Users/jdobry/projects/nodejs-repo-tools.
   generate <targets..>  Generate the given target(s) in /Users/jdobry/projects/nodejs-repo-tools.
-  lint                  Lint files by running: semistandard in /Users/jdobry/projects/nodejs-repo-tools.
-  list                  List samples.
   test                  Run a test sub-command.
   unify                 (Node.js only) Recursively add sub-directory dependencies to the top-level package.json file.
 

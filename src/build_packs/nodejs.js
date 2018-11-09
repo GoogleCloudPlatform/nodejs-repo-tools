@@ -51,10 +51,6 @@ const TESTS = `
 
 const nodejsConfig = {
   display: 'Node.js',
-  lint: {
-    cmd: 'semistandard',
-    args: [],
-  },
   test: {
     app: {
       cmd: 'node',

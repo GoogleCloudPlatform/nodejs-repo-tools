@@ -32,17 +32,6 @@
       "./cjs/cli/commands/**/*.js"
     ]
   },
-  "semistandard": {
-    "globals": [
-      "before",
-      "describe",
-      "it"
-    ],
-    "ignore": [
-      "test/samples/nodejs/snippet/lint_error.js",
-      "cjs/**/*.js"
-    ]
-  },
   "nyc": {
     "include": [
       "cjs/**/*.js"
@@ -73,8 +62,8 @@
     "clean": "node ./scripts/clean",
     "build": "npm run clean && babel src --out-dir cjs",
     "generate-scaffolding": "node ./bin/tools generate coc contributors license pkgjson",
-    "lint": "npm run build && node ./bin/tools lint --cmd eslint -- src/ test/",
-    "prettier": "npm run build && node ./bin/tools exec -- prettier --write 'src/{,**/,**/**/,**/**/**/}*.js' 'test/{,**/,**/**/,**/**/**/,**/**/**/**/,**/**/**/**/**/}*.js'",
+    "lint": "npm run build && eslint src/ test/",
+    "fix": "npm run build && eslint --fix '**/*.js'",
     "prepublishOnly": "npm run lint",
     "release": "npm run prepublishOnly && node ./scripts/release",
     "pretest": "npm run prepublishOnly",
@@ -91,7 +80,6 @@
     "lodash": "^4.17.11",
     "nyc": "11.7.2",
     "proxyquire": "^2.0.0",
-    "semistandard": "13.0.0",
     "semver": "^5.5.0",
     "sinon": "6.0.1",
     "supertest": "^3.2.0",

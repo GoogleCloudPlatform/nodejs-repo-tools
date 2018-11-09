@@ -2,7 +2,7 @@
 
 This Container Builder build step runs the `node` tool.
 
-It also installs Yarn, nyc, codecov, and semistandard.
+It also installs Yarn, nyc, and codecov.
 
 ## Building this builder
 

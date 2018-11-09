@@ -12,7 +12,6 @@
     "node": ">=4"
   },
   "scripts": {
-    "lint": "../../../../bin/tools lint",
     "mocha": "mocha --timeout 20000 test/*.test.js",
     "test": "../../../../bin/tools test run --cmd npm -- run mocha"
   },
@@ -21,16 +20,6 @@
   },
   "devDependencies": {
     "mocha": "3.5.3"
-  },
-  "semistandard": {
-    "globals": [
-      "before",
-      "describe",
-      "it"
-    ],
-    "ignore": [
-      "lint_error.js"
-    ]
   },
   "cloud-repo-tools": {
     "requiresKeyFile": true,

@@ -40,10 +40,6 @@ const TESTS = `
 
 const pythonConfig = {
   display: 'Python',
-  lint: {
-    cmd: 'nox',
-    args: ['lint'],
-  },
   test: {
     app: {
       cmd: 'python',

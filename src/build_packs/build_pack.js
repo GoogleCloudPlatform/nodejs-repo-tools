@@ -31,10 +31,6 @@ const globalOpts = {
     config: '.cloud-repo-tools.json',
     configKey: null,
   },
-  lint: {
-    cmd: 'lint',
-    args: [],
-  },
   test: {
     app: {},
     build: {

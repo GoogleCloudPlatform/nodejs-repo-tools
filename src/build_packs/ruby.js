@@ -38,10 +38,6 @@ module.exports = {
   display: 'Ruby',
   detect: cwd => fs.statSync(path.join(cwd, 'Gemfile')).isFile(),
   load: filename => require(filename),
-  lint: {
-    cmd: 'semistandard',
-    args: [],
-  },
   test: {
     app: {
       cmd: 'bundle',
