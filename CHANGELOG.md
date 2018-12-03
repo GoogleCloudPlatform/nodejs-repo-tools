@@ -1,3 +1,9 @@
+##### 3.1.0 - 03 December 2018
+
+- fix: fix: update badges on default readme (#175)
+- fix: update eslint and jsdoc templates (#174)
+- fix: remove contributors code (#173)
+
 ##### 3.0.0 - 09 November 2018
 
 ###### Breaking changes
