@@ -5,8 +5,7 @@
 # [{{name}}: {{display}} Client](https://github.com{{repoPath}})
 
 {{release_quality release_quality}}
-[![CircleCI](https://img.shields.io/circleci/project/github{{repoPath}}.svg?style=flat)](https://circleci.com/gh{{repoPath}})
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/github{{repoPath}}?branch=master&svg=true)](https://ci.appveyor.com/project{{repoPath}})
+[![npm version](https://img.shields.io/npm/v/{{lib_pkg_name}}.svg)](https://www.npmjs.org/package/{{lib_pkg_name}})
 [![codecov](https://img.shields.io/codecov/c/github{{repoPath}}/master.svg?style=flat)](https://codecov.io/gh{{repoPath}})
 
 {{description}}
