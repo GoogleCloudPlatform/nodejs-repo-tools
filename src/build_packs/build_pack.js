@@ -16,12 +16,8 @@
 'use strict';
 
 const _ = require('lodash');
-const {execSync} = require('child_process');
 const path = require('path');
-
 const utils = require('../utils');
-
-const TTY = process.platform === 'win32' ? 'CON' : '/dev/tty';
 
 const globalOpts = {
   global: {
@@ -58,26 +54,6 @@ const globalOpts = {
     contributing: {
       description: 'Generate a .github/CONTRIBUTING.md file.',
       filename: '.github/CONTRIBUTING.md',
-    },
-    contributors: {
-      description: 'Generate a CONTRIBUTORS file.',
-      filename: 'CONTRIBUTORS',
-      addData(data, opts) {
-        try {
-          const output = execSync(`git shortlog -e -s < ${TTY}`, {
-            shell: true,
-            cwd: opts.localPath,
-            encoding: 'utf8',
-          });
-          data.contributors = output
-            .split('\n')
-            .filter(x => x)
-            .map(line => line.substring(line.indexOf('\t') + 1));
-        } catch (err) {
-          utils.logger.error('generate', 'Failed to load contibutors!');
-          throw err;
-        }
-      },
     },
     issue_template: {
       description: 'Generate a .github/ISSUE_TEMPLATE.md file.',

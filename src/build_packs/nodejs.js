@@ -114,7 +114,7 @@ const nodejsConfig = {
     pkgjson: {
       description: 'Generate and/or update a package.json file.',
       filename: 'package.json',
-      addData(data, opts) {
+      addData(data) {
         const json = {};
         const origKeys = Object.keys(data.pkgjson);
         json.name = data.libPkgName || data.pkgjson.name || 'TODO';
@@ -137,7 +137,6 @@ const nodejsConfig = {
         json.main = data.pkgjson.main || 'src/index.js';
         _.pull(origKeys, 'main');
 
-        _.pull(origKeys, 'contributors');
         _.pull(origKeys, 'scripts');
         const depRe = /dependencies/i;
         const depKeys = origKeys.filter(x => depRe.test(x));
@@ -148,9 +147,6 @@ const nodejsConfig = {
           json[key] = data.pkgjson[key];
         }
 
-        // Put contributors, scripts, and (dev)dependencies at the bottom
-        data.generate.contributors.addData(data, opts);
-        json.contributors = data.contributors;
         json.scripts = data.pkgjson.scripts || {};
         depKeys.sort();
         for (const key of depKeys) {
