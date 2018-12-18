@@ -60,7 +60,7 @@ const products = [
     `Cloud Asset`,
     `${BASE}/resource-manager/docs/cloud-asset-inventory/overview`,
     `[Cloud Asset Inventory]({{docs_url}}) is a storage service that keeps a five week history of Google Cloud Platform (GCP) asset metadata. It allows you to export all asset metadata at a certain timestamp or timeframe.`,
-    `cloudasset.googleapis.com`,
+    `cloudasset.googleapis.com`
   ),
   new Product(
     `automl`,
@@ -323,14 +323,14 @@ const products = [
     'Google Cloud Scheduler',
     'Cloud Scheduler',
     `${BASE}/scheduler/docs/`,
-    `[Cloud Scheduler]({{docs_url}}) is a fully managed enterprise-grade cron job scheduler. It allows you to schedule virtually any job, including batch, big data jobs, cloud infrastructure operations, and more. You can automate everything, including retries in case of failure to reduce manual toil and intervention. Cloud Scheduler even acts as a single pane of glass, allowing you to manage all your automation tasks from one place.`,
+    `[Cloud Scheduler]({{docs_url}}) is a fully managed enterprise-grade cron job scheduler. It allows you to schedule virtually any job, including batch, big data jobs, cloud infrastructure operations, and more. You can automate everything, including retries in case of failure to reduce manual toil and intervention. Cloud Scheduler even acts as a single pane of glass, allowing you to manage all your automation tasks from one place.`
   ),
   new Product(
     'security-center',
     'Google Cloud Security Command Center',
     'Cloud Security Command Center',
     `${BASE}/security-center/docs/`,
-    '[Cloud Security Command Center]({{docs_url}}) helps security teams gather data, identify threats, and act on them before they result in business damage or loss. It offers deep insight into application and data risk so that you can quickly mitigate threats to your cloud resources and evaluate overall health. With Cloud Security Command Center, you can view and monitor an inventory of your cloud assets, scan storage systems for sensitive data, detect common web vulnerabilities, and review access rights to your critical resources, all from a single, centralized dashboard.',
+    '[Cloud Security Command Center]({{docs_url}}) helps security teams gather data, identify threats, and act on them before they result in business damage or loss. It offers deep insight into application and data risk so that you can quickly mitigate threats to your cloud resources and evaluate overall health. With Cloud Security Command Center, you can view and monitor an inventory of your cloud assets, scan storage systems for sensitive data, detect common web vulnerabilities, and review access rights to your critical resources, all from a single, centralized dashboard.'
   ),
   new Product(
     `spanner`,
