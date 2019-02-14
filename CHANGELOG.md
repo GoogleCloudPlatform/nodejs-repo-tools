@@ -1,3 +1,7 @@
+##### 3.2.0 - 14 February 2019
+
+- Update dependencies
+
 ##### 3.1.0 - 03 December 2018
 
 - fix: fix: update badges on default readme (#175)
