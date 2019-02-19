@@ -239,6 +239,14 @@ const products = [
     `iam.googleapis.com`
   ),
   new Product(
+    `irm`,
+    `Stackdriver Incident Response & Management`,
+    `Stackdriver IRM`,
+    `${BASE}/incident-response/docs/`,
+    `[Stackdriver Incident Response & Management (IRM)]({{docs_url}}) is used for managing and responding to incidents. It replaces the existing Stackdriver Monitoring Incidents dashboard with information and tools to help reduce your mean time to incident mitigation.`,
+    `irm.googleapis.com`
+  ),
+  new Product(
     `functions`,
     `Google Cloud Functions`,
     `Cloud Functions`,
