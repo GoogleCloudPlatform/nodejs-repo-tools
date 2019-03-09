@@ -73,7 +73,7 @@
     "proxyquire": "^2.1.0",
     "semver": "^5.6.0",
     "sinon": "^7.2.3",
-    "supertest": "^3.4.2",
+    "supertest": "^4.0.0",
     "yargs": "^13.1.0",
     "yargs-parser": "^13.0.0"
   },
