@@ -62,7 +62,7 @@
     "test": "node ./bin/tools test run --cmd npm -- run cover"
   },
   "dependencies": {
-    "@sindresorhus/slugify": "^0.8.0",
+    "@sindresorhus/slugify": "^0.9.0",
     "ava": "^1.2.1",
     "colors": "^1.3.3",
     "fs-extra": "^7.0.1",
