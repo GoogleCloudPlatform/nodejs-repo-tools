@@ -399,3 +399,9 @@ exports.deleteVersion = config => {
     }
   });
 };
+
+exports.checkEnvVar = envVarName => {
+  if (!process.env[envVarName]) {
+    throw new Error(`Test failed: must set environment variable ${envVarName}`);
+  }
+};
