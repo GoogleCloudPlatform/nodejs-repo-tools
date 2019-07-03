@@ -59,7 +59,9 @@
     "release": "npm run prepublishOnly && node ./scripts/release",
     "pretest": "npm run prepublishOnly",
     "cover": "nyc --cache ava -v -T 1m -s && nyc report",
-    "test": "node ./bin/tools test run --cmd npm -- run cover"
+    "test": "node ./bin/tools test run --cmd npm -- run cover",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "@sindresorhus/slugify": "^0.9.0",
@@ -75,7 +77,8 @@
     "sinon": "^7.2.3",
     "supertest": "^4.0.0",
     "yargs": "^13.1.0",
-    "yargs-parser": "^13.0.0"
+    "yargs-parser": "^13.0.0",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
@@ -86,5 +89,6 @@
     "eslint-plugin-node": "9.0.0",
     "eslint-plugin-prettier": "^3.0.1",
     "prettier": "^1.16.4"
-  }
+  },
+  "snyk": true
 }
