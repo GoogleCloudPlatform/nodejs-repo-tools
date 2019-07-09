@@ -8,7 +8,7 @@ RUN apt-get update -y && \
     rm /var/lib/apt/lists/*_*
 
 # Install the latest LTS release of nodejs
-RUN mkdir /nodejs && curl https://nodejs.org/dist/v8.12.0/node-v8.12.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl https://nodejs.org/dist/v8.16.0/node-v8.16.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH $PATH:/nodejs/bin
 
 # Install the Repo Tools binary
