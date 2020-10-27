@@ -1,3 +1,7 @@
+![status: inactive](https://img.shields.io/badge/status-inactive-red.svg)
+
+This project is no longer actively developed or maintained.
+
 # nodejs-repo-tools [![build status][travis_badge]][travis_link] [![coverage][coverage_badge]][coverage_link] [![Greenkeeper badge][greenkeeper_badge]][greenkeeper_link]
 
 A tool used to maintain and test repositories in the GoogleCloudPlatform
